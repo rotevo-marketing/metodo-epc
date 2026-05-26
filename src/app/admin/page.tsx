@@ -12,6 +12,17 @@ type ClientRecord = {
   slug: string;
 };
 
+type ProjectData = {
+  coverImageUrl?: string | null;
+  selectedModules?: string[];
+  modules?: {
+    title: string;
+    slug: string;
+    category: string;
+    description: string;
+  }[];
+};
+
 type PlanningProject = {
   id: string;
   title: string;
@@ -20,6 +31,7 @@ type PlanningProject = {
   status: "draft" | "in_progress" | "published" | "archived";
   created_at: string;
   updated_at: string;
+  data: ProjectData | null;
   clients: ClientRecord | ClientRecord[] | null;
 };
 
@@ -63,7 +75,9 @@ export default function AdminPage() {
 
   const [projects, setProjects] = useState<PlanningProject[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDeletingId, setIsDeletingId] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const totalProjects = projects.length;
 
@@ -76,69 +90,106 @@ export default function AdminPage() {
   }, [projects]);
 
   useEffect(() => {
-    async function loadAdminData() {
-      setIsLoading(true);
-      setErrorMessage("");
+    loadAdminData();
+  }, []);
 
-      const { data: userData, error: userError } = await supabase.auth.getUser();
+  async function loadAdminData() {
+    setIsLoading(true);
+    setErrorMessage("");
+    setSuccessMessage("");
 
-      if (userError || !userData.user) {
-        window.localStorage.removeItem("metodo-epc-strategist-auth");
-        router.push("/estrategista/login");
-        return;
-      }
+    const { data: userData, error: userError } = await supabase.auth.getUser();
 
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", userData.user.id)
-        .single();
-
-      if (profileError || profile?.role !== "strategist") {
-        await supabase.auth.signOut();
-        window.localStorage.removeItem("metodo-epc-strategist-auth");
-        router.push("/estrategista/login");
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from("planning_projects")
-        .select(
-          `
-          id,
-          title,
-          slug,
-          description,
-          status,
-          created_at,
-          updated_at,
-          clients (
-            id,
-            name,
-            slug
-          )
-        `
-        )
-        .order("updated_at", { ascending: false });
-
-      if (error) {
-        setErrorMessage("Não foi possível carregar os planejamentos.");
-        setIsLoading(false);
-        return;
-      }
-
-      setProjects((data ?? []) as unknown as PlanningProject[]);
-      setIsLoading(false);
+    if (userError || !userData.user) {
+      window.localStorage.removeItem("metodo-epc-strategist-auth");
+      router.push("/estrategista/login");
+      return;
     }
 
-    loadAdminData();
-  }, [router]);
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", userData.user.id)
+      .single();
+
+    if (profileError || profile?.role !== "strategist") {
+      await supabase.auth.signOut();
+      window.localStorage.removeItem("metodo-epc-strategist-auth");
+      router.push("/estrategista/login");
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from("planning_projects")
+      .select(
+        `
+        id,
+        title,
+        slug,
+        description,
+        status,
+        created_at,
+        updated_at,
+        data,
+        clients (
+          id,
+          name,
+          slug
+        )
+      `
+      )
+      .order("updated_at", { ascending: false });
+
+    if (error) {
+      setErrorMessage("Não foi possível carregar os planejamentos.");
+      setIsLoading(false);
+      return;
+    }
+
+    setProjects((data ?? []) as unknown as PlanningProject[]);
+    setIsLoading(false);
+  }
 
   async function handleLogout() {
     await supabase.auth.signOut();
     window.localStorage.removeItem("metodo-epc-strategist-auth");
     window.localStorage.removeItem("metodo-epc-strategist-remember");
     router.push("/estrategista/login");
+  }
+
+  async function handleDeleteProject(project: PlanningProject) {
+    const client = getProjectClient(project);
+    const clientName = client?.name ?? "este cliente";
+
+    const confirmed = window.confirm(
+      `Tem certeza que deseja excluir o planejamento de ${clientName}? Essa ação não pode ser desfeita.`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setIsDeletingId(project.id);
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    const { error } = await supabase
+      .from("planning_projects")
+      .delete()
+      .eq("id", project.id);
+
+    if (error) {
+      setErrorMessage(error.message || "Não foi possível excluir o planejamento.");
+      setIsDeletingId("");
+      return;
+    }
+
+    setProjects((currentProjects) =>
+      currentProjects.filter((currentProject) => currentProject.id !== project.id)
+    );
+
+    setSuccessMessage("Planejamento excluído com sucesso.");
+    setIsDeletingId("");
   }
 
   return (
@@ -211,13 +262,19 @@ export default function AdminPage() {
           </div>
 
           <p className="text-sm text-slate-500">
-            Clique em um planejamento para editar os módulos.
+            Clique em um planejamento para configurar os módulos.
           </p>
         </div>
 
         {errorMessage ? (
           <div className="mt-6 rounded-2xl bg-red-50 px-5 py-4 text-sm font-medium text-red-700">
             {errorMessage}
+          </div>
+        ) : null}
+
+        {successMessage ? (
+          <div className="mt-6 rounded-2xl bg-emerald-50 px-5 py-4 text-sm font-medium text-emerald-700">
+            {successMessage}
           </div>
         ) : null}
 
@@ -250,6 +307,8 @@ export default function AdminPage() {
               const client = getProjectClient(project);
               const clientName = client?.name ?? "Cliente sem nome";
               const clientSlug = client?.slug ?? "demo";
+              const coverImageUrl = project.data?.coverImageUrl ?? "";
+              const isDeleting = isDeletingId === project.id;
 
               return (
                 <article
@@ -257,37 +316,53 @@ export default function AdminPage() {
                   className="rounded-[1.5rem] bg-white p-6 shadow-sm ring-1 ring-slate-200"
                 >
                   <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-                    <div>
-                      <div className="flex flex-wrap items-center gap-3">
-                        <h3 className="text-2xl font-bold tracking-[-0.03em]">
-                          {clientName}
-                        </h3>
-
-                        <span
-                          className={`rounded-full px-3 py-1 text-xs font-bold ${getStatusClass(
-                            project.status
-                          )}`}
-                        >
-                          {getStatusLabel(project.status)}
-                        </span>
+                    <div className="flex items-start gap-4">
+                      <div className="h-16 w-16 shrink-0 overflow-hidden rounded-full bg-slate-100 ring-1 ring-slate-200">
+                        {coverImageUrl ? (
+                          <img
+                            src={coverImageUrl}
+                            alt={clientName}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center text-xl font-bold text-slate-500">
+                            {clientName.charAt(0).toUpperCase()}
+                          </div>
+                        )}
                       </div>
 
-                      <p className="mt-3 text-base text-slate-600">
-                        {project.title}
-                      </p>
+                      <div>
+                        <div className="flex flex-wrap items-center gap-3">
+                          <h3 className="text-2xl font-bold tracking-[-0.03em]">
+                            {clientName}
+                          </h3>
 
-                      {project.description ? (
-                        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-                          {project.description}
+                          <span
+                            className={`rounded-full px-3 py-1 text-xs font-bold ${getStatusClass(
+                              project.status
+                            )}`}
+                          >
+                            {getStatusLabel(project.status)}
+                          </span>
+                        </div>
+
+                        <p className="mt-3 text-base text-slate-600">
+                          {project.title}
                         </p>
-                      ) : null}
 
-                      <p className="mt-4 text-sm text-slate-400">
-                        Atualizado em {formatDate(project.updated_at)}
-                      </p>
+                        {project.description ? (
+                          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+                            {project.description}
+                          </p>
+                        ) : null}
+
+                        <p className="mt-4 text-sm text-slate-400">
+                          Atualizado em {formatDate(project.updated_at)}
+                        </p>
+                      </div>
                     </div>
 
-                    <div className="flex flex-col gap-3 sm:flex-row">
+                    <div className="flex flex-col gap-3 sm:flex-row lg:shrink-0">
                       <Link
                         href={`/admin/planejamentos/${clientSlug}`}
                         className="inline-flex items-center justify-center rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
@@ -301,6 +376,15 @@ export default function AdminPage() {
                       >
                         Ver apresentação
                       </Link>
+
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteProject(project)}
+                        disabled={isDeleting}
+                        className="inline-flex items-center justify-center rounded-full bg-red-50 px-7 py-3 text-sm font-semibold text-red-700 ring-1 ring-red-100 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {isDeleting ? "Excluindo..." : "Excluir"}
+                      </button>
                     </div>
                   </div>
                 </article>
