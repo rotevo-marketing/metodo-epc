@@ -22,6 +22,7 @@ type ProjectData = {
     category: string;
     description: string;
   }[];
+  moduleContent?: Record<string, unknown>;
 };
 
 type PlanningProject = {
@@ -515,7 +516,7 @@ export default function PlanejamentoClientePage() {
                             <div className="mt-5 flex justify-end">
                               {isSelected ? (
                                 <Link
-                                  href={`/admin/planejamentos/demo/modulos/${module.slug}`}
+                                  href={`/admin/planejamentos/${clientSlug}/modulos/${module.slug}`}
                                   className="inline-flex rounded-full bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800"
                                 >
                                   Preencher módulo
