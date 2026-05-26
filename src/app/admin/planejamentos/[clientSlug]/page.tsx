@@ -71,6 +71,12 @@ function getStatusClass(status: PlanningProject["status"]) {
   return "bg-slate-100 text-slate-600";
 }
 
+function getDefaultSelectedModules() {
+  return planningModules
+    .filter((module) => module.presentation)
+    .map((module) => module.slug);
+}
+
 export default function PlanejamentoClientePage() {
   const router = useRouter();
   const params = useParams();
@@ -79,20 +85,13 @@ export default function PlanejamentoClientePage() {
     typeof params.clientSlug === "string" ? params.clientSlug : "";
 
   const [project, setProject] = useState<PlanningProject | null>(null);
+  const [selectedModuleSlugs, setSelectedModuleSlugs] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const client = project ? getProjectClient(project) : null;
-
-  const selectedModuleSlugs = useMemo(() => {
-    if (!project?.data?.selectedModules?.length) {
-      return planningModules
-        .filter((module) => module.presentation)
-        .map((module) => module.slug);
-    }
-
-    return project.data.selectedModules;
-  }, [project]);
 
   const selectedModules = useMemo(() => {
     return planningModules.filter(
@@ -107,6 +106,7 @@ export default function PlanejamentoClientePage() {
     async function loadProject() {
       setIsLoading(true);
       setErrorMessage("");
+      setSuccessMessage("");
 
       const { data: userData, error: userError } = await supabase.auth.getUser();
 
@@ -153,7 +153,9 @@ export default function PlanejamentoClientePage() {
         .limit(1);
 
       if (error) {
-        setErrorMessage(error.message || "Não foi possível carregar este planejamento.");
+        setErrorMessage(
+          error.message || "Não foi possível carregar este planejamento."
+        );
         setIsLoading(false);
         return;
       }
@@ -167,6 +169,15 @@ export default function PlanejamentoClientePage() {
       }
 
       setProject(foundProject);
+
+      const storedSelectedModules = foundProject.data?.selectedModules;
+
+      if (storedSelectedModules?.length) {
+        setSelectedModuleSlugs(storedSelectedModules);
+      } else {
+        setSelectedModuleSlugs(getDefaultSelectedModules());
+      }
+
       setIsLoading(false);
     }
 
@@ -174,6 +185,83 @@ export default function PlanejamentoClientePage() {
       loadProject();
     }
   }, [clientSlug, router]);
+
+  function toggleModule(moduleSlug: string) {
+    setSuccessMessage("");
+
+    setSelectedModuleSlugs((currentModules) => {
+      if (currentModules.includes(moduleSlug)) {
+        return currentModules.filter((slug) => slug !== moduleSlug);
+      }
+
+      return [...currentModules, moduleSlug];
+    });
+  }
+
+  function selectAllModules() {
+    setSuccessMessage("");
+    setSelectedModuleSlugs(getDefaultSelectedModules());
+  }
+
+  function clearModules() {
+    setSuccessMessage("");
+    setSelectedModuleSlugs([]);
+  }
+
+  async function saveModuleSelection() {
+    if (!project) {
+      return;
+    }
+
+    if (selectedModuleSlugs.length === 0) {
+      setErrorMessage("Selecione pelo menos um módulo para este planejamento.");
+      return;
+    }
+
+    setIsSaving(true);
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    const selectedModuleRecords = planningModules
+      .filter((module) => selectedModuleSlugs.includes(module.slug))
+      .map((module) => ({
+        title: module.title,
+        slug: module.slug,
+        category: module.category,
+        description: module.description,
+      }));
+
+    const nextData: ProjectData = {
+      ...(project.data ?? {}),
+      selectedModules: selectedModuleSlugs,
+      modules: selectedModuleRecords,
+    };
+
+    const { error } = await supabase
+      .from("planning_projects")
+      .update({
+        data: nextData,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", project.id);
+
+    if (error) {
+      setErrorMessage(
+        error.message || "Não foi possível salvar a seleção de módulos."
+      );
+      setIsSaving(false);
+      return;
+    }
+
+    setProject({
+      ...project,
+      data: nextData,
+      updated_at: new Date().toISOString(),
+    });
+
+    setSuccessMessage("Seleção de módulos salva com sucesso.");
+    setIsSaving(false);
+  }
 
   return (
     <main className="min-h-screen bg-slate-100 text-slate-950">
@@ -206,7 +294,7 @@ export default function PlanejamentoClientePage() {
           </div>
         ) : null}
 
-        {errorMessage ? (
+        {errorMessage && !project ? (
           <div className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-10">
             <p className="text-sm font-bold uppercase tracking-[0.18em] text-red-500">
               Atenção
@@ -231,7 +319,7 @@ export default function PlanejamentoClientePage() {
               <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
                 <div>
                   <p className="text-sm font-bold uppercase tracking-[0.18em] text-slate-500">
-                    Planejamento estratégico
+                    Configuração do planejamento
                   </p>
 
                   <div className="mt-5 flex items-center gap-4">
@@ -301,26 +389,67 @@ export default function PlanejamentoClientePage() {
               </div>
             </div>
 
-            <div className="mt-10 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-              <div>
-                <p className="text-sm font-bold uppercase tracking-[0.18em] text-slate-500">
-                  Módulos
-                </p>
+            <div className="sticky top-0 z-10 mt-8 rounded-3xl bg-white/95 p-5 shadow-sm ring-1 ring-slate-200 backdrop-blur">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                  <p className="text-sm font-bold uppercase tracking-[0.18em] text-slate-500">
+                    Seleção de módulos
+                  </p>
 
-                <h2 className="mt-2 text-3xl font-bold tracking-[-0.04em]">
-                  Áreas deste planejamento
-                </h2>
+                  <h2 className="mt-1 text-2xl font-bold tracking-[-0.03em]">
+                    Escolha o que entra neste planejamento
+                  </h2>
+
+                  <p className="mt-2 text-sm text-slate-500">
+                    Apenas os módulos selecionados devem ser preenchidos e aparecer no planejamento final.
+                  </p>
+                </div>
+
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <button
+                    type="button"
+                    onClick={selectAllModules}
+                    className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-slate-50"
+                  >
+                    Selecionar todos
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={clearModules}
+                    className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-slate-50"
+                  >
+                    Limpar
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={saveModuleSelection}
+                    disabled={isSaving}
+                    className="rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {isSaving ? "Salvando..." : "Salvar seleção"}
+                  </button>
+                </div>
               </div>
 
-              <p className="text-sm text-slate-500">
-                Clique em um módulo para editar o conteúdo estratégico.
-              </p>
+              {errorMessage ? (
+                <div className="mt-4 rounded-2xl bg-red-50 px-5 py-4 text-sm font-medium text-red-700">
+                  {errorMessage}
+                </div>
+              ) : null}
+
+              {successMessage ? (
+                <div className="mt-4 rounded-2xl bg-emerald-50 px-5 py-4 text-sm font-medium text-emerald-700">
+                  {successMessage}
+                </div>
+              ) : null}
             </div>
 
-            <div className="mt-6 space-y-10">
+            <div className="mt-8 space-y-10">
               {moduleCategories.map((category) => {
-                const categoryModules = selectedModules.filter(
-                  (module) => module.category === category
+                const categoryModules = planningModules.filter(
+                  (module) => module.category === category && module.presentation
                 );
 
                 if (categoryModules.length === 0) {
@@ -334,25 +463,76 @@ export default function PlanejamentoClientePage() {
                     </h3>
 
                     <div className="mt-4 grid gap-4 md:grid-cols-2">
-                      {categoryModules.map((module) => (
-                        <Link
-                          key={module.slug}
-                          href={`/admin/planejamentos/demo/modulos/${module.slug}`}
-                          className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow-md"
-                        >
-                          <p className="text-sm font-semibold text-slate-400">
-                            Módulo
-                          </p>
+                      {categoryModules.map((module) => {
+                        const isSelected = selectedModuleSlugs.includes(
+                          module.slug
+                        );
 
-                          <h4 className="mt-2 text-xl font-bold">
-                            {module.title}
-                          </h4>
+                        return (
+                          <div
+                            key={module.slug}
+                            className={`rounded-3xl bg-white p-6 shadow-sm ring-1 transition ${
+                              isSelected
+                                ? "ring-slate-950"
+                                : "opacity-60 ring-slate-200"
+                            }`}
+                          >
+                            <label className="flex cursor-pointer items-start gap-4">
+                              <input
+                                type="checkbox"
+                                checked={isSelected}
+                                onChange={() => toggleModule(module.slug)}
+                                className="mt-1 h-5 w-5 rounded border-slate-300"
+                              />
 
-                          <p className="mt-3 text-sm leading-6 text-slate-600">
-                            {module.description}
-                          </p>
-                        </Link>
-                      ))}
+                              <div className="flex-1">
+                                <div className="flex flex-wrap items-center gap-3">
+                                  <p className="text-sm font-semibold text-slate-400">
+                                    Módulo
+                                  </p>
+
+                                  {isSelected ? (
+                                    <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700">
+                                      Selecionado
+                                    </span>
+                                  ) : (
+                                    <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">
+                                      Fora do planejamento
+                                    </span>
+                                  )}
+                                </div>
+
+                                <h4 className="mt-2 text-xl font-bold">
+                                  {module.title}
+                                </h4>
+
+                                <p className="mt-3 text-sm leading-6 text-slate-600">
+                                  {module.description}
+                                </p>
+                              </div>
+                            </label>
+
+                            <div className="mt-5 flex justify-end">
+                              {isSelected ? (
+                                <Link
+                                  href={`/admin/planejamentos/demo/modulos/${module.slug}`}
+                                  className="inline-flex rounded-full bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800"
+                                >
+                                  Preencher módulo
+                                </Link>
+                              ) : (
+                                <button
+                                  type="button"
+                                  disabled
+                                  className="inline-flex cursor-not-allowed rounded-full bg-slate-100 px-5 py-2.5 text-sm font-semibold text-slate-400"
+                                >
+                                  Selecione para preencher
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </section>
                 );
