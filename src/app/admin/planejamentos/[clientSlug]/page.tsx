@@ -11,9 +11,6 @@ type ClientRecord = {
   id: string;
   name: string;
   slug: string;
-  data?: {
-    coverImageUrl?: string | null;
-  } | null;
 };
 
 type ProjectData = {
@@ -104,8 +101,7 @@ export default function PlanejamentoClientePage() {
     );
   }, [selectedModuleSlugs]);
 
-  const coverImageUrl =
-    project?.data?.coverImageUrl || client?.data?.coverImageUrl || "";
+  const coverImageUrl = project?.data?.coverImageUrl || "";
 
   useEffect(() => {
     async function loadProject() {
@@ -148,8 +144,7 @@ export default function PlanejamentoClientePage() {
           clients!inner (
             id,
             name,
-            slug,
-            data
+            slug
           )
         `
         )
