@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { moduleCategories, planningModules } from "@/data/modules";
-import ResumoEstrategico from "@/components/apresentacao/ResumoEstrategico";
+import ResumoEstrategico from "@/Components/apresentacao/ResumoEstrategico";
 import { MetodoFooter, MetodoLogo } from "@/Components/MetodoBrand";
 
 type Section = {

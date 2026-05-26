@@ -44,7 +44,7 @@ export default function SelecionarModulosPage() {
               <div className="grid gap-4 md:grid-cols-2">
                 {planningModules
                   .filter((module) => module.category === category)
-                  .map((module) => (
+                  .map((module, index) => (
                     <label
                       key={module.slug}
                       className="block cursor-pointer rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow-md"
@@ -59,7 +59,7 @@ export default function SelecionarModulosPage() {
                         <div className="flex-1">
                           <div className="flex flex-wrap items-center gap-3">
                             <p className="text-sm font-semibold text-slate-400">
-                              Módulo {module.id}
+                              Módulo {index + 1}
                             </p>
 
                             <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
