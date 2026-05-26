@@ -6,6 +6,12 @@ import { useRouter } from "next/navigation";
 import { MetodoFooter, MetodoLogo } from "@/Components/MetodoBrand";
 import { supabase } from "@/lib/supabase";
 
+type ClientRecord = {
+  id: string;
+  name: string;
+  slug: string;
+};
+
 type PlanningProject = {
   id: string;
   title: string;
@@ -14,13 +20,7 @@ type PlanningProject = {
   status: "draft" | "in_progress" | "published" | "archived";
   created_at: string;
   updated_at: string;
-  clients:
-    | {
-        id: string;
-        name: string;
-        slug: string;
-      }[]
-    | null;
+  clients: ClientRecord | ClientRecord[] | null;
 };
 
 function formatDate(date: string) {
@@ -48,6 +48,14 @@ function getStatusClass(status: PlanningProject["status"]) {
   }
 
   return "bg-slate-100 text-slate-600";
+}
+
+function getProjectClient(project: PlanningProject) {
+  if (Array.isArray(project.clients)) {
+    return project.clients[0] ?? null;
+  }
+
+  return project.clients ?? null;
 }
 
 export default function AdminPage() {
@@ -239,7 +247,7 @@ export default function AdminPage() {
         {!isLoading && projects.length > 0 ? (
           <div className="mt-6 space-y-4">
             {projects.map((project) => {
-              const client = project.clients?.[0] ?? null;
+              const client = getProjectClient(project);
               const clientName = client?.name ?? "Cliente sem nome";
               const clientSlug = client?.slug ?? "demo";
 
