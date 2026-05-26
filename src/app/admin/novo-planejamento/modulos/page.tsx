@@ -1,113 +1,453 @@
+"use client";
+
+import { FormEvent, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { moduleCategories, planningModules } from "@/data/modules";
+import { MetodoFooter, MetodoLogo } from "@/Components/MetodoBrand";
+import { supabase } from "@/lib/supabase";
+
+type NewPlanningDraft = {
+  clientName: string;
+  clientSlug: string;
+  projectTitle: string;
+  projectSlug: string;
+  description: string;
+  coverImageUrl: string;
+};
+
+function getStoredDraft(): NewPlanningDraft | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  const storedDraft = window.localStorage.getItem(
+    "metodo-epc-new-planning-draft"
+  );
+
+  if (!storedDraft) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(storedDraft) as NewPlanningDraft;
+  } catch {
+    return null;
+  }
+}
 
 export default function SelecionarModulosPage() {
+  const router = useRouter();
+
+  const [draft, setDraft] = useState<NewPlanningDraft | null>(null);
+  const [selectedModules, setSelectedModules] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const selectedCount = selectedModules.length;
+
+  const finalProjectSlug = useMemo(() => {
+    if (!draft) {
+      return "";
+    }
+
+    if (draft.projectSlug.startsWith(draft.clientSlug)) {
+      return draft.projectSlug;
+    }
+
+    return `${draft.clientSlug}-${draft.projectSlug}`;
+  }, [draft]);
+
+  useEffect(() => {
+    async function validateAndLoadDraft() {
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+
+      if (userError || !userData.user) {
+        window.localStorage.removeItem("metodo-epc-strategist-auth");
+        router.push("/estrategista/login");
+        return;
+      }
+
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", userData.user.id)
+        .single();
+
+      if (profileError || profile?.role !== "strategist") {
+        await supabase.auth.signOut();
+        window.localStorage.removeItem("metodo-epc-strategist-auth");
+        router.push("/estrategista/login");
+        return;
+      }
+
+      const storedDraft = getStoredDraft();
+
+      if (!storedDraft) {
+        router.push("/admin/novo-planejamento");
+        return;
+      }
+
+      setDraft(storedDraft);
+
+      const defaultSelectedModules = planningModules
+        .filter((module) => module.presentation)
+        .map((module) => module.slug);
+
+      setSelectedModules(defaultSelectedModules);
+      setIsLoading(false);
+    }
+
+    validateAndLoadDraft();
+  }, [router]);
+
+  function toggleModule(moduleSlug: string) {
+    setSelectedModules((currentModules) => {
+      if (currentModules.includes(moduleSlug)) {
+        return currentModules.filter((slug) => slug !== moduleSlug);
+      }
+
+      return [...currentModules, moduleSlug];
+    });
+  }
+
+  function selectAllModules() {
+    setSelectedModules(
+      planningModules
+        .filter((module) => module.presentation)
+        .map((module) => module.slug)
+    );
+  }
+
+  function clearModules() {
+    setSelectedModules([]);
+  }
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (!draft) {
+      setErrorMessage("Os dados iniciais do planejamento não foram encontrados.");
+      return;
+    }
+
+    if (selectedModules.length === 0) {
+      setErrorMessage("Selecione pelo menos um módulo para o planejamento.");
+      return;
+    }
+
+    setIsSaving(true);
+    setErrorMessage("");
+
+    const { data: client, error: clientError } = await supabase
+      .from("clients")
+      .upsert(
+        {
+          name: draft.clientName,
+          slug: draft.clientSlug,
+          data: {
+            coverImageUrl: draft.coverImageUrl || null,
+          },
+        },
+        {
+          onConflict: "slug",
+        }
+      )
+      .select("id, name, slug")
+      .single();
+
+    if (clientError || !client) {
+      setErrorMessage(
+        clientError?.message ||
+          "Não foi possível criar ou atualizar o cliente."
+      );
+      setIsSaving(false);
+      return;
+    }
+
+    const selectedModuleRecords = planningModules
+      .filter((module) => selectedModules.includes(module.slug))
+      .map((module) => ({
+        title: module.title,
+        slug: module.slug,
+        category: module.category,
+        description: module.description,
+      }));
+
+    const { error: projectError } = await supabase
+      .from("planning_projects")
+      .insert({
+        client_id: client.id,
+        title: draft.projectTitle,
+        slug: finalProjectSlug,
+        description: draft.description || null,
+        status: "draft",
+        data: {
+          coverImageUrl: draft.coverImageUrl || null,
+          selectedModules,
+          modules: selectedModuleRecords,
+        },
+      });
+
+    if (projectError) {
+      setErrorMessage(
+        projectError.message || "Não foi possível criar o planejamento."
+      );
+      setIsSaving(false);
+      return;
+    }
+
+    window.localStorage.removeItem("metodo-epc-new-planning-draft");
+    router.push("/admin");
+  }
+
+  if (isLoading || !draft) {
+    return (
+      <main className="min-h-screen bg-slate-100 text-slate-950">
+        <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-8 lg:px-10">
+          <MetodoLogo />
+
+          <Link
+            href="/admin"
+            className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-50"
+          >
+            Voltar
+          </Link>
+        </header>
+
+        <section className="mx-auto max-w-6xl px-6 py-10 lg:px-10">
+          <div className="rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
+            <p className="text-slate-500">Carregando módulos...</p>
+          </div>
+        </section>
+
+        <MetodoFooter />
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen bg-slate-100 text-slate-950">
-      <section className="mx-auto max-w-6xl px-6 py-10">
-        <div className="rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
-          <p className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+      <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-8 lg:px-10">
+        <MetodoLogo />
+
+        <div className="flex items-center gap-3">
+          <Link
+            href="/admin/novo-planejamento"
+            className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-50"
+          >
+            Voltar
+          </Link>
+
+          <Link
+            href="/admin"
+            className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-50"
+          >
+            Cancelar
+          </Link>
+        </div>
+      </header>
+
+      <section className="mx-auto max-w-6xl px-6 pb-20 lg:px-10">
+        <div className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-10">
+          <p className="text-sm font-bold uppercase tracking-[0.18em] text-slate-500">
             Novo planejamento
           </p>
 
-          <div className="mt-3 flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+          <div className="mt-4 flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
             <div>
-              <h1 className="text-4xl font-bold tracking-tight">
+              <h1 className="text-4xl font-bold tracking-[-0.04em] text-slate-950">
                 Configuração da apresentação
               </h1>
 
-              <p className="mt-4 max-w-3xl text-slate-600">
-                Selecione quais módulos farão parte da apresentação final do cliente.
-                Os módulos escolhidos aparecerão no planejamento publicado.
+              <p className="mt-4 max-w-3xl text-base leading-7 text-slate-600">
+                Selecione quais módulos farão parte do planejamento final do
+                cliente. Os módulos escolhidos serão salvos no projeto.
               </p>
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4">
+            <div className="rounded-2xl bg-slate-50 p-5 ring-1 ring-slate-200 lg:min-w-72">
+              <div className="flex items-center gap-4">
+                <div className="h-16 w-16 overflow-hidden rounded-full bg-slate-200 ring-1 ring-slate-300">
+                  {draft.coverImageUrl ? (
+                    <img
+                      src={draft.coverImageUrl}
+                      alt={draft.clientName}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-xl font-bold text-slate-500">
+                      {draft.clientName.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <p className="text-sm font-semibold text-slate-500">
+                    Cliente
+                  </p>
+                  <strong className="block text-lg text-slate-950">
+                    {draft.clientName}
+                  </strong>
+                </div>
+              </div>
+
+              <div className="mt-5 border-t border-slate-200 pt-5">
+                <p className="text-sm font-semibold text-slate-500">
+                  Planejamento
+                </p>
+                <strong className="mt-1 block text-lg text-slate-950">
+                  {draft.projectTitle}
+                </strong>
+                <p className="mt-2 text-xs text-slate-400">
+                  Slug final: {finalProjectSlug}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
+            <div className="rounded-2xl border border-slate-200 p-5">
               <p className="text-sm text-slate-500">Módulos disponíveis</p>
-              <strong className="mt-1 block text-3xl">
-                {planningModules.length}
+              <strong className="mt-2 block text-3xl text-slate-950">
+                {planningModules.filter((module) => module.presentation).length}
+              </strong>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 p-5">
+              <p className="text-sm text-slate-500">Módulos selecionados</p>
+              <strong className="mt-2 block text-3xl text-slate-950">
+                {selectedCount}
+              </strong>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 p-5">
+              <p className="text-sm text-slate-500">Status inicial</p>
+              <strong className="mt-2 block text-3xl text-slate-950">
+                Rascunho
               </strong>
             </div>
           </div>
-        </div>
 
-        <form className="mt-8 space-y-10">
-          {moduleCategories.map((category) => (
-            <section key={category}>
-              <div className="mb-4">
-                <p className="text-sm font-semibold uppercase tracking-wide text-slate-500">
-                  Categoria
-                </p>
-
-                <h2 className="mt-1 text-2xl font-bold">{category}</h2>
-              </div>
-
-              <div className="grid gap-4 md:grid-cols-2">
-                {planningModules
-                  .filter((module) => module.category === category)
-                  .map((module, index) => (
-                    <label
-                      key={module.slug}
-                      className="block cursor-pointer rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow-md"
-                    >
-                      <div className="flex items-start gap-4">
-                        <input
-                          type="checkbox"
-                          defaultChecked
-                          className="mt-1 h-5 w-5 rounded border-slate-300"
-                        />
-
-                        <div className="flex-1">
-                          <div className="flex flex-wrap items-center gap-3">
-                            <p className="text-sm font-semibold text-slate-400">
-                              Módulo {index + 1}
-                            </p>
-
-                            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-                              Apresentação
-                            </span>
-                          </div>
-
-                          <h3 className="mt-2 text-xl font-bold">
-                            {module.title}
-                          </h3>
-
-                          <p className="mt-3 text-sm leading-6 text-slate-600">
-                            {module.description}
-                          </p>
-                        </div>
-                      </div>
-                    </label>
-                  ))}
-              </div>
-            </section>
-          ))}
-
-          <div className="sticky bottom-0 -mx-6 border-t border-slate-200 bg-slate-100/90 px-6 py-5 backdrop-blur">
-            <div className="mx-auto flex max-w-6xl flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-              <a
-                href="/admin/novo-planejamento"
-                className="rounded-full border border-slate-200 bg-white px-6 py-3 text-center text-sm font-semibold text-slate-700 hover:bg-slate-50"
-              >
-                Voltar
-              </a>
-
-              <a
-                href="/admin"
-                className="rounded-full border border-slate-200 bg-white px-6 py-3 text-center text-sm font-semibold text-slate-700 hover:bg-slate-50"
-              >
-                Cancelar
-              </a>
-
-              <a
-                href="/admin/planejamentos/demo"
-                className="rounded-full bg-slate-950 px-6 py-3 text-center text-sm font-semibold text-white hover:bg-slate-800"
-              >
-                Criar planejamento
-              </a>
+          {errorMessage ? (
+            <div className="mt-6 rounded-2xl bg-red-50 px-5 py-4 text-sm font-medium text-red-700">
+              {errorMessage}
             </div>
+          ) : null}
+
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <button
+              type="button"
+              onClick={selectAllModules}
+              className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-slate-50"
+            >
+              Selecionar todos
+            </button>
+
+            <button
+              type="button"
+              onClick={clearModules}
+              className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-slate-50"
+            >
+              Limpar seleção
+            </button>
           </div>
-        </form>
+
+          <form onSubmit={handleSubmit} className="mt-8 space-y-10">
+            {moduleCategories.map((category) => {
+              const categoryModules = planningModules.filter(
+                (module) => module.category === category && module.presentation
+              );
+
+              if (categoryModules.length === 0) {
+                return null;
+              }
+
+              return (
+                <section key={category}>
+                  <div className="mb-4">
+                    <p className="text-sm font-bold uppercase tracking-[0.18em] text-slate-500">
+                      Categoria
+                    </p>
+
+                    <h2 className="mt-1 text-2xl font-bold tracking-[-0.03em]">
+                      {category}
+                    </h2>
+                  </div>
+
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {categoryModules.map((module) => {
+                      const isSelected = selectedModules.includes(module.slug);
+
+                      return (
+                        <label
+                          key={module.slug}
+                          className={`block cursor-pointer rounded-3xl bg-white p-6 shadow-sm ring-1 transition ${
+                            isSelected
+                              ? "ring-slate-950"
+                              : "ring-slate-200 hover:ring-slate-300"
+                          }`}
+                        >
+                          <div className="flex items-start gap-4">
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={() => toggleModule(module.slug)}
+                              className="mt-1 h-5 w-5 rounded border-slate-300"
+                            />
+
+                            <div className="flex-1">
+                              <div className="flex flex-wrap items-center gap-3">
+                                <p className="text-sm font-semibold text-slate-400">
+                                  Módulo
+                                </p>
+
+                                {isSelected ? (
+                                  <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700">
+                                    Selecionado
+                                  </span>
+                                ) : null}
+                              </div>
+
+                              <h3 className="mt-2 text-xl font-bold">
+                                {module.title}
+                              </h3>
+
+                              <p className="mt-3 text-sm leading-6 text-slate-600">
+                                {module.description}
+                              </p>
+                            </div>
+                          </div>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </section>
+              );
+            })}
+
+            <div className="flex flex-col gap-3 border-t border-slate-200 pt-8 sm:flex-row sm:items-center sm:justify-between">
+              <Link
+                href="/admin/novo-planejamento"
+                className="inline-flex items-center justify-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-slate-50"
+              >
+                Voltar aos dados
+              </Link>
+
+              <button
+                type="submit"
+                disabled={isSaving}
+                className="inline-flex items-center justify-center rounded-full bg-slate-950 px-8 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isSaving ? "Criando..." : "Criar planejamento"}
+              </button>
+            </div>
+          </form>
+        </div>
       </section>
+
+      <MetodoFooter />
     </main>
   );
 }

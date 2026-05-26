@@ -22,8 +22,8 @@ export default function NovoPlanejamentoPage() {
   const [clientName, setClientName] = useState("");
   const [projectTitle, setProjectTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [coverImageUrl, setCoverImageUrl] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   const clientSlug = useMemo(() => {
@@ -73,7 +73,7 @@ export default function NovoPlanejamentoPage() {
     validateStrategist();
   }, [router]);
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (!clientName.trim()) {
@@ -91,47 +91,21 @@ export default function NovoPlanejamentoPage() {
       return;
     }
 
-    setIsSaving(true);
-    setErrorMessage("");
+    const draft = {
+      clientName: clientName.trim(),
+      clientSlug,
+      projectTitle: projectTitle.trim(),
+      projectSlug,
+      description: description.trim(),
+      coverImageUrl: coverImageUrl.trim(),
+    };
 
-    const { data: client, error: clientError } = await supabase
-      .from("clients")
-      .upsert(
-        {
-          name: clientName.trim(),
-          slug: clientSlug,
-        },
-        {
-          onConflict: "slug",
-        }
-      )
-      .select("id, name, slug")
-      .single();
+    window.localStorage.setItem(
+      "metodo-epc-new-planning-draft",
+      JSON.stringify(draft)
+    );
 
-    if (clientError || !client) {
-      setErrorMessage("Não foi possível criar ou atualizar o cliente.");
-      setIsSaving(false);
-      return;
-    }
-
-    const { error: projectError } = await supabase
-      .from("planning_projects")
-      .insert({
-        client_id: client.id,
-        title: projectTitle.trim(),
-        slug: projectSlug,
-        description: description.trim() || null,
-        status: "draft",
-        data: {},
-      });
-
-    if (projectError) {
-      setErrorMessage("Não foi possível criar o planejamento.");
-      setIsSaving(false);
-      return;
-    }
-
-    router.push(`/admin/planejamentos/${client.slug}`);
+    router.push("/admin/novo-planejamento/modulos");
   }
 
   if (isLoading) {
@@ -183,8 +157,8 @@ export default function NovoPlanejamentoPage() {
           </h1>
 
           <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600">
-            Preencha as informações iniciais do cliente. Depois, o sistema criará
-            a estrutura para você completar o planejamento estratégico.
+            Preencha as informações iniciais do cliente. Na próxima etapa, você
+            vai selecionar quais módulos farão parte do planejamento.
           </p>
 
           {errorMessage ? (
@@ -236,6 +210,40 @@ export default function NovoPlanejamentoPage() {
 
             <div>
               <label className="mb-2 block text-sm font-semibold text-slate-700">
+                Imagem de capa do cliente
+              </label>
+
+              <input
+                type="url"
+                value={coverImageUrl}
+                onChange={(event) => setCoverImageUrl(event.target.value)}
+                placeholder="Cole aqui a URL da imagem de capa"
+                className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-slate-400"
+              />
+
+              <p className="mt-2 text-xs text-slate-400">
+                Por enquanto, use uma URL de imagem. Depois podemos trocar para upload direto.
+              </p>
+
+              {coverImageUrl ? (
+                <div className="mt-4 flex items-center gap-4">
+                  <div className="h-16 w-16 overflow-hidden rounded-full bg-slate-100 ring-1 ring-slate-200">
+                    <img
+                      src={coverImageUrl}
+                      alt="Prévia da imagem do cliente"
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+
+                  <p className="text-sm text-slate-500">
+                    Essa imagem aparecerá no card do planejamento.
+                  </p>
+                </div>
+              ) : null}
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-slate-700">
                 Descrição opcional
               </label>
 
@@ -250,14 +258,13 @@ export default function NovoPlanejamentoPage() {
 
             <div className="rounded-2xl bg-slate-50 p-5 ring-1 ring-slate-200">
               <p className="text-sm font-semibold text-slate-700">
-                O que será criado
+                Próxima etapa
               </p>
 
-              <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-600">
-                <li>Cliente cadastrado na tabela de clientes.</li>
-                <li>Planejamento criado com status de rascunho.</li>
-                <li>Projeto pronto para edição dos módulos estratégicos.</li>
-              </ul>
+              <p className="mt-2 text-sm leading-6 text-slate-600">
+                Depois de avançar, você escolherá quais módulos entram no
+                planejamento deste cliente.
+              </p>
             </div>
 
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -270,10 +277,9 @@ export default function NovoPlanejamentoPage() {
 
               <button
                 type="submit"
-                disabled={isSaving}
-                className="inline-flex items-center justify-center rounded-full bg-slate-950 px-8 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex items-center justify-center rounded-full bg-slate-950 px-8 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
               >
-                {isSaving ? "Criando..." : "Criar planejamento"}
+                Escolher módulos
               </button>
             </div>
           </form>
