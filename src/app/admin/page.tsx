@@ -309,6 +309,7 @@ export default function AdminPage() {
               const clientSlug = client?.slug ?? "demo";
               const coverImageUrl = project.data?.coverImageUrl ?? "";
               const isDeleting = isDeletingId === project.id;
+              const isDemoProject = clientSlug === "demo";
 
               return (
                 <article
@@ -378,13 +379,13 @@ export default function AdminPage() {
                       </Link>
 
                       <button
-                        type="button"
-                        onClick={() => handleDeleteProject(project)}
-                        disabled={isDeleting}
-                        className="inline-flex items-center justify-center rounded-full bg-red-50 px-7 py-3 text-sm font-semibold text-red-700 ring-1 ring-red-100 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
-                      >
-                        {isDeleting ? "Excluindo..." : "Excluir"}
-                      </button>
+  type="button"
+  onClick={() => handleDeleteProject(project)}
+  disabled={isDeleting || isDemoProject}
+  className="inline-flex items-center justify-center rounded-full bg-red-50 px-7 py-3 text-sm font-semibold text-red-700 ring-1 ring-red-100 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-40"
+>
+  {isDeleting ? "Excluindo..." : isDemoProject ? "Modelo" : "Excluir"}
+</button>
                     </div>
                   </div>
                 </article>
