@@ -3,8 +3,12 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { moduleCategories, planningModules } from "@/data/modules";
+import { planningModules } from "@/data/modules";
 import { MetodoFooter, MetodoLogo } from "@/Components/MetodoBrand";
+import EspecialistaForm, {
+  initialSpecialistData,
+  SpecialistData,
+} from "@/Components/modulos/EspecialistaForm";
 import { supabase } from "@/lib/supabase";
 
 type ClientRecord = {
@@ -13,7 +17,7 @@ type ClientRecord = {
   slug: string;
 };
 
-type ModuleContent = {
+type GenericModuleData = {
   mainText?: string;
   notes?: string;
   references?: string;
@@ -28,7 +32,7 @@ type ProjectData = {
     category: string;
     description: string;
   }[];
-  moduleContent?: Record<string, ModuleContent>;
+  moduleContent?: Record<string, unknown>;
 };
 
 type PlanningProject = {
@@ -74,6 +78,22 @@ function getStatusClass(status: PlanningProject["status"]) {
   return "bg-slate-100 text-slate-600";
 }
 
+function isSpecialistData(value: unknown): value is SpecialistData {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  return "fields" in value || "photo" in value || "characteristics" in value;
+}
+
+function isGenericModuleData(value: unknown): value is GenericModuleData {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  return "mainText" in value || "notes" in value || "references" in value;
+}
+
 export default function ModuloPlanejamentoPage() {
   const router = useRouter();
   const params = useParams();
@@ -85,9 +105,14 @@ export default function ModuloPlanejamentoPage() {
     typeof params.moduleSlug === "string" ? params.moduleSlug : "";
 
   const [project, setProject] = useState<PlanningProject | null>(null);
-  const [mainText, setMainText] = useState("");
-  const [notes, setNotes] = useState("");
-  const [references, setReferences] = useState("");
+  const [specialistData, setSpecialistData] = useState<SpecialistData>(
+    initialSpecialistData
+  );
+  const [genericData, setGenericData] = useState<GenericModuleData>({
+    mainText: "",
+    notes: "",
+    references: "",
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -104,17 +129,16 @@ export default function ModuloPlanejamentoPage() {
   }, [project]);
 
   const isModuleSelected = selectedModules.includes(moduleSlug);
-
-  const moduleCategory = module?.category ?? "Módulo";
+  const isSpecialistModule = moduleSlug === "dna-do-especialista";
 
   const relatedModules = useMemo(() => {
     return planningModules.filter(
       (item) =>
         item.presentation &&
-        item.category === moduleCategory &&
+        item.category === module?.category &&
         selectedModules.includes(item.slug)
     );
-  }, [moduleCategory, selectedModules]);
+  }, [module?.category, selectedModules]);
 
   useEffect(() => {
     async function loadModuleData() {
@@ -183,22 +207,38 @@ export default function ModuloPlanejamentoPage() {
       }
 
       const savedContent =
-        foundProject.data?.moduleContent?.[moduleSlug] ?? {};
+        foundProject.data?.moduleContent?.[moduleSlug] ?? null;
 
       setProject(foundProject);
-      setMainText(savedContent.mainText ?? "");
-      setNotes(savedContent.notes ?? "");
-      setReferences(savedContent.references ?? "");
+
+      if (isSpecialistModule && isSpecialistData(savedContent)) {
+        setSpecialistData({
+          fields: savedContent.fields || {},
+          photo: savedContent.photo || "",
+          characteristics: savedContent.characteristics?.length
+            ? savedContent.characteristics
+            : initialSpecialistData.characteristics,
+        });
+      }
+
+      if (!isSpecialistModule && isGenericModuleData(savedContent)) {
+        setGenericData({
+          mainText: savedContent.mainText || "",
+          notes: savedContent.notes || "",
+          references: savedContent.references || "",
+        });
+      }
+
       setIsLoading(false);
     }
 
     if (clientSlug && moduleSlug) {
       loadModuleData();
     }
-  }, [clientSlug, moduleSlug, router]);
+  }, [clientSlug, moduleSlug, router, isSpecialistModule]);
 
-  async function handleSave(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  async function saveModule(event?: FormEvent<HTMLFormElement>) {
+    event?.preventDefault();
 
     if (!project) {
       return;
@@ -217,15 +257,19 @@ export default function ModuloPlanejamentoPage() {
 
     const currentData = project.data ?? {};
 
+    const contentToSave = isSpecialistModule
+      ? specialistData
+      : {
+          mainText: genericData.mainText?.trim() || "",
+          notes: genericData.notes?.trim() || "",
+          references: genericData.references?.trim() || "",
+        };
+
     const nextData: ProjectData = {
       ...currentData,
       moduleContent: {
         ...(currentData.moduleContent ?? {}),
-        [moduleSlug]: {
-          mainText: mainText.trim(),
-          notes: notes.trim(),
-          references: references.trim(),
-        },
+        [moduleSlug]: contentToSave,
       },
     };
 
@@ -336,7 +380,7 @@ export default function ModuloPlanejamentoPage() {
                 </p>
 
                 <p className="mt-2 text-sm font-semibold text-slate-950">
-                  {moduleCategory}
+                  {module?.category ?? "Módulo"}
                 </p>
               </div>
 
@@ -382,7 +426,8 @@ export default function ModuloPlanejamentoPage() {
 
                 {!isModuleSelected ? (
                   <div className="mt-6 rounded-2xl bg-amber-50 px-5 py-4 text-sm font-medium text-amber-800">
-                    Este módulo não está selecionado para este planejamento. Para preencher, volte aos módulos e selecione este item.
+                    Este módulo não está selecionado para este planejamento.
+                    Para preencher, volte aos módulos e selecione este item.
                   </div>
                 ) : null}
 
@@ -399,69 +444,96 @@ export default function ModuloPlanejamentoPage() {
                 ) : null}
               </div>
 
-              <form
-                onSubmit={handleSave}
-                className="mt-6 rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-10"
-              >
-                <div>
-                  <label className="mb-2 block text-sm font-semibold text-slate-700">
-                    Conteúdo principal do módulo
-                  </label>
+              {isSpecialistModule ? (
+                <EspecialistaForm
+                  data={specialistData}
+                  setData={setSpecialistData}
+                  clientSlug={clientSlug}
+                  presentationHref={`/apresentacao/${project.slug}`}
+                  isSaving={isSaving}
+                  isDisabled={!isModuleSelected}
+                  onSave={() => saveModule()}
+                />
+              ) : (
+                <form
+                  onSubmit={saveModule}
+                  className="mt-6 rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-10"
+                >
+                  <div>
+                    <label className="mb-2 block text-sm font-semibold text-slate-700">
+                      Conteúdo principal do módulo
+                    </label>
 
-                  <textarea
-                    rows={10}
-                    value={mainText}
-                    onChange={(event) => setMainText(event.target.value)}
-                    placeholder="Preencha aqui as informações estratégicas deste módulo."
-                    className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm leading-6 outline-none transition focus:border-slate-400"
-                  />
-                </div>
+                    <textarea
+                      rows={10}
+                      value={genericData.mainText || ""}
+                      onChange={(event) =>
+                        setGenericData((current) => ({
+                          ...current,
+                          mainText: event.target.value,
+                        }))
+                      }
+                      placeholder="Preencha aqui as informações estratégicas deste módulo."
+                      className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm leading-6 outline-none transition focus:border-slate-400"
+                    />
+                  </div>
 
-                <div className="mt-6">
-                  <label className="mb-2 block text-sm font-semibold text-slate-700">
-                    Observações internas
-                  </label>
+                  <div className="mt-6">
+                    <label className="mb-2 block text-sm font-semibold text-slate-700">
+                      Observações internas
+                    </label>
 
-                  <textarea
-                    rows={5}
-                    value={notes}
-                    onChange={(event) => setNotes(event.target.value)}
-                    placeholder="Anote observações, decisões, pendências ou contexto para este cliente."
-                    className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm leading-6 outline-none transition focus:border-slate-400"
-                  />
-                </div>
+                    <textarea
+                      rows={5}
+                      value={genericData.notes || ""}
+                      onChange={(event) =>
+                        setGenericData((current) => ({
+                          ...current,
+                          notes: event.target.value,
+                        }))
+                      }
+                      placeholder="Anote observações, decisões, pendências ou contexto para este cliente."
+                      className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm leading-6 outline-none transition focus:border-slate-400"
+                    />
+                  </div>
 
-                <div className="mt-6">
-                  <label className="mb-2 block text-sm font-semibold text-slate-700">
-                    Referências e links
-                  </label>
+                  <div className="mt-6">
+                    <label className="mb-2 block text-sm font-semibold text-slate-700">
+                      Referências e links
+                    </label>
 
-                  <textarea
-                    rows={4}
-                    value={references}
-                    onChange={(event) => setReferences(event.target.value)}
-                    placeholder="Cole referências, links, exemplos ou materiais usados neste módulo."
-                    className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm leading-6 outline-none transition focus:border-slate-400"
-                  />
-                </div>
+                    <textarea
+                      rows={4}
+                      value={genericData.references || ""}
+                      onChange={(event) =>
+                        setGenericData((current) => ({
+                          ...current,
+                          references: event.target.value,
+                        }))
+                      }
+                      placeholder="Cole referências, links, exemplos ou materiais usados neste módulo."
+                      className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm leading-6 outline-none transition focus:border-slate-400"
+                    />
+                  </div>
 
-                <div className="mt-8 flex flex-col gap-3 border-t border-slate-200 pt-8 sm:flex-row sm:items-center sm:justify-between">
-                  <Link
-                    href={`/admin/planejamentos/${clientSlug}`}
-                    className="inline-flex items-center justify-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-slate-50"
-                  >
-                    Voltar para configuração
-                  </Link>
+                  <div className="mt-8 flex flex-col gap-3 border-t border-slate-200 pt-8 sm:flex-row sm:items-center sm:justify-between">
+                    <Link
+                      href={`/admin/planejamentos/${clientSlug}`}
+                      className="inline-flex items-center justify-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-slate-50"
+                    >
+                      Voltar para módulos
+                    </Link>
 
-                  <button
-                    type="submit"
-                    disabled={isSaving || !isModuleSelected}
-                    className="inline-flex items-center justify-center rounded-full bg-slate-950 px-8 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    {isSaving ? "Salvando..." : "Salvar módulo"}
-                  </button>
-                </div>
-              </form>
+                    <button
+                      type="submit"
+                      disabled={isSaving || !isModuleSelected}
+                      className="inline-flex items-center justify-center rounded-full bg-slate-950 px-8 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {isSaving ? "Salvando..." : "Salvar módulo"}
+                    </button>
+                  </div>
+                </form>
+              )}
             </div>
           </div>
         ) : null}
