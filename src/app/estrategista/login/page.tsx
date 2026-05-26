@@ -3,9 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { MetodoLogo } from "@/Components/MetodoBrand";
-
-const STRATEGIST_EMAIL = "estrategista@metodoepc.com";
-const STRATEGIST_PASSWORD = "metodoepc2026";
+import { supabase } from "@/lib/supabase";
 
 export default function EstrategistaLoginPage() {
   const router = useRouter();
@@ -15,30 +13,57 @@ export default function EstrategistaLoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  function handleLogin(event: React.FormEvent<HTMLFormElement>) {
+  async function handleLogin(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    setErrorMessage("");
+    setIsLoading(true);
 
     const typedEmail = email.trim().toLowerCase();
     const typedPassword = password.trim();
 
-    if (
-      typedEmail === STRATEGIST_EMAIL &&
-      typedPassword === STRATEGIST_PASSWORD
-    ) {
-      window.localStorage.setItem("metodo-epc-strategist-auth", "true");
-
-      if (rememberMe) {
-        window.localStorage.setItem("metodo-epc-strategist-remember", "true");
-      } else {
-        window.localStorage.removeItem("metodo-epc-strategist-remember");
-      }
-
-      router.push("/admin");
+    if (!typedEmail || !typedPassword) {
+      setErrorMessage("Informe o e-mail e a senha para acessar.");
+      setIsLoading(false);
       return;
     }
 
-    setErrorMessage("Email ou senha incorretos. Verifique os dados e tente novamente.");
+    const { data: loginData, error: loginError } =
+      await supabase.auth.signInWithPassword({
+        email: typedEmail,
+        password: typedPassword,
+      });
+
+    if (loginError || !loginData.user) {
+      setErrorMessage("E-mail ou senha inválidos.");
+      setIsLoading(false);
+      return;
+    }
+
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", loginData.user.id)
+      .single();
+
+    if (profileError || profile?.role !== "strategist") {
+      await supabase.auth.signOut();
+      setErrorMessage("Este usuário não tem permissão de estrategista.");
+      setIsLoading(false);
+      return;
+    }
+
+    window.localStorage.setItem("metodo-epc-strategist-auth", "true");
+
+    if (rememberMe) {
+      window.localStorage.setItem("metodo-epc-strategist-remember", "true");
+    } else {
+      window.localStorage.removeItem("metodo-epc-strategist-remember");
+    }
+
+    router.push("/admin");
   }
 
   return (
@@ -49,11 +74,9 @@ export default function EstrategistaLoginPage() {
         <div className="pointer-events-none absolute bottom-[-120px] left-[-80px] h-[260px] w-[260px] rounded-full border border-white/10" />
 
         <header className="relative z-10 flex items-center justify-between">
-          <MetodoLogo
-  href="/"
-  size="md"
-  className="brightness-0 invert"
-/>
+          <a href="/" className="flex items-center gap-4">
+            <MetodoLogo href="/" size="md" className="brightness-0 invert" />
+          </a>
 
           <a
             href="/"
@@ -73,110 +96,96 @@ export default function EstrategistaLoginPage() {
               Espaço do estrategista.
             </h1>
 
-            <p className="mt-8 max-w-2xl text-lg leading-8 text-slate-300">
-              Entre com seus dados para acessar o painel administrativo, editar planejamentos e acompanhar os módulos estratégicos dos clientes.
+            <p className="mt-8 max-w-2xl text-lg leading-8 text-white/80">
+              Entre com seus dados para acessar o painel administrativo, editar
+              planejamentos e acompanhar os módulos estratégicos dos clientes.
             </p>
           </div>
 
-          <div className="rounded-[2rem] border border-white/10 bg-white/5 p-4 shadow-2xl shadow-black/20">
-            <form
-              onSubmit={handleLogin}
-              className="rounded-[1.5rem] bg-white p-8 text-slate-950 lg:p-10"
-            >
+          <div className="rounded-[2rem] border border-white/10 bg-white/10 p-4 shadow-2xl backdrop-blur">
+            <div className="rounded-[1.5rem] bg-white p-8 text-slate-950 shadow-xl lg:p-10">
               <div className="flex items-start justify-between gap-6">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.45em] text-slate-400">
+                  <p className="text-xs font-semibold uppercase tracking-[0.5em] text-slate-400">
                     Acessar painel
                   </p>
 
-                  <h2 className="mt-4 text-5xl font-semibold tracking-[-0.06em]">
+                  <h2 className="mt-4 text-5xl font-light tracking-[-0.07em] text-slate-950">
                     Entrar
                   </h2>
                 </div>
 
                 <div className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-950 text-white">
-                  <span className="text-lg">🔒</span>
+                  🔐
                 </div>
               </div>
 
-              <div className="mt-9 space-y-5">
+              <form onSubmit={handleLogin} className="mt-10 space-y-5">
                 <input
                   type="email"
                   value={email}
-                  onChange={(event) => {
-                    setEmail(event.target.value);
-                    setErrorMessage("");
-                  }}
+                  onChange={(event) => setEmail(event.target.value)}
                   placeholder="Email"
-                  className="w-full rounded-2xl border border-slate-200 px-5 py-4 text-base outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                  className="h-14 w-full rounded-2xl border border-slate-200 px-5 text-base outline-none transition placeholder:text-slate-400 focus:border-slate-950"
                 />
 
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
                     value={password}
-                    onChange={(event) => {
-                      setPassword(event.target.value);
-                      setErrorMessage("");
-                    }}
+                    onChange={(event) => setPassword(event.target.value)}
                     placeholder="Senha"
-                    className="w-full rounded-2xl border border-slate-200 px-5 py-4 pr-12 text-base outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                    className="h-14 w-full rounded-2xl border border-slate-200 px-5 pr-14 text-base outline-none transition placeholder:text-slate-400 focus:border-slate-950"
                   />
 
                   <button
                     type="button"
                     onClick={() => setShowPassword((current) => !current)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-slate-400 hover:text-slate-950"
+                    className="absolute right-5 top-1/2 -translate-y-1/2 text-sm font-medium text-slate-400 transition hover:text-slate-950"
                   >
                     {showPassword ? "ocultar" : "ver"}
                   </button>
                 </div>
-              </div>
 
-              {errorMessage && (
-                <p className="mt-4 rounded-2xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-600">
-                  {errorMessage}
-                </p>
-              )}
-
-              <div className="mt-6 flex items-center gap-3">
-                <input
-                  id="remember-strategist"
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(event) => setRememberMe(event.target.checked)}
-                  className="h-5 w-5 rounded border-slate-300"
-                />
-
-                <label
-                  htmlFor="remember-strategist"
-                  className="text-sm font-medium text-slate-600"
-                >
+                <label className="flex items-center gap-3 text-sm text-slate-600">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(event) => setRememberMe(event.target.checked)}
+                    className="h-5 w-5 rounded border-slate-300"
+                  />
                   Lembrar de mim
                 </label>
-              </div>
 
-              <div className="mt-7 flex flex-col gap-4 sm:flex-row sm:items-center">
-                <button
-                  type="submit"
-                  className="rounded-2xl bg-slate-950 px-8 py-4 text-sm font-semibold text-white transition hover:bg-slate-800"
-                >
-                  Entrar no painel
-                </button>
+                {errorMessage ? (
+                  <p className="rounded-2xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+                    {errorMessage}
+                  </p>
+                ) : null}
 
-                <p className="text-sm text-slate-500">
-                  Acesso exclusivo para estrategistas autorizados.
+                <div className="flex flex-col gap-4 pt-2 sm:flex-row sm:items-center">
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="h-14 cursor-pointer rounded-2xl bg-slate-950 px-8 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {isLoading ? "Entrando..." : "Entrar no painel"}
+                  </button>
+
+                  <p className="text-sm text-slate-500">
+                    Acesso exclusivo para estrategistas autorizados.
+                  </p>
+                </div>
+
+                <p className="pt-6 text-center text-sm text-slate-400">
+                  Painel interno do Metodo EPC.
                 </p>
-              </div>
-
-              <p className="mt-8 text-center text-sm text-slate-400">
-                Painel interno do Metodo EPC.
-              </p>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
 
-        <footer className="relative z-10 text-center text-xs text-slate-400">
+        <footer className="relative z-10 text-center text-xs text-white/50">
           © 2026 Metodo EPC. Todos os direitos reservados.
         </footer>
       </section>
