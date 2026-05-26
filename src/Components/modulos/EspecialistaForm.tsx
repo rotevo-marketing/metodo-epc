@@ -369,13 +369,13 @@ export default function EspecialistaForm({
           </Link>
 
           <button
-            type="button"
-            onClick={onSave}
-            disabled={isSaving || isDisabled}
-            className="rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {isSaving ? "Salvando..." : "Salvar módulo"}
-          </button>
+  type="button"
+  onClick={onSave}
+  disabled={isSaving || isDisabled}
+  className="cursor-pointer rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+>
+  {isSaving ? "Salvando..." : "Salvar módulo"}
+</button>
         </div>
       </div>
     </div>
