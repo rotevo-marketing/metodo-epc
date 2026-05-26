@@ -145,7 +145,7 @@ export default function PlanejamentoClientePage() {
           created_at,
           updated_at,
           data,
-          clients (
+          clients!inner (
             id,
             name,
             slug,
@@ -158,7 +158,7 @@ export default function PlanejamentoClientePage() {
         .limit(1);
 
       if (error) {
-        setErrorMessage("Não foi possível carregar este planejamento.");
+        setErrorMessage(error.message || "Não foi possível carregar este planejamento.");
         setIsLoading(false);
         return;
       }
