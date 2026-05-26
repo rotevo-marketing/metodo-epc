@@ -1,173 +1,286 @@
+"use client";
+
+import { FormEvent, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { MetodoFooter, MetodoLogo } from "@/Components/MetodoBrand";
+import { supabase } from "@/lib/supabase";
+
+function createSlug(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 export default function NovoPlanejamentoPage() {
+  const router = useRouter();
+
+  const [clientName, setClientName] = useState("");
+  const [projectTitle, setProjectTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const clientSlug = useMemo(() => {
+    return createSlug(clientName);
+  }, [clientName]);
+
+  const projectSlug = useMemo(() => {
+    const baseSlug = createSlug(projectTitle);
+
+    if (baseSlug) {
+      return baseSlug;
+    }
+
+    if (clientSlug) {
+      return clientSlug;
+    }
+
+    return "";
+  }, [clientSlug, projectTitle]);
+
+  useEffect(() => {
+    async function validateStrategist() {
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+
+      if (userError || !userData.user) {
+        window.localStorage.removeItem("metodo-epc-strategist-auth");
+        router.push("/estrategista/login");
+        return;
+      }
+
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", userData.user.id)
+        .single();
+
+      if (profileError || profile?.role !== "strategist") {
+        await supabase.auth.signOut();
+        window.localStorage.removeItem("metodo-epc-strategist-auth");
+        router.push("/estrategista/login");
+        return;
+      }
+
+      setIsLoading(false);
+    }
+
+    validateStrategist();
+  }, [router]);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (!clientName.trim()) {
+      setErrorMessage("Informe o nome do cliente.");
+      return;
+    }
+
+    if (!projectTitle.trim()) {
+      setErrorMessage("Informe o título do planejamento.");
+      return;
+    }
+
+    if (!clientSlug || !projectSlug) {
+      setErrorMessage("Não foi possível gerar o slug do cliente ou do projeto.");
+      return;
+    }
+
+    setIsSaving(true);
+    setErrorMessage("");
+
+    const { data: client, error: clientError } = await supabase
+      .from("clients")
+      .upsert(
+        {
+          name: clientName.trim(),
+          slug: clientSlug,
+        },
+        {
+          onConflict: "slug",
+        }
+      )
+      .select("id, name, slug")
+      .single();
+
+    if (clientError || !client) {
+      setErrorMessage("Não foi possível criar ou atualizar o cliente.");
+      setIsSaving(false);
+      return;
+    }
+
+    const { error: projectError } = await supabase
+      .from("planning_projects")
+      .insert({
+        client_id: client.id,
+        title: projectTitle.trim(),
+        slug: projectSlug,
+        description: description.trim() || null,
+        status: "draft",
+        data: {},
+      });
+
+    if (projectError) {
+      setErrorMessage("Não foi possível criar o planejamento.");
+      setIsSaving(false);
+      return;
+    }
+
+    router.push(`/admin/planejamentos/${client.slug}`);
+  }
+
+  if (isLoading) {
+    return (
+      <main className="min-h-screen bg-slate-100 text-slate-950">
+        <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-8 lg:px-10">
+          <MetodoLogo />
+
+          <Link
+            href="/admin"
+            className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-50"
+          >
+            Voltar
+          </Link>
+        </header>
+
+        <section className="mx-auto max-w-4xl px-6 py-10 lg:px-10">
+          <div className="rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
+            <p className="text-slate-500">Carregando...</p>
+          </div>
+        </section>
+
+        <MetodoFooter />
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen bg-slate-100 text-slate-950">
-      <section className="mx-auto max-w-4xl px-6 py-10">
-        <div className="rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
-          <p className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+      <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-8 lg:px-10">
+        <MetodoLogo />
+
+        <Link
+          href="/admin"
+          className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-50"
+        >
+          Voltar ao painel
+        </Link>
+      </header>
+
+      <section className="mx-auto max-w-4xl px-6 pb-20 lg:px-10">
+        <div className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-10">
+          <p className="text-sm font-bold uppercase tracking-[0.18em] text-slate-500">
             Novo planejamento
           </p>
 
-          <h1 className="mt-3 text-4xl font-bold tracking-tight">
+          <h1 className="mt-4 text-4xl font-bold tracking-[-0.04em] text-slate-950">
             Criar novo projeto
           </h1>
 
-          <p className="mt-4 max-w-2xl text-slate-600">
-            Preencha as informações iniciais do cliente. Depois, o sistema
-            criará a estrutura de módulos para você completar o planejamento
-            estratégico.
+          <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600">
+            Preencha as informações iniciais do cliente. Depois, o sistema criará
+            a estrutura para você completar o planejamento estratégico.
           </p>
 
-          <form className="mt-8 space-y-8">
+          {errorMessage ? (
+            <div className="mt-6 rounded-2xl bg-red-50 px-5 py-4 text-sm font-medium text-red-700">
+              {errorMessage}
+            </div>
+          ) : null}
+
+          <form onSubmit={handleSubmit} className="mt-8 space-y-8">
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-slate-700">
+                Nome do cliente
+              </label>
+
+              <input
+                type="text"
+                value={clientName}
+                onChange={(event) => setClientName(event.target.value)}
+                placeholder="Ex: Cliente Demo"
+                className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-slate-400"
+              />
+
+              {clientSlug ? (
+                <p className="mt-2 text-xs text-slate-400">
+                  Slug do cliente: {clientSlug}
+                </p>
+              ) : null}
+            </div>
+
             <div>
               <label className="mb-2 block text-sm font-semibold text-slate-700">
                 Título do planejamento
               </label>
+
               <input
                 type="text"
-                placeholder="Ex: Planejamento estratégico 2026"
-                className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                value={projectTitle}
+                onChange={(event) => setProjectTitle(event.target.value)}
+                placeholder="Ex: Planejamento Estratégico 2026"
+                className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-slate-400"
               />
+
+              {projectSlug ? (
+                <p className="mt-2 text-xs text-slate-400">
+                  Slug da apresentação: {projectSlug}
+                </p>
+              ) : null}
             </div>
 
             <div>
               <label className="mb-2 block text-sm font-semibold text-slate-700">
                 Descrição opcional
               </label>
+
               <textarea
                 rows={4}
-                placeholder="Resumo interno sobre este projeto..."
-                className="w-full resize-none rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                value={description}
+                onChange={(event) => setDescription(event.target.value)}
+                placeholder="Ex: Planejamento estratégico inicial do cliente."
+                className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-slate-400"
               />
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2">
-              <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-700">
-                  Nome do cliente
-                </label>
-                <input
-                  type="text"
-                  placeholder="Ex: Cliente Demo"
-                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
-                />
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-700">
-                  Idioma
-                </label>
-                <select className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100">
-                  <option>Português</option>
-                  <option>Inglês</option>
-                  <option>Espanhol</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
-              <h2 className="text-2xl font-bold">Capa do planejamento</h2>
-
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-                Escolha uma imagem de capa ou use a capa padrão com fundo preto,
-                seguindo a identidade visual do Metodo EPC.
+            <div className="rounded-2xl bg-slate-50 p-5 ring-1 ring-slate-200">
+              <p className="text-sm font-semibold text-slate-700">
+                O que será criado
               </p>
 
-              <div className="mt-6 space-y-4">
-                <label className="block cursor-pointer rounded-2xl border border-slate-200 bg-white p-5 hover:bg-slate-50">
-                  <div className="flex items-start gap-3">
-                    <input
-                      type="radio"
-                      name="coverType"
-                      className="mt-1"
-                      defaultChecked
-                    />
-
-                    <div className="flex-1">
-                      <span className="font-semibold">Imagem de capa</span>
-
-                      <p className="mt-2 text-sm text-slate-500">
-                        Escolha uma imagem no formato 1920x1080px.
-                      </p>
-
-                      <div className="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center">
-                        <div className="flex h-24 w-24 items-center justify-center rounded-full bg-slate-950 text-xs font-semibold text-white">
-                          Capa
-                        </div>
-
-                        <div className="flex-1">
-                          <div className="flex flex-wrap gap-3">
-                            <label className="cursor-pointer rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white hover:bg-slate-800">
-                              Escolher capa
-                              <input
-                                type="file"
-                                accept="image/*"
-                                className="hidden"
-                              />
-                            </label>
-
-                            <button
-                              type="button"
-                              className="rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-                            >
-                              Remover
-                            </button>
-                          </div>
-
-                          <p className="mt-3 text-sm text-slate-500">
-                            Formatos aceitos: JPG, PNG ou WEBP.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </label>
-
-                <label className="block cursor-pointer rounded-2xl border border-slate-200 bg-white p-5 hover:bg-slate-50">
-                  <div className="flex items-start gap-3">
-                    <input type="radio" name="coverType" className="mt-1" />
-
-                    <div className="flex-1">
-                      <span className="font-semibold">Cor da capa</span>
-
-                      <p className="mt-2 text-sm text-slate-500">
-                        Usa fundo preto padrão da identidade Metodo EPC.
-                      </p>
-
-                      <div className="mt-5 flex items-center gap-4">
-                        <div className="h-16 w-16 rounded-full bg-black ring-4 ring-slate-100" />
-
-                        <div>
-                          <p className="font-semibold">Preto Metodo EPC</p>
-
-                          <p className="text-sm text-slate-500">
-                            Esta será a única opção de cor sólida da capa.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </label>
-              </div>
+              <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-600">
+                <li>Cliente cadastrado na tabela de clientes.</li>
+                <li>Planejamento criado com status de rascunho.</li>
+                <li>Projeto pronto para edição dos módulos estratégicos.</li>
+              </ul>
             </div>
 
-            <div className="flex flex-col-reverse gap-3 border-t border-slate-200 pt-6 sm:flex-row sm:justify-end">
-              <a
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <Link
                 href="/admin"
-                className="rounded-full border border-slate-200 px-6 py-3 text-center text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                className="inline-flex items-center justify-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-slate-50"
               >
                 Cancelar
-              </a>
+              </Link>
 
-              <a
-                href="/admin/novo-planejamento/modulos"
-                className="rounded-full bg-slate-950 px-6 py-3 text-center text-sm font-semibold text-white hover:bg-slate-800"
+              <button
+                type="submit"
+                disabled={isSaving}
+                className="inline-flex items-center justify-center rounded-full bg-slate-950 px-8 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Próximo
-              </a>
+                {isSaving ? "Criando..." : "Criar planejamento"}
+              </button>
             </div>
           </form>
         </div>
       </section>
+
+      <MetodoFooter />
     </main>
   );
 }
