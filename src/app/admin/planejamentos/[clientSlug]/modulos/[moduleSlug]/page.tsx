@@ -132,6 +132,13 @@ import PinterestForm, {
   normalizePinterestTextList,
 } from "@/Components/modulos/PinterestForm";
 
+import PodcastsForm, {
+  initialPodcastsData,
+  initialPodcastsFrequencyItems,
+  PodcastsData,
+  normalizePodcastsTextList,
+} from "@/Components/modulos/PodcastsForm";
+
 type ClientRecord = {
   id: string;
   name: string;
@@ -283,6 +290,8 @@ const [toneVoiceData, setToneVoiceData] =
   useState<BlogData>(initialBlogData);
   const [pinterestData, setPinterestData] =
   useState<PinterestData>(initialPinterestData);
+  const [podcastsData, setPodcastsData] =
+  useState<PodcastsData>(initialPodcastsData);
 
   const module = useMemo(() => {
     return planningModules.find((item) => item.slug === moduleSlug) ?? null;
@@ -319,6 +328,7 @@ const [toneVoiceData, setToneVoiceData] =
   const isWhatsappModule = moduleSlug === "whatsapp";
   const isBlogModule = moduleSlug === "blog";
   const isPinterestModule = moduleSlug === "pinterest";
+  const isPodcastsModule = moduleSlug === "podcasts";
 
   const relatedModules = useMemo(() => {
     return planningModules.filter(
@@ -990,6 +1000,54 @@ if (isBlogModule && isBlogData(savedContent)) {
   });
 }
 
+if (isPodcastsModule && isPodcastsData(savedContent)) {
+  setPodcastsData({
+    frequencyItems:
+      Array.isArray(savedContent.frequencyItems) &&
+      savedContent.frequencyItems.length
+        ? savedContent.frequencyItems.map((item) => ({
+            format: item.format || "",
+            quantity: item.quantity || "",
+            period: item.period || "por semana",
+            observation: item.observation || "",
+          }))
+        : initialPodcastsFrequencyItems,
+    objectives: normalizePodcastsTextList(savedContent.objectives),
+    languageStructures: normalizePodcastsTextList(savedContent.languageStructures),
+    mainFormat: savedContent.mainFormat || "",
+    durationAndRhythm: savedContent.durationAndRhythm || "",
+    seriesOrSegments: savedContent.seriesOrSegments || "",
+    guestsAndParticipants: savedContent.guestsAndParticipants || "",
+    visualStrategy: savedContent.visualStrategy || "",
+    visualReferences:
+      Array.isArray(savedContent.visualReferences) &&
+      savedContent.visualReferences.length
+        ? savedContent.visualReferences.map((r) => ({
+            image: r.image || "",
+          }))
+        : initialPodcastsData.visualReferences,
+    contents:
+      Array.isArray(savedContent.contents) && savedContent.contents.length
+        ? savedContent.contents.map((c) => ({
+            title: c.title || "",
+            suggestedDate: c.suggestedDate || "",
+            guestOrResponsible: c.guestOrResponsible || "",
+            format: c.format || "",
+            observation: c.observation || "",
+          }))
+        : initialPodcastsData.contents,
+    publishingPlatforms: savedContent.publishingPlatforms || "",
+    repurposingStrategy: savedContent.repurposingStrategy || "",
+    references:
+      Array.isArray(savedContent.references) && savedContent.references.length
+        ? savedContent.references.map((r) => ({
+            title: r.title || "",
+            link: r.link || "",
+          }))
+        : initialPodcastsData.references,
+  });
+}
+
 if (isPinterestModule && isPinterestData(savedContent)) {
   setPinterestData({
     frequencyItems:
@@ -1170,6 +1228,20 @@ function isPinterestData(value: unknown): value is PinterestData {
     "pinKeywords" in value ||
     "destinationLinks" in value ||
     "descriptionGuidelines" in value
+  );
+}
+
+function isPodcastsData(value: unknown): value is PodcastsData {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  return (
+    "mainFormat" in value ||
+    "durationAndRhythm" in value ||
+    "seriesOrSegments" in value ||
+    "publishingPlatforms" in value ||
+    "repurposingStrategy" in value
   );
 }
 
@@ -1380,13 +1452,15 @@ function isProjectObjectivesData(
                                             ? blogData
                                             : isPinterestModule
                                               ? pinterestData
-                                              : {
-                                                mainText:
-                                                  genericData.mainText?.trim() || "",
-                                                notes: genericData.notes?.trim() || "",
-                                                references:
-                                                  genericData.references?.trim() || "",
-                                              };
+                                              : isPodcastsModule
+                                                ? podcastsData
+                                                : {
+                                                  mainText:
+                                                    genericData.mainText?.trim() || "",
+                                                  notes: genericData.notes?.trim() || "",
+                                                  references:
+                                                    genericData.references?.trim() || "",
+                                                };
 
     const nextData: ProjectData = {
       ...currentData,
@@ -1801,6 +1875,16 @@ function isProjectObjectivesData(
   <PinterestForm
     data={pinterestData}
     setData={setPinterestData}
+    clientSlug={clientSlug}
+    presentationHref={`/apresentacao/${project.slug}`}
+    isSaving={isSaving}
+    isDisabled={!isModuleSelected}
+    onSave={() => saveModule()}
+  />
+) : isPodcastsModule ? (
+  <PodcastsForm
+    data={podcastsData}
+    setData={setPodcastsData}
     clientSlug={clientSlug}
     presentationHref={`/apresentacao/${project.slug}`}
     isSaving={isSaving}
