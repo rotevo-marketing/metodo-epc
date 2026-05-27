@@ -156,6 +156,11 @@ import EstrategiaDoSiteForm, {
   SiteStrategyData,
 } from "@/Components/modulos/EstrategiaDoSiteForm";
 
+import MapaDoSiteForm, {
+  initialSiteMapData,
+  SiteMapData,
+} from "@/Components/modulos/MapaDoSiteForm";
+
 type ClientRecord = {
   id: string;
   name: string;
@@ -315,6 +320,8 @@ const [toneVoiceData, setToneVoiceData] =
   useState<EducationalMaterialsData>(initialEducationalMaterialsData);
   const [siteStrategyData, setSiteStrategyData] =
   useState<SiteStrategyData>(initialSiteStrategyData);
+  const [siteMapData, setSiteMapData] =
+  useState<SiteMapData>(initialSiteMapData);
 
   const module = useMemo(() => {
     return planningModules.find((item) => item.slug === moduleSlug) ?? null;
@@ -355,6 +362,7 @@ const [toneVoiceData, setToneVoiceData] =
   const isLivesModule = moduleSlug === "lives";
   const isEducationalMaterialsModule = moduleSlug === "materiais-educacionais";
   const isSiteStrategyModule = moduleSlug === "estrategia-do-site";
+  const isSiteMapModule = moduleSlug === "mapa-do-site";
 
   const relatedModules = useMemo(() => {
     return planningModules.filter(
@@ -1074,6 +1082,31 @@ if (isPodcastsModule && isPodcastsData(savedContent)) {
   });
 }
 
+if (isSiteMapModule && isSiteMapData(savedContent)) {
+  setSiteMapData({
+    pages:
+      Array.isArray(savedContent.pages) && savedContent.pages.length
+        ? savedContent.pages.map((p) => ({
+            title: p.title || "",
+            type: p.type || "Institucional",
+            objective: p.objective || "",
+            description: p.description || "",
+            requiredSections: p.requiredSections || "",
+            mainCta: p.mainCta || "",
+            priority: p.priority || "Alta",
+          }))
+        : initialSiteMapData.pages,
+    strategicNotes: savedContent.strategicNotes || "",
+    references:
+      Array.isArray(savedContent.references) && savedContent.references.length
+        ? savedContent.references.map((r) => ({
+            title: r.title || "",
+            link: r.link || "",
+          }))
+        : initialSiteMapData.references,
+  });
+}
+
 if (isSiteStrategyModule && isSiteStrategyData(savedContent)) {
   setSiteStrategyData({
     visualIdentity: savedContent.visualIdentity || "",
@@ -1418,9 +1451,16 @@ function isSiteStrategyData(value: unknown): value is SiteStrategyData {
     "integrations" in value ||
     "essentialPages" in value ||
     "importantFeatures" in value ||
-    "strategicNotes" in value ||
     "visualIdentity" in value
   );
+}
+
+function isSiteMapData(value: unknown): value is SiteMapData {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  return "pages" in value;
 }
 
 function isPersonasData(value: unknown): value is PersonasData {
@@ -1638,13 +1678,15 @@ function isProjectObjectivesData(
                                                     ? educationalMaterialsData
                                                     : isSiteStrategyModule
                                                       ? siteStrategyData
-                                                      : {
-                                                        mainText:
-                                                          genericData.mainText?.trim() || "",
-                                                        notes: genericData.notes?.trim() || "",
-                                                        references:
-                                                          genericData.references?.trim() || "",
-                                                      };
+                                                      : isSiteMapModule
+                                                        ? siteMapData
+                                                        : {
+                                                          mainText:
+                                                            genericData.mainText?.trim() || "",
+                                                          notes: genericData.notes?.trim() || "",
+                                                          references:
+                                                            genericData.references?.trim() || "",
+                                                        };
 
     const nextData: ProjectData = {
       ...currentData,
@@ -2099,6 +2141,16 @@ function isProjectObjectivesData(
   <EstrategiaDoSiteForm
     data={siteStrategyData}
     setData={setSiteStrategyData}
+    clientSlug={clientSlug}
+    presentationHref={`/apresentacao/${project.slug}`}
+    isSaving={isSaving}
+    isDisabled={!isModuleSelected}
+    onSave={() => saveModule()}
+  />
+) : isSiteMapModule ? (
+  <MapaDoSiteForm
+    data={siteMapData}
+    setData={setSiteMapData}
     clientSlug={clientSlug}
     presentationHref={`/apresentacao/${project.slug}`}
     isSaving={isSaving}
