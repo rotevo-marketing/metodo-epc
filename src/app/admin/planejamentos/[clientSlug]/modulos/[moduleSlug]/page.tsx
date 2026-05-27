@@ -161,6 +161,11 @@ import MapaDoSiteForm, {
   SiteMapData,
 } from "@/Components/modulos/MapaDoSiteForm";
 
+import CampanhaCaptacaoLeadForm, {
+  initialLeadCaptureCampaignData,
+  LeadCaptureCampaignData,
+} from "@/Components/modulos/CampanhaCaptacaoLeadForm";
+
 type ClientRecord = {
   id: string;
   name: string;
@@ -322,6 +327,9 @@ const [toneVoiceData, setToneVoiceData] =
   useState<SiteStrategyData>(initialSiteStrategyData);
   const [siteMapData, setSiteMapData] =
   useState<SiteMapData>(initialSiteMapData);
+  const [leadCaptureCampaignData, setLeadCaptureCampaignData] =
+  useState<LeadCaptureCampaignData>(initialLeadCaptureCampaignData);
+
 
   const module = useMemo(() => {
     return planningModules.find((item) => item.slug === moduleSlug) ?? null;
@@ -363,6 +371,8 @@ const [toneVoiceData, setToneVoiceData] =
   const isEducationalMaterialsModule = moduleSlug === "materiais-educacionais";
   const isSiteStrategyModule = moduleSlug === "estrategia-do-site";
   const isSiteMapModule = moduleSlug === "mapa-do-site";
+  const isLeadCaptureCampaignModule =
+  moduleSlug === "campanha-captacao-de-lead";
 
   const relatedModules = useMemo(() => {
     return planningModules.filter(
@@ -1260,6 +1270,52 @@ if (isPinterestModule && isPinterestData(savedContent)) {
   });
 }
 
+if (
+  isLeadCaptureCampaignModule &&
+  isLeadCaptureCampaignData(savedContent)
+) {
+  setLeadCaptureCampaignData({
+    campaignType: savedContent.campaignType || "Captação direta",
+    campaignPhase: savedContent.campaignPhase || "Teste inicial",
+    trafficObjective: savedContent.trafficObjective || "Leads",
+    audienceTemperature: savedContent.audienceTemperature || "Frio",
+    recommendedChannels: savedContent.recommendedChannels || "",
+    budget: savedContent.budget || "",
+    materials:
+      Array.isArray(savedContent.materials) && savedContent.materials.length
+        ? savedContent.materials.map((material) => ({
+            title: material.title || "",
+            type: material.type || "",
+          }))
+        : initialLeadCaptureCampaignData.materials,
+    objective: savedContent.objective || "",
+    audience: savedContent.audience || "",
+    positioning: savedContent.positioning || "",
+    creativeDirection: savedContent.creativeDirection || "",
+    strategicScenario: savedContent.strategicScenario || "",
+    offerPromise: savedContent.offerPromise || "",
+    perceivedBenefit: savedContent.perceivedBenefit || "",
+    mainCall: savedContent.mainCall || "",
+    offerName: savedContent.offerName || "",
+    pageHeadline: savedContent.pageHeadline || "",
+    pageArgument: savedContent.pageArgument || "",
+    formFields: savedContent.formFields || "",
+    pageCta: savedContent.pageCta || "",
+    nextStepAfterSignup: savedContent.nextStepAfterSignup || "",
+    qualificationCriteria: savedContent.qualificationCriteria || "",
+    initialNurturingSequence:
+      savedContent.initialNurturingSequence || "",
+    metrics: savedContent.metrics || "",
+    references:
+      Array.isArray(savedContent.references) && savedContent.references.length
+        ? savedContent.references.map((reference) => ({
+            title: reference.title || "",
+            link: reference.link || "",
+          }))
+        : initialLeadCaptureCampaignData.references,
+  });
+}
+
 function isContentFunnelData(value: unknown): value is ContentFunnelData {
   if (!value || typeof value !== "object") {
     return false;
@@ -1452,6 +1508,42 @@ function isSiteStrategyData(value: unknown): value is SiteStrategyData {
     "essentialPages" in value ||
     "importantFeatures" in value ||
     "visualIdentity" in value
+  );
+}
+
+function isLeadCaptureCampaignData(
+  value: unknown
+): value is LeadCaptureCampaignData {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  return (
+    "campaignType" in value ||
+    "campaignPhase" in value ||
+    "trafficObjective" in value ||
+    "audienceTemperature" in value ||
+    "recommendedChannels" in value ||
+    "budget" in value ||
+    "materials" in value ||
+    "objective" in value ||
+    "audience" in value ||
+    "positioning" in value ||
+    "creativeDirection" in value ||
+    "strategicScenario" in value ||
+    "offerPromise" in value ||
+    "perceivedBenefit" in value ||
+    "mainCall" in value ||
+    "offerName" in value ||
+    "pageHeadline" in value ||
+    "pageArgument" in value ||
+    "formFields" in value ||
+    "pageCta" in value ||
+    "nextStepAfterSignup" in value ||
+    "qualificationCriteria" in value ||
+    "initialNurturingSequence" in value ||
+    "metrics" in value ||
+    "references" in value
   );
 }
 
@@ -1680,13 +1772,15 @@ function isProjectObjectivesData(
                                                       ? siteStrategyData
                                                       : isSiteMapModule
                                                         ? siteMapData
-                                                        : {
-                                                          mainText:
-                                                            genericData.mainText?.trim() || "",
-                                                          notes: genericData.notes?.trim() || "",
-                                                          references:
-                                                            genericData.references?.trim() || "",
-                                                        };
+                                                        : isLeadCaptureCampaignModule
+                                                          ? leadCaptureCampaignData
+                                                          : {
+                                                            mainText:
+                                                              genericData.mainText?.trim() || "",
+                                                            notes: genericData.notes?.trim() || "",
+                                                            references:
+                                                              genericData.references?.trim() || "",
+                                                          };
 
     const nextData: ProjectData = {
       ...currentData,
@@ -2151,6 +2245,16 @@ function isProjectObjectivesData(
   <MapaDoSiteForm
     data={siteMapData}
     setData={setSiteMapData}
+    clientSlug={clientSlug}
+    presentationHref={`/apresentacao/${project.slug}`}
+    isSaving={isSaving}
+    isDisabled={!isModuleSelected}
+    onSave={() => saveModule()}
+  />
+) : isLeadCaptureCampaignModule ? (
+  <CampanhaCaptacaoLeadForm
+    data={leadCaptureCampaignData}
+    setData={setLeadCaptureCampaignData}
     clientSlug={clientSlug}
     presentationHref={`/apresentacao/${project.slug}`}
     isSaving={isSaving}
