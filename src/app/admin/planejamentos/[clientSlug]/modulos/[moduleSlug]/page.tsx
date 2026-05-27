@@ -90,6 +90,13 @@ import TikTokForm, {
   normalizeTikTokTextList,
 } from "@/Components/modulos/TikTokForm";
 
+import YoutubeForm, {
+  initialYoutubeData,
+  initialYoutubeFrequencyItems,
+  YoutubeData,
+  normalizeYoutubeTextList,
+} from "@/Components/modulos/YoutubeForm";
+
 type ClientRecord = {
   id: string;
   name: string;
@@ -229,6 +236,8 @@ const [toneVoiceData, setToneVoiceData] =
   useState<InstagramData>(initialInstagramData);
   const [tiktokData, setTiktokData] =
   useState<TikTokData>(initialTikTokData);
+  const [youtubeData, setYoutubeData] =
+  useState<YoutubeData>(initialYoutubeData);
 
 
   const module = useMemo(() => {
@@ -260,6 +269,7 @@ const [toneVoiceData, setToneVoiceData] =
   const isEditorialLinesModule = moduleSlug === "linhas-editoriais";
   const isInstagramModule = moduleSlug === "instagram";
   const isTiktokModule = moduleSlug === "tiktok";
+  const isYoutubeModule = moduleSlug === "youtube";
 
   const relatedModules = useMemo(() => {
     return planningModules.filter(
@@ -726,6 +736,46 @@ if (isTiktokModule && isTikTokData(savedContent)) {
   });
 }
 
+if (isYoutubeModule && isYoutubeData(savedContent)) {
+  setYoutubeData({
+    frequencyItems:
+      Array.isArray(savedContent.frequencyItems) &&
+      savedContent.frequencyItems.length
+        ? savedContent.frequencyItems.map((item) => ({
+            format: item.format || "",
+            quantity: item.quantity || "",
+            period: item.period || "por semana",
+            observation: item.observation || "",
+          }))
+        : initialYoutubeFrequencyItems,
+    objectives: normalizeYoutubeTextList(savedContent.objectives),
+    languageStructures: normalizeYoutubeTextList(savedContent.languageStructures),
+    editingStyle: savedContent.editingStyle || "",
+    visualReferences:
+      Array.isArray(savedContent.visualReferences) &&
+      savedContent.visualReferences.length
+        ? savedContent.visualReferences.map((reference) => ({
+            image: reference.image || "",
+          }))
+        : initialYoutubeData.visualReferences,
+    seoStrategies: normalizeYoutubeTextList(savedContent.seoStrategies),
+    contents: normalizeYoutubeTextList(savedContent.contents),
+    channelPhoto: savedContent.channelPhoto || "",
+    channelCover: savedContent.channelCover || "",
+    channelName: savedContent.channelName || "",
+    channelCategory: savedContent.channelCategory || "",
+    channelDescription: savedContent.channelDescription || "",
+    suggestedPlaylists: savedContent.suggestedPlaylists || "",
+    references:
+      Array.isArray(savedContent.references) && savedContent.references.length
+        ? savedContent.references.map((reference) => ({
+            title: reference.title || "",
+            link: reference.link || "",
+          }))
+        : initialYoutubeData.references,
+  });
+}
+
 function isContentFunnelData(value: unknown): value is ContentFunnelData {
   if (!value || typeof value !== "object") {
     return false;
@@ -786,6 +836,20 @@ function isTikTokData(value: unknown): value is TikTokData {
     "contentSeries" in value ||
     "openingHooks" in value ||
     "retentionResources" in value
+  );
+}
+
+function isYoutubeData(value: unknown): value is YoutubeData {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  return (
+    "editingStyle" in value ||
+    "seoStrategies" in value ||
+    "channelName" in value ||
+    "channelDescription" in value ||
+    "suggestedPlaylists" in value
   );
 }
 
@@ -982,13 +1046,17 @@ function isProjectObjectivesData(
                               ? editorialLinesData
                               : isInstagramModule
                                 ? instagramData
-                                : {
-                                    mainText:
-                                      genericData.mainText?.trim() || "",
-                                    notes: genericData.notes?.trim() || "",
-                                    references:
-                                      genericData.references?.trim() || "",
-                                  };
+                                : isTiktokModule
+                                  ? tiktokData
+                                  : isYoutubeModule
+                                    ? youtubeData
+                                    : {
+                                        mainText:
+                                          genericData.mainText?.trim() || "",
+                                        notes: genericData.notes?.trim() || "",
+                                        references:
+                                          genericData.references?.trim() || "",
+                                      };
 
     const nextData: ProjectData = {
       ...currentData,
@@ -1333,6 +1401,26 @@ function isProjectObjectivesData(
   <InstagramForm
     data={instagramData}
     setData={setInstagramData}
+    clientSlug={clientSlug}
+    presentationHref={`/apresentacao/${project.slug}`}
+    isSaving={isSaving}
+    isDisabled={!isModuleSelected}
+    onSave={() => saveModule()}
+  />
+) : isTiktokModule ? (
+  <TikTokForm
+    data={tiktokData}
+    setData={setTiktokData}
+    clientSlug={clientSlug}
+    presentationHref={`/apresentacao/${project.slug}`}
+    isSaving={isSaving}
+    isDisabled={!isModuleSelected}
+    onSave={() => saveModule()}
+  />
+) : isYoutubeModule ? (
+  <YoutubeForm
+    data={youtubeData}
+    setData={setYoutubeData}
     clientSlug={clientSlug}
     presentationHref={`/apresentacao/${project.slug}`}
     isSaving={isSaving}
