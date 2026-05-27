@@ -52,6 +52,12 @@ import PersonasForm, {
   PersonasData,
 } from "@/Components/modulos/PersonasForm";
 
+import JornadaCompraForm, {
+  awarenessLevels,
+  BuyingJourneyData,
+  initialBuyingJourneyData,
+  journeyStages,
+} from "@/Components/modulos/JornadaCompraForm";
 type ClientRecord = {
   id: string;
   name: string;
@@ -179,6 +185,8 @@ const [toneVoiceData, setToneVoiceData] =
   useState<KeywordsData>(initialKeywordsData);
   const [personasData, setPersonasData] =
   useState<PersonasData>(initialPersonasData);
+  const [buyingJourneyData, setBuyingJourneyData] =
+  useState<BuyingJourneyData>(initialBuyingJourneyData);
   
 
   const module = useMemo(() => {
@@ -204,6 +212,7 @@ const [toneVoiceData, setToneVoiceData] =
   const isSwotModule = moduleSlug === "analise-swot";
   const isKeywordsModule = moduleSlug === "palavras-chave";
   const isPersonasModule = moduleSlug === "personas";
+  const isBuyingJourneyModule = moduleSlug === "jornada-de-compra";
 
   const relatedModules = useMemo(() => {
     return planningModules.filter(
@@ -451,12 +460,78 @@ if (isPersonasModule && isPersonasData(savedContent)) {
   });
 }
 
+if (isBuyingJourneyModule && isBuyingJourneyData(savedContent)) {
+  setBuyingJourneyData({
+    overview: savedContent.overview || "",
+    stages:
+      Array.isArray(savedContent.stages) && savedContent.stages.length
+        ? journeyStages.map((_, index) => ({
+            awarenessLevel:
+              savedContent.stages[index]?.awarenessLevel || awarenessLevels[0],
+            thoughts: savedContent.stages[index]?.thoughts || "",
+            pains: savedContent.stages[index]?.pains || "",
+            recommendedContent:
+              savedContent.stages[index]?.recommendedContent || "",
+            recommendedChannels:
+              savedContent.stages[index]?.recommendedChannels || "",
+            desiredNextStep:
+              savedContent.stages[index]?.desiredNextStep || "",
+            conversionPoint:
+              savedContent.stages[index]?.conversionPoint || "",
+          }))
+        : initialBuyingJourneyData.stages,
+    turningPoints: {
+      discoveryToPain: savedContent.turningPoints?.discoveryToPain || "",
+      painToSolution: savedContent.turningPoints?.painToSolution || "",
+      solutionToComparison:
+        savedContent.turningPoints?.solutionToComparison || "",
+      comparisonToDecision:
+        savedContent.turningPoints?.comparisonToDecision || "",
+    },
+    objections: {
+      beginning: savedContent.objections?.beginning || "",
+      middle: savedContent.objections?.middle || "",
+      end: savedContent.objections?.end || "",
+    },
+    advancementTriggers: savedContent.advancementTriggers || "",
+    essentialContent: {
+      awareness: savedContent.essentialContent?.awareness || "",
+      decision: savedContent.essentialContent?.decision || "",
+    },
+    funnelCampaignsAutomation: savedContent.funnelCampaignsAutomation || "",
+    references:
+      Array.isArray(savedContent.references) && savedContent.references.length
+        ? savedContent.references.map((reference) => ({
+            title: reference.title || "",
+            link: reference.link || "",
+          }))
+        : initialBuyingJourneyData.references,
+  });
+}
+
 function isPersonasData(value: unknown): value is PersonasData {
   if (!value || typeof value !== "object") {
     return false;
   }
 
   return "personas" in value;
+}
+
+function isBuyingJourneyData(value: unknown): value is BuyingJourneyData {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  return (
+    "overview" in value ||
+    "stages" in value ||
+    "turningPoints" in value ||
+    "objections" in value ||
+    "advancementTriggers" in value ||
+    "essentialContent" in value ||
+    "funnelCampaignsAutomation" in value ||
+    "references" in value
+  );
 }
 
 function isKeywordsData(value: unknown): value is KeywordsData {
@@ -609,11 +684,13 @@ function isProjectObjectivesData(
                     ? keywordsData
                     : isPersonasModule
                       ? personasData
-                      : {
-                          mainText: genericData.mainText?.trim() || "",
-                          notes: genericData.notes?.trim() || "",
-                          references: genericData.references?.trim() || "",
-                        };
+                      : isBuyingJourneyModule
+                        ? buyingJourneyData
+                        : {
+                            mainText: genericData.mainText?.trim() || "",
+                            notes: genericData.notes?.trim() || "",
+                            references: genericData.references?.trim() || "",
+                          };
 
     const nextData: ProjectData = {
       ...currentData,
@@ -903,6 +980,17 @@ function isProjectObjectivesData(
   <PersonasForm
     data={personasData}
     setData={setPersonasData}
+    clientSlug={clientSlug}
+    presentationHref={`/apresentacao/${project.slug}`}
+    isSaving={isSaving}
+    isDisabled={!isModuleSelected}
+    onSave={() => saveModule()}
+  />
+
+  ) : isBuyingJourneyModule ? (
+  <JornadaCompraForm
+    data={buyingJourneyData}
+    setData={setBuyingJourneyData}
     clientSlug={clientSlug}
     presentationHref={`/apresentacao/${project.slug}`}
     isSaving={isSaving}
