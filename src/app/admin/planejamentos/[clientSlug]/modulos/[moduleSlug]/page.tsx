@@ -139,6 +139,13 @@ import PodcastsForm, {
   normalizePodcastsTextList,
 } from "@/Components/modulos/PodcastsForm";
 
+import LivesForm, {
+  initialLivesData,
+  initialLivesFrequencyItems,
+  LivesData,
+  normalizeLivesTextList,
+} from "@/Components/modulos/LivesForm";
+
 type ClientRecord = {
   id: string;
   name: string;
@@ -292,6 +299,8 @@ const [toneVoiceData, setToneVoiceData] =
   useState<PinterestData>(initialPinterestData);
   const [podcastsData, setPodcastsData] =
   useState<PodcastsData>(initialPodcastsData);
+  const [livesData, setLivesData] =
+  useState<LivesData>(initialLivesData);
 
   const module = useMemo(() => {
     return planningModules.find((item) => item.slug === moduleSlug) ?? null;
@@ -329,6 +338,7 @@ const [toneVoiceData, setToneVoiceData] =
   const isBlogModule = moduleSlug === "blog";
   const isPinterestModule = moduleSlug === "pinterest";
   const isPodcastsModule = moduleSlug === "podcasts";
+  const isLivesModule = moduleSlug === "lives";
 
   const relatedModules = useMemo(() => {
     return planningModules.filter(
@@ -1048,6 +1058,62 @@ if (isPodcastsModule && isPodcastsData(savedContent)) {
   });
 }
 
+if (isLivesModule && isLivesData(savedContent)) {
+  setLivesData({
+    frequencyItems:
+      Array.isArray(savedContent.frequencyItems) &&
+      savedContent.frequencyItems.length
+        ? savedContent.frequencyItems.map((item) => ({
+            format: item.format || "",
+            quantity: item.quantity || "",
+            period: item.period || "por semana",
+            observation: item.observation || "",
+          }))
+        : initialLivesFrequencyItems,
+    networkFrequencies:
+      Array.isArray(savedContent.networkFrequencies) &&
+      savedContent.networkFrequencies.length
+        ? savedContent.networkFrequencies.map((item) => ({
+            channel: item.channel || "",
+            frequency: item.frequency || "",
+          }))
+        : [{ channel: "", frequency: "" }],
+    objectives: normalizeLivesTextList(savedContent.objectives),
+    languageStructures: normalizeLivesTextList(savedContent.languageStructures),
+    openingScript: savedContent.openingScript || "",
+    centralContent: savedContent.centralContent || "",
+    publicInteraction: savedContent.publicInteraction || "",
+    closingAndCall: savedContent.closingAndCall || "",
+    visualStrategy: savedContent.visualStrategy || "",
+    visualReferences:
+      Array.isArray(savedContent.visualReferences) &&
+      savedContent.visualReferences.length
+        ? savedContent.visualReferences.map((r) => ({
+            image: r.image || "",
+          }))
+        : initialLivesData.visualReferences,
+    contents:
+      Array.isArray(savedContent.contents) && savedContent.contents.length
+        ? savedContent.contents.map((c) => ({
+            title: c.title || "",
+            suggestedDate: c.suggestedDate || "",
+            channel: c.channel || "",
+            objective: c.objective || "",
+            observation: c.observation || "",
+          }))
+        : initialLivesData.contents,
+    beforeAndAfterPromotion: savedContent.beforeAndAfterPromotion || "",
+    repurposingStrategy: savedContent.repurposingStrategy || "",
+    references:
+      Array.isArray(savedContent.references) && savedContent.references.length
+        ? savedContent.references.map((r) => ({
+            title: r.title || "",
+            link: r.link || "",
+          }))
+        : initialLivesData.references,
+  });
+}
+
 if (isPinterestModule && isPinterestData(savedContent)) {
   setPinterestData({
     frequencyItems:
@@ -1242,6 +1308,21 @@ function isPodcastsData(value: unknown): value is PodcastsData {
     "seriesOrSegments" in value ||
     "publishingPlatforms" in value ||
     "repurposingStrategy" in value
+  );
+}
+
+function isLivesData(value: unknown): value is LivesData {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  return (
+    "networkFrequencies" in value ||
+    "openingScript" in value ||
+    "centralContent" in value ||
+    "publicInteraction" in value ||
+    "closingAndCall" in value ||
+    "beforeAndAfterPromotion" in value
   );
 }
 
@@ -1454,13 +1535,15 @@ function isProjectObjectivesData(
                                               ? pinterestData
                                               : isPodcastsModule
                                                 ? podcastsData
-                                                : {
-                                                  mainText:
-                                                    genericData.mainText?.trim() || "",
-                                                  notes: genericData.notes?.trim() || "",
-                                                  references:
-                                                    genericData.references?.trim() || "",
-                                                };
+                                                : isLivesModule
+                                                  ? livesData
+                                                  : {
+                                                    mainText:
+                                                      genericData.mainText?.trim() || "",
+                                                    notes: genericData.notes?.trim() || "",
+                                                    references:
+                                                      genericData.references?.trim() || "",
+                                                  };
 
     const nextData: ProjectData = {
       ...currentData,
@@ -1885,6 +1968,16 @@ function isProjectObjectivesData(
   <PodcastsForm
     data={podcastsData}
     setData={setPodcastsData}
+    clientSlug={clientSlug}
+    presentationHref={`/apresentacao/${project.slug}`}
+    isSaving={isSaving}
+    isDisabled={!isModuleSelected}
+    onSave={() => saveModule()}
+  />
+) : isLivesModule ? (
+  <LivesForm
+    data={livesData}
+    setData={setLivesData}
     clientSlug={clientSlug}
     presentationHref={`/apresentacao/${project.slug}`}
     isSaving={isSaving}
