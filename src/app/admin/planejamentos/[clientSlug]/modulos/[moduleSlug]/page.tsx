@@ -196,6 +196,11 @@ import MetricasIndicadoresForm, {
   MetricsData,
 } from "@/Components/modulos/MetricasIndicadoresForm";
 
+import OrientacoesAdicionaisForm, {
+  initialAdditionalGuidelinesData,
+  AdditionalGuidelinesData,
+} from "@/Components/modulos/OrientacoesAdicionaisForm";
+
 type ClientRecord = {
   id: string;
   name: string;
@@ -371,6 +376,8 @@ const [toneVoiceData, setToneVoiceData] =
   useState<ContentCalendarData>(initialContentCalendarData);
   const [metricsData, setMetricsData] =
   useState<MetricsData>(initialMetricsData);
+  const [additionalGuidelinesData, setAdditionalGuidelinesData] =
+  useState<AdditionalGuidelinesData>(initialAdditionalGuidelinesData);
 
   const module = useMemo(() => {
     return planningModules.find((item) => item.slug === moduleSlug) ?? null;
@@ -422,6 +429,7 @@ const [toneVoiceData, setToneVoiceData] =
   const isTimelineModule = moduleSlug === "linha-do-tempo";
   const isContentCalendarModule = moduleSlug === "calendario-de-conteudo";
   const isMetricsModule = moduleSlug === "metricas-e-indicadores";
+  const isAdditionalGuidelinesModule = moduleSlug === "orientacoes-adicionais";
 
   const relatedModules = useMemo(() => {
     return planningModules.filter(
@@ -2048,6 +2056,37 @@ function isMetricsData(value: unknown): value is MetricsData {
   );
 }
 
+if (isAdditionalGuidelinesModule && isAdditionalGuidelinesData(savedContent)) {
+  setAdditionalGuidelinesData({
+    executionGuidelines: savedContent.executionGuidelines || initialAdditionalGuidelinesData.executionGuidelines,
+    attentionPoints: savedContent.attentionPoints || initialAdditionalGuidelinesData.attentionPoints,
+    pendingItems: Array.isArray(savedContent.pendingItems) && savedContent.pendingItems.length
+      ? savedContent.pendingItems.map((item) => ({ title: item.title || "", description: item.description || "", responsible: item.responsible || "", status: item.status || "Pendente" }))
+      : initialAdditionalGuidelinesData.pendingItems,
+    nextSteps: Array.isArray(savedContent.nextSteps) && savedContent.nextSteps.length
+      ? savedContent.nextSteps.map((step) => ({ title: step.title || "", description: step.description || "", priority: step.priority || "Alta" }))
+      : initialAdditionalGuidelinesData.nextSteps,
+    teamRecommendations: Array.isArray(savedContent.teamRecommendations) && savedContent.teamRecommendations.length
+      ? savedContent.teamRecommendations.map((item) => ({ area: item.area || "", recommendation: item.recommendation || "" }))
+      : initialAdditionalGuidelinesData.teamRecommendations,
+    finalObservations: savedContent.finalObservations || initialAdditionalGuidelinesData.finalObservations,
+    references: Array.isArray(savedContent.references) && savedContent.references.length
+      ? savedContent.references.map((r) => ({ title: r.title || "", link: r.link || "" }))
+      : initialAdditionalGuidelinesData.references,
+  });
+}
+
+function isAdditionalGuidelinesData(value: unknown): value is AdditionalGuidelinesData {
+  if (!value || typeof value !== "object") return false;
+  return (
+    "executionGuidelines" in value ||
+    "attentionPoints" in value ||
+    "pendingItems" in value ||
+    "nextSteps" in value ||
+    "teamRecommendations" in value
+  );
+}
+
       if (!isSpecialistModule && isGenericModuleData(savedContent)) {
         setGenericData({
           mainText: savedContent.mainText || "",
@@ -2203,7 +2242,9 @@ function isProjectObjectivesData(
                                                                     ? contentCalendarData
                                                                     : isMetricsModule
                                                                       ? metricsData
-                                                                      : {
+                                                                      : isAdditionalGuidelinesModule
+                                                                        ? additionalGuidelinesData
+                                                                        : {
                                                             mainText:
                                                               genericData.mainText?.trim() || "",
                                                             notes: genericData.notes?.trim() || "",
@@ -2744,6 +2785,16 @@ function isProjectObjectivesData(
   <MetricasIndicadoresForm
     data={metricsData}
     setData={setMetricsData}
+    clientSlug={clientSlug}
+    presentationHref={`/apresentacao/${project.slug}`}
+    isSaving={isSaving}
+    isDisabled={!isModuleSelected}
+    onSave={() => saveModule()}
+  />
+) : isAdditionalGuidelinesModule ? (
+  <OrientacoesAdicionaisForm
+    data={additionalGuidelinesData}
+    setData={setAdditionalGuidelinesData}
     clientSlug={clientSlug}
     presentationHref={`/apresentacao/${project.slug}`}
     isSaving={isSaving}
