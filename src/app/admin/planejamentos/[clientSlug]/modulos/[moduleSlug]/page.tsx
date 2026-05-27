@@ -14,6 +14,10 @@ import EmpresaForm, {
   CompanyData,
   initialCompanyData,
 } from "@/Components/modulos/EmpresaForm";
+import DnaConteudoForm, {
+  ContentDnaData,
+  initialContentDnaData,
+} from "@/Components/modulos/DnaConteudoForm";
 
 type ClientRecord = {
   id: string;
@@ -115,6 +119,9 @@ export default function ModuloPlanejamentoPage() {
   const [companyData, setCompanyData] = useState<CompanyData>(
   initialCompanyData
 );
+const [contentDnaData, setContentDnaData] = useState<ContentDnaData>(
+  initialContentDnaData
+);
   const [genericData, setGenericData] = useState<GenericModuleData>({
     mainText: "",
     notes: "",
@@ -138,6 +145,7 @@ export default function ModuloPlanejamentoPage() {
   const isModuleSelected = selectedModules.includes(moduleSlug);
   const isSpecialistModule = moduleSlug === "dna-do-especialista";
   const isCompanyModule = moduleSlug === "dna-da-empresa";
+  const isContentDnaModule = moduleSlug === "dna-de-conteudo";
 
   const relatedModules = useMemo(() => {
     return planningModules.filter(
@@ -235,6 +243,15 @@ export default function ModuloPlanejamentoPage() {
   });
 }
 
+if (isContentDnaModule && isContentDnaData(savedContent)) {
+  setContentDnaData({
+    fields: savedContent.fields || {},
+    secondaryIdeas: savedContent.secondaryIdeas?.length
+      ? savedContent.secondaryIdeas
+      : initialContentDnaData.secondaryIdeas,
+  });
+}
+
       if (!isSpecialistModule && isGenericModuleData(savedContent)) {
         setGenericData({
           mainText: savedContent.mainText || "",
@@ -251,6 +268,13 @@ export default function ModuloPlanejamentoPage() {
   return "fields" in value;
 }
 
+function isContentDnaData(value: unknown): value is ContentDnaData {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  return "fields" in value || "secondaryIdeas" in value;
+}
       setIsLoading(false);
     }
 
@@ -283,11 +307,13 @@ export default function ModuloPlanejamentoPage() {
   ? specialistData
   : isCompanyModule
     ? companyData
-    : {
-        mainText: genericData.mainText?.trim() || "",
-        notes: genericData.notes?.trim() || "",
-        references: genericData.references?.trim() || "",
-      };
+    : isContentDnaModule
+      ? contentDnaData
+      : {
+          mainText: genericData.mainText?.trim() || "",
+          notes: genericData.notes?.trim() || "",
+          references: genericData.references?.trim() || "",
+        };
 
     const nextData: ProjectData = {
       ...currentData,
@@ -482,6 +508,16 @@ export default function ModuloPlanejamentoPage() {
   <EmpresaForm
     data={companyData}
     setData={setCompanyData}
+    clientSlug={clientSlug}
+    presentationHref={`/apresentacao/${project.slug}`}
+    isSaving={isSaving}
+    isDisabled={!isModuleSelected}
+    onSave={() => saveModule()}
+  />
+) : isContentDnaModule ? (
+  <DnaConteudoForm
+    data={contentDnaData}
+    setData={setContentDnaData}
     clientSlug={clientSlug}
     presentationHref={`/apresentacao/${project.slug}`}
     isSaving={isSaving}
