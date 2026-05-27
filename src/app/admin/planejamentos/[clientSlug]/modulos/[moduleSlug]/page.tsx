@@ -46,6 +46,11 @@ import PalavrasChaveForm, {
   initialKeywordsData,
   KeywordsData,
 } from "@/Components/modulos/PalavrasChaveForm";
+import PersonasForm, {
+  createEmptyPersona,
+  initialPersonasData,
+  PersonasData,
+} from "@/Components/modulos/PersonasForm";
 
 type ClientRecord = {
   id: string;
@@ -172,6 +177,8 @@ const [toneVoiceData, setToneVoiceData] =
   const [swotData, setSwotData] = useState<SwotData>(initialSwotData);
   const [keywordsData, setKeywordsData] =
   useState<KeywordsData>(initialKeywordsData);
+  const [personasData, setPersonasData] =
+  useState<PersonasData>(initialPersonasData);
   
 
   const module = useMemo(() => {
@@ -196,6 +203,7 @@ const [toneVoiceData, setToneVoiceData] =
   const isCompetitorResearchModule = moduleSlug === "pesquisa-de-concorrencia";
   const isSwotModule = moduleSlug === "analise-swot";
   const isKeywordsModule = moduleSlug === "palavras-chave";
+  const isPersonasModule = moduleSlug === "personas";
 
   const relatedModules = useMemo(() => {
     return planningModules.filter(
@@ -427,6 +435,30 @@ if (isKeywordsModule && isKeywordsData(savedContent)) {
   });
 }
 
+if (isPersonasModule && isPersonasData(savedContent)) {
+  setPersonasData({
+    personas:
+      Array.isArray(savedContent.personas) && savedContent.personas.length
+        ? savedContent.personas.map((persona) => ({
+            ...createEmptyPersona(),
+            ...persona,
+            behaviors: {
+              ...createEmptyPersona().behaviors,
+              ...(persona.behaviors || {}),
+            },
+          }))
+        : initialPersonasData.personas,
+  });
+}
+
+function isPersonasData(value: unknown): value is PersonasData {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  return "personas" in value;
+}
+
 function isKeywordsData(value: unknown): value is KeywordsData {
   if (!value || typeof value !== "object") {
     return false;
@@ -575,11 +607,13 @@ function isProjectObjectivesData(
                   ? swotData
                   : isKeywordsModule
                     ? keywordsData
-                    : {
-                        mainText: genericData.mainText?.trim() || "",
-                        notes: genericData.notes?.trim() || "",
-                        references: genericData.references?.trim() || "",
-                      };
+                    : isPersonasModule
+                      ? personasData
+                      : {
+                          mainText: genericData.mainText?.trim() || "",
+                          notes: genericData.notes?.trim() || "",
+                          references: genericData.references?.trim() || "",
+                        };
 
     const nextData: ProjectData = {
       ...currentData,
@@ -858,6 +892,17 @@ function isProjectObjectivesData(
   <PalavrasChaveForm
     data={keywordsData}
     setData={setKeywordsData}
+    clientSlug={clientSlug}
+    presentationHref={`/apresentacao/${project.slug}`}
+    isSaving={isSaving}
+    isDisabled={!isModuleSelected}
+    onSave={() => saveModule()}
+  />
+
+  ) : isPersonasModule ? (
+  <PersonasForm
+    data={personasData}
+    setData={setPersonasData}
     clientSlug={clientSlug}
     presentationHref={`/apresentacao/${project.slug}`}
     isSaving={isSaving}
