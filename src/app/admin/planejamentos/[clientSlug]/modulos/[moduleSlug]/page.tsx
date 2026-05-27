@@ -166,6 +166,11 @@ import CampanhaCaptacaoLeadForm, {
   LeadCaptureCampaignData,
 } from "@/Components/modulos/CampanhaCaptacaoLeadForm";
 
+import CampanhaConversaoVendasForm, {
+  initialSalesConversionCampaignData,
+  SalesConversionCampaignData,
+} from "@/Components/modulos/CampanhaConversaoVendasForm";
+
 type ClientRecord = {
   id: string;
   name: string;
@@ -329,6 +334,8 @@ const [toneVoiceData, setToneVoiceData] =
   useState<SiteMapData>(initialSiteMapData);
   const [leadCaptureCampaignData, setLeadCaptureCampaignData] =
   useState<LeadCaptureCampaignData>(initialLeadCaptureCampaignData);
+  const [salesConversionCampaignData, setSalesConversionCampaignData] =
+  useState<SalesConversionCampaignData>(initialSalesConversionCampaignData);
 
 
   const module = useMemo(() => {
@@ -373,6 +380,8 @@ const [toneVoiceData, setToneVoiceData] =
   const isSiteMapModule = moduleSlug === "mapa-do-site";
   const isLeadCaptureCampaignModule =
   moduleSlug === "campanha-captacao-de-lead";
+  const isSalesConversionCampaignModule =
+  moduleSlug === "campanha-conversao-de-vendas";
 
   const relatedModules = useMemo(() => {
     return planningModules.filter(
@@ -1271,6 +1280,78 @@ if (isPinterestModule && isPinterestData(savedContent)) {
 }
 
 if (
+  isSalesConversionCampaignModule &&
+  isSalesConversionCampaignData(savedContent)
+) {
+  setSalesConversionCampaignData({
+    campaignType: savedContent.campaignType || "Venda direta",
+    campaignPhase: savedContent.campaignPhase || "Teste inicial",
+    salesObjective: savedContent.salesObjective || "Conversões",
+    audienceTemperature: savedContent.audienceTemperature || "Morno",
+    recommendedChannels: savedContent.recommendedChannels || "",
+    budget: savedContent.budget || "",
+    objective: savedContent.objective || "",
+    offerProduct: savedContent.offerProduct || "",
+    offerPrice: savedContent.offerPrice || "",
+    offerPromise: savedContent.offerPromise || "",
+    offerBenefits: savedContent.offerBenefits || "",
+    mainCall: savedContent.mainCall || "",
+    audienceCold: savedContent.audienceCold || "",
+    audienceWarm: savedContent.audienceWarm || "",
+    audienceHot: savedContent.audienceHot || "",
+    positioning: savedContent.positioning || "",
+    creativeDirection: savedContent.creativeDirection || "",
+    strategicScenario: savedContent.strategicScenario || "",
+    destinations:
+      Array.isArray(savedContent.destinations) && savedContent.destinations.length
+        ? savedContent.destinations.map((destination) => ({
+            title: destination.title || "",
+            link: destination.link || "",
+          }))
+        : initialSalesConversionCampaignData.destinations,
+    mainObjections: savedContent.mainObjections || "",
+    strategicResponses: savedContent.strategicResponses || "",
+    salesPageDestination: savedContent.salesPageDestination || "",
+    mainCta: savedContent.mainCta || "",
+    proofElements: savedContent.proofElements || "",
+    urgencyAndScarcity: savedContent.urgencyAndScarcity || "",
+    remarketingStructure: savedContent.remarketingStructure || "",
+    metrics: savedContent.metrics || "",
+    references:
+      Array.isArray(savedContent.references) && savedContent.references.length
+        ? savedContent.references.map((reference) => ({
+            title: reference.title || "",
+            link: reference.link || "",
+          }))
+        : initialSalesConversionCampaignData.references,
+  });
+}
+
+function isSalesConversionCampaignData(
+  value: unknown
+): value is SalesConversionCampaignData {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  return (
+    "salesObjective" in value ||
+    "offerProduct" in value ||
+    "offerPrice" in value ||
+    "offerBenefits" in value ||
+    "audienceCold" in value ||
+    "audienceWarm" in value ||
+    "audienceHot" in value ||
+    "destinations" in value ||
+    "mainObjections" in value ||
+    "strategicResponses" in value ||
+    "proofElements" in value ||
+    "urgencyAndScarcity" in value ||
+    "remarketingStructure" in value
+  );
+}
+
+if (
   isLeadCaptureCampaignModule &&
   isLeadCaptureCampaignData(savedContent)
 ) {
@@ -1774,7 +1855,9 @@ function isProjectObjectivesData(
                                                         ? siteMapData
                                                         : isLeadCaptureCampaignModule
                                                           ? leadCaptureCampaignData
-                                                          : {
+                                                          : isSalesConversionCampaignModule
+                                                            ? salesConversionCampaignData
+                                                            : {
                                                             mainText:
                                                               genericData.mainText?.trim() || "",
                                                             notes: genericData.notes?.trim() || "",
@@ -2255,6 +2338,16 @@ function isProjectObjectivesData(
   <CampanhaCaptacaoLeadForm
     data={leadCaptureCampaignData}
     setData={setLeadCaptureCampaignData}
+    clientSlug={clientSlug}
+    presentationHref={`/apresentacao/${project.slug}`}
+    isSaving={isSaving}
+    isDisabled={!isModuleSelected}
+    onSave={() => saveModule()}
+  />
+) : isSalesConversionCampaignModule ? (
+  <CampanhaConversaoVendasForm
+    data={salesConversionCampaignData}
+    setData={setSalesConversionCampaignData}
     clientSlug={clientSlug}
     presentationHref={`/apresentacao/${project.slug}`}
     isSaving={isSaving}
