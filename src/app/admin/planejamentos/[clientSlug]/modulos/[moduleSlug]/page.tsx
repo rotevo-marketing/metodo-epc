@@ -26,6 +26,10 @@ import IdentidadeVisualForm, {
   initialVisualIdentityData,
   VisualIdentityData,
 } from "@/Components/modulos/IdentidadeVisualForm";
+import ObjetivosProjetoForm, {
+  initialProjectObjectivesData,
+  ProjectObjectivesData,
+} from "@/Components/modulos/ObjetivosProjetoForm";
 
 type ClientRecord = {
   id: string;
@@ -143,6 +147,9 @@ const [toneVoiceData, setToneVoiceData] =
   const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [projectObjectivesData, setProjectObjectivesData] =
+  useState<ProjectObjectivesData>(initialProjectObjectivesData);
+  
 
   const module = useMemo(() => {
     return planningModules.find((item) => item.slug === moduleSlug) ?? null;
@@ -160,6 +167,7 @@ const [toneVoiceData, setToneVoiceData] =
   const isContentDnaModule = moduleSlug === "dna-de-conteudo";
   const isToneVoiceModule = moduleSlug === "tom-de-voz";
   const isVisualIdentityModule = moduleSlug === "identidade-visual";
+  const isProjectObjectivesModule = moduleSlug === "objetivos-do-projeto";
 
   const relatedModules = useMemo(() => {
     return planningModules.filter(
@@ -299,6 +307,29 @@ if (isVisualIdentityModule && isVisualIdentityData(savedContent)) {
   });
 }
 
+if (isProjectObjectivesModule && isProjectObjectivesData(savedContent)) {
+  setProjectObjectivesData({
+    mainObjective:
+      savedContent.mainObjective || initialProjectObjectivesData.mainObjective,
+    secondaryObjectives: Array.isArray(savedContent.secondaryObjectives)
+      ? savedContent.secondaryObjectives
+      : initialProjectObjectivesData.secondaryObjectives,
+    priorities: Array.isArray(savedContent.priorities)
+      ? savedContent.priorities
+      : initialProjectObjectivesData.priorities,
+    successIndicators: Array.isArray(savedContent.successIndicators)
+      ? savedContent.successIndicators
+      : initialProjectObjectivesData.successIndicators,
+    expectedResults: Array.isArray(savedContent.expectedResults)
+      ? savedContent.expectedResults
+      : initialProjectObjectivesData.expectedResults,
+    phases: Array.isArray(savedContent.phases)
+      ? savedContent.phases
+      : initialProjectObjectivesData.phases,
+    strategicObservation: savedContent.strategicObservation || "",
+  });
+}
+
 function isVisualIdentityData(value: unknown): value is VisualIdentityData {
   if (!value || typeof value !== "object") {
     return false;
@@ -350,6 +381,25 @@ function isToneVoiceData(value: unknown): value is ToneVoiceData {
     "references" in value
   );
 }
+
+function isProjectObjectivesData(
+  value: unknown
+): value is ProjectObjectivesData {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  return (
+    "mainObjective" in value ||
+    "secondaryObjectives" in value ||
+    "priorities" in value ||
+    "successIndicators" in value ||
+    "expectedResults" in value ||
+    "phases" in value ||
+    "strategicObservation" in value
+  );
+}
+
       setIsLoading(false);
     }
 
@@ -388,11 +438,13 @@ function isToneVoiceData(value: unknown): value is ToneVoiceData {
         ? toneVoiceData
         : isVisualIdentityModule
           ? visualIdentityData
-          : {
-              mainText: genericData.mainText?.trim() || "",
-              notes: genericData.notes?.trim() || "",
-              references: genericData.references?.trim() || "",
-            };
+          : isProjectObjectivesModule
+            ? projectObjectivesData
+            : {
+                mainText: genericData.mainText?.trim() || "",
+                notes: genericData.notes?.trim() || "",
+                references: genericData.references?.trim() || "",
+              };
 
     const nextData: ProjectData = {
       ...currentData,
@@ -623,8 +675,17 @@ function isToneVoiceData(value: unknown): value is ToneVoiceData {
     isDisabled={!isModuleSelected}
     onSave={() => saveModule()}
   />
+) : isProjectObjectivesModule ? (
+  <ObjetivosProjetoForm
+    data={projectObjectivesData}
+    setData={setProjectObjectivesData}
+    clientSlug={clientSlug}
+    presentationHref={`/apresentacao/${project.slug}`}
+    isSaving={isSaving}
+    isDisabled={!isModuleSelected}
+    onSave={() => saveModule()}
+  />
 ) : (
-
                 <form
                   onSubmit={saveModule}
                   className="mt-6 rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-10"
