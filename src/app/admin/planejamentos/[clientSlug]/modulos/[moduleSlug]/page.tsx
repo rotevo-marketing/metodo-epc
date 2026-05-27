@@ -65,6 +65,12 @@ import CanaisDigitaisAtuaisForm, {
   initialCurrentChannelsData,
 } from "@/Components/modulos/CanaisDigitaisAtuaisForm";
 
+import FunilConteudoForm, {
+  ContentFunnelData,
+  funnelStages,
+  initialContentFunnelData,
+} from "@/Components/modulos/FunilConteudoForm";
+
 type ClientRecord = {
   id: string;
   name: string;
@@ -196,6 +202,8 @@ const [toneVoiceData, setToneVoiceData] =
   useState<BuyingJourneyData>(initialBuyingJourneyData);
   const [currentChannelsData, setCurrentChannelsData] =
   useState<CurrentChannelsData>(initialCurrentChannelsData);
+  const [contentFunnelData, setContentFunnelData] =
+  useState<ContentFunnelData>(initialContentFunnelData);
   
 
   const module = useMemo(() => {
@@ -223,6 +231,7 @@ const [toneVoiceData, setToneVoiceData] =
   const isPersonasModule = moduleSlug === "personas";
   const isBuyingJourneyModule = moduleSlug === "jornada-de-compra";
   const isCurrentChannelsModule = moduleSlug === "canais-digitais-atuais";
+  const isContentFunnelModule = moduleSlug === "funil-de-conteudo";
 
   const relatedModules = useMemo(() => {
     return planningModules.filter(
@@ -540,6 +549,57 @@ if (isCurrentChannelsModule && isCurrentChannelsData(savedContent)) {
   });
 }
 
+if (isContentFunnelModule && isContentFunnelData(savedContent)) {
+  setContentFunnelData({
+    stages:
+      Array.isArray(savedContent.stages) && savedContent.stages.length
+        ? funnelStages.map((_, index) => ({
+            strategy: savedContent.stages[index]?.strategy || "",
+            objective: savedContent.stages[index]?.objective || "",
+            nextStep: savedContent.stages[index]?.nextStep || "",
+            themes: savedContent.stages[index]?.themes || "",
+            recommendedFormat:
+              savedContent.stages[index]?.recommendedFormat || "Reels",
+            ctas: savedContent.stages[index]?.ctas || "",
+          }))
+        : initialContentFunnelData.stages,
+    overview: savedContent.overview || "",
+    distribution: {
+      attraction: savedContent.distribution?.attraction || "",
+      connection: savedContent.distribution?.connection || "",
+      bonding: savedContent.distribution?.bonding || "",
+      sales: savedContent.distribution?.sales || "",
+    },
+    metrics: {
+      attraction: savedContent.metrics?.attraction || "",
+      connection: savedContent.metrics?.connection || "",
+      bonding: savedContent.metrics?.bonding || "",
+      sales: savedContent.metrics?.sales || "",
+    },
+    references:
+      Array.isArray(savedContent.references) && savedContent.references.length
+        ? savedContent.references.map((reference) => ({
+            title: reference.title || "",
+            link: reference.link || "",
+          }))
+        : initialContentFunnelData.references,
+  });
+}
+
+function isContentFunnelData(value: unknown): value is ContentFunnelData {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  return (
+    "stages" in value ||
+    "overview" in value ||
+    "distribution" in value ||
+    "metrics" in value ||
+    "references" in value
+  );
+}
+
 function isPersonasData(value: unknown): value is PersonasData {
   if (!value || typeof value !== "object") {
     return false;
@@ -727,11 +787,13 @@ function isProjectObjectivesData(
                         ? buyingJourneyData
                         : isCurrentChannelsModule
                           ? currentChannelsData
-                          : {
-                              mainText: genericData.mainText?.trim() || "",
-                              notes: genericData.notes?.trim() || "",
-                              references: genericData.references?.trim() || "",
-                            };
+                          : isContentFunnelModule
+                            ? contentFunnelData
+                            : {
+                                mainText: genericData.mainText?.trim() || "",
+                                notes: genericData.notes?.trim() || "",
+                                references: genericData.references?.trim() || "",
+                              };
 
     const nextData: ProjectData = {
       ...currentData,
@@ -1043,6 +1105,17 @@ function isProjectObjectivesData(
   <CanaisDigitaisAtuaisForm
     data={currentChannelsData}
     setData={setCurrentChannelsData}
+    clientSlug={clientSlug}
+    presentationHref={`/apresentacao/${project.slug}`}
+    isSaving={isSaving}
+    isDisabled={!isModuleSelected}
+    onSave={() => saveModule()}
+  />
+
+  ) : isContentFunnelModule ? (
+  <FunilConteudoForm
+    data={contentFunnelData}
+    setData={setContentFunnelData}
     clientSlug={clientSlug}
     presentationHref={`/apresentacao/${project.slug}`}
     isSaving={isSaving}
