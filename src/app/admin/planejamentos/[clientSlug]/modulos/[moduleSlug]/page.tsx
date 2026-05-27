@@ -76,6 +76,13 @@ import LinhasEditoriaisForm, {
   initialEditorialLinesData,
 } from "@/Components/modulos/LinhasEditoriaisForm";
 
+import InstagramForm, {
+  initialInstagramData,
+  initialInstagramFrequencyItems,
+  InstagramData,
+  normalizeInstagramTextList,
+} from "@/Components/modulos/InstagramForm";
+
 type ClientRecord = {
   id: string;
   name: string;
@@ -211,6 +218,8 @@ const [toneVoiceData, setToneVoiceData] =
   useState<ContentFunnelData>(initialContentFunnelData);
   const [editorialLinesData, setEditorialLinesData] =
   useState<EditorialLinesData>(initialEditorialLinesData);
+  const [instagramData, setInstagramData] =
+  useState<InstagramData>(initialInstagramData);
   
 
   const module = useMemo(() => {
@@ -240,6 +249,7 @@ const [toneVoiceData, setToneVoiceData] =
   const isCurrentChannelsModule = moduleSlug === "canais-digitais-atuais";
   const isContentFunnelModule = moduleSlug === "funil-de-conteudo";
   const isEditorialLinesModule = moduleSlug === "linhas-editoriais";
+  const isInstagramModule = moduleSlug === "instagram";
 
   const relatedModules = useMemo(() => {
     return planningModules.filter(
@@ -621,6 +631,54 @@ if (isEditorialLinesModule && isEditorialLinesData(savedContent)) {
   });
 }
 
+if (isInstagramModule && isInstagramData(savedContent)) {
+  setInstagramData({
+    frequencyItems:
+      Array.isArray(savedContent.frequencyItems) &&
+      savedContent.frequencyItems.length
+        ? savedContent.frequencyItems.map((item) => ({
+            format: item.format || "",
+            quantity: item.quantity || "",
+            period: item.period || "por semana",
+            observation: item.observation || "",
+          }))
+        : initialInstagramFrequencyItems,
+    objectives: normalizeInstagramTextList(savedContent.objectives),
+    stories: normalizeInstagramTextList(savedContent.stories),
+    hashtags: normalizeInstagramTextList(savedContent.hashtags),
+    reels: normalizeInstagramTextList(savedContent.reels),
+    languageStructures: normalizeInstagramTextList(
+      savedContent.languageStructures
+    ),
+    contents: normalizeInstagramTextList(savedContent.contents),
+    visualStrategy: savedContent.visualStrategy || "",
+    visualReferences:
+      Array.isArray(savedContent.visualReferences) &&
+      savedContent.visualReferences.length
+        ? savedContent.visualReferences.map((reference) => ({
+            image: reference.image || "",
+          }))
+        : initialInstagramData.visualReferences,
+    bioEnabled:
+      typeof savedContent.bioEnabled === "boolean"
+        ? savedContent.bioEnabled
+        : true,
+    bioPhoto: savedContent.bioPhoto || "",
+    profileHandle: savedContent.profileHandle || "",
+    profileName: savedContent.profileName || "",
+    bioText: savedContent.bioText || "",
+    bioLink: savedContent.bioLink || "",
+    highlights: savedContent.highlights || "",
+    references:
+      Array.isArray(savedContent.references) && savedContent.references.length
+        ? savedContent.references.map((reference) => ({
+            title: reference.title || "",
+            link: reference.link || "",
+          }))
+        : initialInstagramData.references,
+  });
+}
+
 function isContentFunnelData(value: unknown): value is ContentFunnelData {
   if (!value || typeof value !== "object") {
     return false;
@@ -641,6 +699,32 @@ function isEditorialLinesData(value: unknown): value is EditorialLinesData {
   }
 
   return "lines" in value || "generalGuidelines" in value || "references" in value;
+}
+
+function isInstagramData(value: unknown): value is InstagramData {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  return (
+    "frequencyItems" in value ||
+    "objectives" in value ||
+    "stories" in value ||
+    "hashtags" in value ||
+    "reels" in value ||
+    "languageStructures" in value ||
+    "contents" in value ||
+    "visualStrategy" in value ||
+    "visualReferences" in value ||
+    "bioEnabled" in value ||
+    "bioPhoto" in value ||
+    "profileHandle" in value ||
+    "profileName" in value ||
+    "bioText" in value ||
+    "bioLink" in value ||
+    "highlights" in value ||
+    "references" in value
+  );
 }
 
 function isPersonasData(value: unknown): value is PersonasData {
@@ -834,11 +918,15 @@ function isProjectObjectivesData(
                             ? contentFunnelData
                             : isEditorialLinesModule
                               ? editorialLinesData
-                              : {
-                                  mainText: genericData.mainText?.trim() || "",
-                                  notes: genericData.notes?.trim() || "",
-                                  references: genericData.references?.trim() || "",
-                                };
+                              : isInstagramModule
+                                ? instagramData
+                                : {
+                                    mainText:
+                                      genericData.mainText?.trim() || "",
+                                    notes: genericData.notes?.trim() || "",
+                                    references:
+                                      genericData.references?.trim() || "",
+                                  };
 
     const nextData: ProjectData = {
       ...currentData,
@@ -1172,6 +1260,17 @@ function isProjectObjectivesData(
   <LinhasEditoriaisForm
     data={editorialLinesData}
     setData={setEditorialLinesData}
+    clientSlug={clientSlug}
+    presentationHref={`/apresentacao/${project.slug}`}
+    isSaving={isSaving}
+    isDisabled={!isModuleSelected}
+    onSave={() => saveModule()}
+  />
+
+  ) : isInstagramModule ? (
+  <InstagramForm
+    data={instagramData}
+    setData={setInstagramData}
     clientSlug={clientSlug}
     presentationHref={`/apresentacao/${project.slug}`}
     isSaving={isSaving}
