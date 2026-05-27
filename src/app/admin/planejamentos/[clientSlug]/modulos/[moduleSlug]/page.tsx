@@ -191,6 +191,11 @@ import CalendarioConteudoForm, {
   ContentCalendarData,
 } from "@/Components/modulos/CalendarioConteudoForm";
 
+import MetricasIndicadoresForm, {
+  initialMetricsData,
+  MetricsData,
+} from "@/Components/modulos/MetricasIndicadoresForm";
+
 type ClientRecord = {
   id: string;
   name: string;
@@ -364,6 +369,8 @@ const [toneVoiceData, setToneVoiceData] =
   useState<TimelineData>(initialTimelineData);
   const [contentCalendarData, setContentCalendarData] =
   useState<ContentCalendarData>(initialContentCalendarData);
+  const [metricsData, setMetricsData] =
+  useState<MetricsData>(initialMetricsData);
 
   const module = useMemo(() => {
     return planningModules.find((item) => item.slug === moduleSlug) ?? null;
@@ -414,6 +421,7 @@ const [toneVoiceData, setToneVoiceData] =
   const isAutomationSystemModule = moduleSlug === "fluxo-de-automacao";
   const isTimelineModule = moduleSlug === "linha-do-tempo";
   const isContentCalendarModule = moduleSlug === "calendario-de-conteudo";
+  const isMetricsModule = moduleSlug === "metricas-e-indicadores";
 
   const relatedModules = useMemo(() => {
     return planningModules.filter(
@@ -1981,6 +1989,65 @@ function isContentCalendarData(value: unknown): value is ContentCalendarData {
   );
 }
 
+if (isMetricsModule && isMetricsData(savedContent)) {
+  setMetricsData({
+    indicators:
+      Array.isArray(savedContent.indicators) && savedContent.indicators.length
+        ? savedContent.indicators.map((ind) => ({
+            name: ind.name || "",
+            type: ind.type || "Alcance",
+            channel: ind.channel || "Instagram",
+            goal: ind.goal || "",
+            frequency: ind.frequency || "Semanal",
+            tool: ind.tool || "",
+            responsible: ind.responsible || "",
+            interpretation: ind.interpretation || "",
+            decisionCriteria: ind.decisionCriteria || "",
+          }))
+        : initialMetricsData.indicators,
+    mainIndicators: savedContent.mainIndicators || initialMetricsData.mainIndicators,
+    journeyMetrics:
+      Array.isArray(savedContent.journeyMetrics) && savedContent.journeyMetrics.length
+        ? savedContent.journeyMetrics.map((item) => ({
+            stage: item.stage || "",
+            metrics: item.metrics || "",
+            purpose: item.purpose || "",
+          }))
+        : initialMetricsData.journeyMetrics,
+    channelMetrics:
+      Array.isArray(savedContent.channelMetrics) && savedContent.channelMetrics.length
+        ? savedContent.channelMetrics.map((item) => ({
+            channel: item.channel || "",
+            metrics: item.metrics || "",
+            tool: item.tool || "",
+          }))
+        : initialMetricsData.channelMetrics,
+    tools:
+      Array.isArray(savedContent.tools) && savedContent.tools.length
+        ? savedContent.tools.map((t) => ({ name: t.name || "", purpose: t.purpose || "" }))
+        : initialMetricsData.tools,
+    analysisRoutine: savedContent.analysisRoutine || initialMetricsData.analysisRoutine,
+    decisionCriteria: savedContent.decisionCriteria || initialMetricsData.decisionCriteria,
+    reportingFormat: savedContent.reportingFormat || initialMetricsData.reportingFormat,
+    strategicObservations: savedContent.strategicObservations || initialMetricsData.strategicObservations,
+    references:
+      Array.isArray(savedContent.references) && savedContent.references.length
+        ? savedContent.references.map((r) => ({ title: r.title || "", link: r.link || "" }))
+        : initialMetricsData.references,
+  });
+}
+
+function isMetricsData(value: unknown): value is MetricsData {
+  if (!value || typeof value !== "object") return false;
+  return (
+    "indicators" in value ||
+    "journeyMetrics" in value ||
+    "channelMetrics" in value ||
+    "analysisRoutine" in value ||
+    "reportingFormat" in value
+  );
+}
+
       if (!isSpecialistModule && isGenericModuleData(savedContent)) {
         setGenericData({
           mainText: savedContent.mainText || "",
@@ -2134,7 +2201,9 @@ function isProjectObjectivesData(
                                                                   ? timelineData
                                                                   : isContentCalendarModule
                                                                     ? contentCalendarData
-                                                                    : {
+                                                                    : isMetricsModule
+                                                                      ? metricsData
+                                                                      : {
                                                             mainText:
                                                               genericData.mainText?.trim() || "",
                                                             notes: genericData.notes?.trim() || "",
@@ -2665,6 +2734,16 @@ function isProjectObjectivesData(
   <CalendarioConteudoForm
     data={contentCalendarData}
     setData={setContentCalendarData}
+    clientSlug={clientSlug}
+    presentationHref={`/apresentacao/${project.slug}`}
+    isSaving={isSaving}
+    isDisabled={!isModuleSelected}
+    onSave={() => saveModule()}
+  />
+) : isMetricsModule ? (
+  <MetricasIndicadoresForm
+    data={metricsData}
+    setData={setMetricsData}
     clientSlug={clientSlug}
     presentationHref={`/apresentacao/${project.slug}`}
     isSaving={isSaving}
