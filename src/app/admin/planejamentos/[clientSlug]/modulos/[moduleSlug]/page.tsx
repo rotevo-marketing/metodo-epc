@@ -71,6 +71,11 @@ import FunilConteudoForm, {
   initialContentFunnelData,
 } from "@/Components/modulos/FunilConteudoForm";
 
+import LinhasEditoriaisForm, {
+  EditorialLinesData,
+  initialEditorialLinesData,
+} from "@/Components/modulos/LinhasEditoriaisForm";
+
 type ClientRecord = {
   id: string;
   name: string;
@@ -204,6 +209,8 @@ const [toneVoiceData, setToneVoiceData] =
   useState<CurrentChannelsData>(initialCurrentChannelsData);
   const [contentFunnelData, setContentFunnelData] =
   useState<ContentFunnelData>(initialContentFunnelData);
+  const [editorialLinesData, setEditorialLinesData] =
+  useState<EditorialLinesData>(initialEditorialLinesData);
   
 
   const module = useMemo(() => {
@@ -232,6 +239,7 @@ const [toneVoiceData, setToneVoiceData] =
   const isBuyingJourneyModule = moduleSlug === "jornada-de-compra";
   const isCurrentChannelsModule = moduleSlug === "canais-digitais-atuais";
   const isContentFunnelModule = moduleSlug === "funil-de-conteudo";
+  const isEditorialLinesModule = moduleSlug === "linhas-editoriais";
 
   const relatedModules = useMemo(() => {
     return planningModules.filter(
@@ -586,6 +594,33 @@ if (isContentFunnelModule && isContentFunnelData(savedContent)) {
   });
 }
 
+if (isEditorialLinesModule && isEditorialLinesData(savedContent)) {
+  setEditorialLinesData({
+    lines:
+      Array.isArray(savedContent.lines) && savedContent.lines.length
+        ? savedContent.lines.map((line) => ({
+            title: line.title || "",
+            objective: line.objective || "",
+            description: line.description || "",
+            targetAudience: line.targetAudience || "",
+            contentPillars: line.contentPillars || "",
+            formats: line.formats || "",
+            frequency: line.frequency || "",
+            examples: line.examples || "",
+            notes: line.notes || "",
+          }))
+        : initialEditorialLinesData.lines,
+    generalGuidelines: savedContent.generalGuidelines || "",
+    references:
+      Array.isArray(savedContent.references) && savedContent.references.length
+        ? savedContent.references.map((reference) => ({
+            title: reference.title || "",
+            link: reference.link || "",
+          }))
+        : initialEditorialLinesData.references,
+  });
+}
+
 function isContentFunnelData(value: unknown): value is ContentFunnelData {
   if (!value || typeof value !== "object") {
     return false;
@@ -598,6 +633,14 @@ function isContentFunnelData(value: unknown): value is ContentFunnelData {
     "metrics" in value ||
     "references" in value
   );
+}
+
+function isEditorialLinesData(value: unknown): value is EditorialLinesData {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  return "lines" in value || "generalGuidelines" in value || "references" in value;
 }
 
 function isPersonasData(value: unknown): value is PersonasData {
@@ -789,11 +832,13 @@ function isProjectObjectivesData(
                           ? currentChannelsData
                           : isContentFunnelModule
                             ? contentFunnelData
-                            : {
-                                mainText: genericData.mainText?.trim() || "",
-                                notes: genericData.notes?.trim() || "",
-                                references: genericData.references?.trim() || "",
-                              };
+                            : isEditorialLinesModule
+                              ? editorialLinesData
+                              : {
+                                  mainText: genericData.mainText?.trim() || "",
+                                  notes: genericData.notes?.trim() || "",
+                                  references: genericData.references?.trim() || "",
+                                };
 
     const nextData: ProjectData = {
       ...currentData,
@@ -1116,6 +1161,17 @@ function isProjectObjectivesData(
   <FunilConteudoForm
     data={contentFunnelData}
     setData={setContentFunnelData}
+    clientSlug={clientSlug}
+    presentationHref={`/apresentacao/${project.slug}`}
+    isSaving={isSaving}
+    isDisabled={!isModuleSelected}
+    onSave={() => saveModule()}
+  />
+
+  ) : isEditorialLinesModule ? (
+  <LinhasEditoriaisForm
+    data={editorialLinesData}
+    setData={setEditorialLinesData}
     clientSlug={clientSlug}
     presentationHref={`/apresentacao/${project.slug}`}
     isSaving={isSaving}
