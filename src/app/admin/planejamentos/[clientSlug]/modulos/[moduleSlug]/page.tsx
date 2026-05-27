@@ -30,6 +30,10 @@ import ObjetivosProjetoForm, {
   initialProjectObjectivesData,
   ProjectObjectivesData,
 } from "@/Components/modulos/ObjetivosProjetoForm";
+import ReferenciasConcorrentesForm, {
+  initialReferencesCompetitorsData,
+  ReferencesCompetitorsData,
+} from "@/Components/modulos/ReferenciasConcorrentesForm";
 
 type ClientRecord = {
   id: string;
@@ -149,6 +153,8 @@ const [toneVoiceData, setToneVoiceData] =
   const [successMessage, setSuccessMessage] = useState("");
   const [projectObjectivesData, setProjectObjectivesData] =
   useState<ProjectObjectivesData>(initialProjectObjectivesData);
+  const [referencesCompetitorsData, setReferencesCompetitorsData] =
+  useState<ReferencesCompetitorsData>(initialReferencesCompetitorsData);
   
 
   const module = useMemo(() => {
@@ -168,6 +174,8 @@ const [toneVoiceData, setToneVoiceData] =
   const isToneVoiceModule = moduleSlug === "tom-de-voz";
   const isVisualIdentityModule = moduleSlug === "identidade-visual";
   const isProjectObjectivesModule = moduleSlug === "objetivos-do-projeto";
+  const isReferencesCompetitorsModule =
+  moduleSlug === "referencias-e-concorrentes";
 
   const relatedModules = useMemo(() => {
     return planningModules.filter(
@@ -330,6 +338,28 @@ if (isProjectObjectivesModule && isProjectObjectivesData(savedContent)) {
   });
 }
 
+if (
+  isReferencesCompetitorsModule &&
+  isReferencesCompetitorsData(savedContent)
+) {
+  setReferencesCompetitorsData({
+    items:
+      Array.isArray(savedContent.items) && savedContent.items.length
+        ? savedContent.items
+        : initialReferencesCompetitorsData.items,
+  });
+}
+
+function isReferencesCompetitorsData(
+  value: unknown
+): value is ReferencesCompetitorsData {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  return "items" in value;
+}
+
 function isVisualIdentityData(value: unknown): value is VisualIdentityData {
   if (!value || typeof value !== "object") {
     return false;
@@ -440,11 +470,13 @@ function isProjectObjectivesData(
           ? visualIdentityData
           : isProjectObjectivesModule
             ? projectObjectivesData
-            : {
-                mainText: genericData.mainText?.trim() || "",
-                notes: genericData.notes?.trim() || "",
-                references: genericData.references?.trim() || "",
-              };
+            : isReferencesCompetitorsModule
+              ? referencesCompetitorsData
+              : {
+                  mainText: genericData.mainText?.trim() || "",
+                  notes: genericData.notes?.trim() || "",
+                  references: genericData.references?.trim() || "",
+                };
 
     const nextData: ProjectData = {
       ...currentData,
@@ -679,6 +711,17 @@ function isProjectObjectivesData(
   <ObjetivosProjetoForm
     data={projectObjectivesData}
     setData={setProjectObjectivesData}
+    clientSlug={clientSlug}
+    presentationHref={`/apresentacao/${project.slug}`}
+    isSaving={isSaving}
+    isDisabled={!isModuleSelected}
+    onSave={() => saveModule()}
+  />
+
+  ) : isReferencesCompetitorsModule ? (
+  <ReferenciasConcorrentesForm
+    data={referencesCompetitorsData}
+    setData={setReferencesCompetitorsData}
     clientSlug={clientSlug}
     presentationHref={`/apresentacao/${project.slug}`}
     isSaving={isSaving}
