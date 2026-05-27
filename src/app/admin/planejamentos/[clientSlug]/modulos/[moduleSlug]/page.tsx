@@ -151,6 +151,11 @@ import MateriaisEducacionaisForm, {
   EducationalMaterialsData,
 } from "@/Components/modulos/MateriaisEducacionaisForm";
 
+import EstrategiaDoSiteForm, {
+  initialSiteStrategyData,
+  SiteStrategyData,
+} from "@/Components/modulos/EstrategiaDoSiteForm";
+
 type ClientRecord = {
   id: string;
   name: string;
@@ -308,6 +313,8 @@ const [toneVoiceData, setToneVoiceData] =
   useState<LivesData>(initialLivesData);
   const [educationalMaterialsData, setEducationalMaterialsData] =
   useState<EducationalMaterialsData>(initialEducationalMaterialsData);
+  const [siteStrategyData, setSiteStrategyData] =
+  useState<SiteStrategyData>(initialSiteStrategyData);
 
   const module = useMemo(() => {
     return planningModules.find((item) => item.slug === moduleSlug) ?? null;
@@ -347,6 +354,7 @@ const [toneVoiceData, setToneVoiceData] =
   const isPodcastsModule = moduleSlug === "podcasts";
   const isLivesModule = moduleSlug === "lives";
   const isEducationalMaterialsModule = moduleSlug === "materiais-educacionais";
+  const isSiteStrategyModule = moduleSlug === "estrategia-do-site";
 
   const relatedModules = useMemo(() => {
     return planningModules.filter(
@@ -1066,6 +1074,39 @@ if (isPodcastsModule && isPodcastsData(savedContent)) {
   });
 }
 
+if (isSiteStrategyModule && isSiteStrategyData(savedContent)) {
+  setSiteStrategyData({
+    visualIdentity: savedContent.visualIdentity || "",
+    references:
+      Array.isArray(savedContent.references) && savedContent.references.length
+        ? savedContent.references.map((r) => ({
+            title: r.title || "",
+            url: r.url || "",
+          }))
+        : [{ title: "", url: "" }],
+    integrations:
+      Array.isArray(savedContent.integrations) && savedContent.integrations.length
+        ? savedContent.integrations.map((i) => ({ name: i.name || "" }))
+        : [{ name: "" }],
+    essentialPages:
+      Array.isArray(savedContent.essentialPages) && savedContent.essentialPages.length
+        ? savedContent.essentialPages.map((p) => ({ value: p.value || "" }))
+        : [{ value: "" }],
+    importantFeatures:
+      Array.isArray(savedContent.importantFeatures) && savedContent.importantFeatures.length
+        ? savedContent.importantFeatures.map((f) => ({ value: f.value || "" }))
+        : [{ value: "" }],
+    strategicNotes: savedContent.strategicNotes || "",
+    externalReferences:
+      Array.isArray(savedContent.externalReferences) && savedContent.externalReferences.length
+        ? savedContent.externalReferences.map((r) => ({
+            title: r.title || "",
+            link: r.link || "",
+          }))
+        : [{ title: "", link: "" }],
+  });
+}
+
 if (isEducationalMaterialsModule && isEducationalMaterialsData(savedContent)) {
   setEducationalMaterialsData({
     materials:
@@ -1368,6 +1409,20 @@ function isEducationalMaterialsData(value: unknown): value is EducationalMateria
   return "materials" in value || "strategy" in value;
 }
 
+function isSiteStrategyData(value: unknown): value is SiteStrategyData {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  return (
+    "integrations" in value ||
+    "essentialPages" in value ||
+    "importantFeatures" in value ||
+    "strategicNotes" in value ||
+    "visualIdentity" in value
+  );
+}
+
 function isPersonasData(value: unknown): value is PersonasData {
   if (!value || typeof value !== "object") {
     return false;
@@ -1581,13 +1636,15 @@ function isProjectObjectivesData(
                                                   ? livesData
                                                   : isEducationalMaterialsModule
                                                     ? educationalMaterialsData
-                                                    : {
-                                                      mainText:
-                                                        genericData.mainText?.trim() || "",
-                                                      notes: genericData.notes?.trim() || "",
-                                                      references:
-                                                        genericData.references?.trim() || "",
-                                                    };
+                                                    : isSiteStrategyModule
+                                                      ? siteStrategyData
+                                                      : {
+                                                        mainText:
+                                                          genericData.mainText?.trim() || "",
+                                                        notes: genericData.notes?.trim() || "",
+                                                        references:
+                                                          genericData.references?.trim() || "",
+                                                      };
 
     const nextData: ProjectData = {
       ...currentData,
@@ -2032,6 +2089,16 @@ function isProjectObjectivesData(
   <MateriaisEducacionaisForm
     data={educationalMaterialsData}
     setData={setEducationalMaterialsData}
+    clientSlug={clientSlug}
+    presentationHref={`/apresentacao/${project.slug}`}
+    isSaving={isSaving}
+    isDisabled={!isModuleSelected}
+    onSave={() => saveModule()}
+  />
+) : isSiteStrategyModule ? (
+  <EstrategiaDoSiteForm
+    data={siteStrategyData}
+    setData={setSiteStrategyData}
     clientSlug={clientSlug}
     presentationHref={`/apresentacao/${project.slug}`}
     isSaving={isSaving}
