@@ -125,6 +125,13 @@ import BlogForm, {
   normalizeBlogTextList,
 } from "@/Components/modulos/BlogForm";
 
+import PinterestForm, {
+  initialPinterestData,
+  initialPinterestFrequencyItems,
+  PinterestData,
+  normalizePinterestTextList,
+} from "@/Components/modulos/PinterestForm";
+
 type ClientRecord = {
   id: string;
   name: string;
@@ -274,6 +281,8 @@ const [toneVoiceData, setToneVoiceData] =
   useState<WhatsAppData>(initialWhatsAppData);
   const [blogData, setBlogData] =
   useState<BlogData>(initialBlogData);
+  const [pinterestData, setPinterestData] =
+  useState<PinterestData>(initialPinterestData);
 
   const module = useMemo(() => {
     return planningModules.find((item) => item.slug === moduleSlug) ?? null;
@@ -309,6 +318,7 @@ const [toneVoiceData, setToneVoiceData] =
   const isLinkedinModule = moduleSlug === "linkedin";
   const isWhatsappModule = moduleSlug === "whatsapp";
   const isBlogModule = moduleSlug === "blog";
+  const isPinterestModule = moduleSlug === "pinterest";
 
   const relatedModules = useMemo(() => {
     return planningModules.filter(
@@ -980,6 +990,44 @@ if (isBlogModule && isBlogData(savedContent)) {
   });
 }
 
+if (isPinterestModule && isPinterestData(savedContent)) {
+  setPinterestData({
+    frequencyItems:
+      Array.isArray(savedContent.frequencyItems) &&
+      savedContent.frequencyItems.length
+        ? savedContent.frequencyItems.map((item) => ({
+            format: item.format || "",
+            quantity: item.quantity || "",
+            period: item.period || "por semana",
+            observation: item.observation || "",
+          }))
+        : initialPinterestFrequencyItems,
+    objectives: normalizePinterestTextList(savedContent.objectives),
+    languageStructures: normalizePinterestTextList(savedContent.languageStructures),
+    contents: normalizePinterestTextList(savedContent.contents),
+    mainBoards: savedContent.mainBoards || "",
+    priorityVisualThemes: savedContent.priorityVisualThemes || "",
+    visualStrategy: savedContent.visualStrategy || "",
+    visualReferences:
+      Array.isArray(savedContent.visualReferences) &&
+      savedContent.visualReferences.length
+        ? savedContent.visualReferences.map((r) => ({
+            image: r.image || "",
+          }))
+        : initialPinterestData.visualReferences,
+    pinKeywords: savedContent.pinKeywords || "",
+    destinationLinks: savedContent.destinationLinks || "",
+    descriptionGuidelines: savedContent.descriptionGuidelines || "",
+    references:
+      Array.isArray(savedContent.references) && savedContent.references.length
+        ? savedContent.references.map((r) => ({
+            title: r.title || "",
+            link: r.link || "",
+          }))
+        : initialPinterestData.references,
+  });
+}
+
 function isContentFunnelData(value: unknown): value is ContentFunnelData {
   if (!value || typeof value !== "object") {
     return false;
@@ -1108,6 +1156,20 @@ function isBlogData(value: unknown): value is BlogData {
     "priorityKeywords" in value ||
     "blogCategories" in value ||
     "seoGuidelines" in value
+  );
+}
+
+function isPinterestData(value: unknown): value is PinterestData {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  return (
+    "mainBoards" in value ||
+    "priorityVisualThemes" in value ||
+    "pinKeywords" in value ||
+    "destinationLinks" in value ||
+    "descriptionGuidelines" in value
   );
 }
 
@@ -1316,13 +1378,15 @@ function isProjectObjectivesData(
                                           ? whatsappData
                                           : isBlogModule
                                             ? blogData
-                                            : {
-                                              mainText:
-                                                genericData.mainText?.trim() || "",
-                                              notes: genericData.notes?.trim() || "",
-                                              references:
-                                                genericData.references?.trim() || "",
-                                            };
+                                            : isPinterestModule
+                                              ? pinterestData
+                                              : {
+                                                mainText:
+                                                  genericData.mainText?.trim() || "",
+                                                notes: genericData.notes?.trim() || "",
+                                                references:
+                                                  genericData.references?.trim() || "",
+                                              };
 
     const nextData: ProjectData = {
       ...currentData,
@@ -1727,6 +1791,16 @@ function isProjectObjectivesData(
   <BlogForm
     data={blogData}
     setData={setBlogData}
+    clientSlug={clientSlug}
+    presentationHref={`/apresentacao/${project.slug}`}
+    isSaving={isSaving}
+    isDisabled={!isModuleSelected}
+    onSave={() => saveModule()}
+  />
+) : isPinterestModule ? (
+  <PinterestForm
+    data={pinterestData}
+    setData={setPinterestData}
     clientSlug={clientSlug}
     presentationHref={`/apresentacao/${project.slug}`}
     isSaving={isSaving}
