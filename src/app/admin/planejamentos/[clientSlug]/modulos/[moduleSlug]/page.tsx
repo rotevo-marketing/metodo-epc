@@ -186,6 +186,11 @@ import LinhaDoTempoForm, {
   TimelineData,
 } from "@/Components/modulos/LinhaDoTempoForm";
 
+import CalendarioConteudoForm, {
+  initialContentCalendarData,
+  ContentCalendarData,
+} from "@/Components/modulos/CalendarioConteudoForm";
+
 type ClientRecord = {
   id: string;
   name: string;
@@ -357,6 +362,8 @@ const [toneVoiceData, setToneVoiceData] =
   useState<AutomationSystemData>(initialAutomationSystemData);
   const [timelineData, setTimelineData] =
   useState<TimelineData>(initialTimelineData);
+  const [contentCalendarData, setContentCalendarData] =
+  useState<ContentCalendarData>(initialContentCalendarData);
 
   const module = useMemo(() => {
     return planningModules.find((item) => item.slug === moduleSlug) ?? null;
@@ -406,6 +413,7 @@ const [toneVoiceData, setToneVoiceData] =
   moduleSlug === "campanha-distribuicao-de-conteudo";
   const isAutomationSystemModule = moduleSlug === "fluxo-de-automacao";
   const isTimelineModule = moduleSlug === "linha-do-tempo";
+  const isContentCalendarModule = moduleSlug === "calendario-de-conteudo";
 
   const relatedModules = useMemo(() => {
     return planningModules.filter(
@@ -1923,6 +1931,56 @@ function isTimelineData(value: unknown): value is TimelineData {
   );
 }
 
+if (isContentCalendarModule && isContentCalendarData(savedContent)) {
+  setContentCalendarData({
+    calendarTitle: savedContent.calendarTitle || "",
+    platform: savedContent.platform || "Notion",
+    calendarLink: savedContent.calendarLink || "",
+    calendarFunction: savedContent.calendarFunction || initialContentCalendarData.calendarFunction,
+    usageGuidelines: savedContent.usageGuidelines || initialContentCalendarData.usageGuidelines,
+    responsiblePeople: savedContent.responsiblePeople || "",
+    updateFrequency: savedContent.updateFrequency || "Semanal",
+    updateRoutine: savedContent.updateRoutine || initialContentCalendarData.updateRoutine,
+    notionStructure: savedContent.notionStructure || initialContentCalendarData.notionStructure,
+    approvalFlowDescription: savedContent.approvalFlowDescription || initialContentCalendarData.approvalFlowDescription,
+    approvalSteps:
+      Array.isArray(savedContent.approvalSteps) && savedContent.approvalSteps.length
+        ? savedContent.approvalSteps.map((step) => ({
+            title: step.title || "",
+            description: step.description || "",
+          }))
+        : initialContentCalendarData.approvalSteps,
+    approvalRules: savedContent.approvalRules || initialContentCalendarData.approvalRules,
+    driveMainFolderTitle: savedContent.driveMainFolderTitle || "",
+    driveMainFolderLink: savedContent.driveMainFolderLink || "",
+    driveFolderStructure: savedContent.driveFolderStructure || initialContentCalendarData.driveFolderStructure,
+    driveFolders:
+      Array.isArray(savedContent.driveFolders) && savedContent.driveFolders.length
+        ? savedContent.driveFolders.map((folder) => ({
+            title: folder.title || "",
+            description: folder.description || "",
+            link: folder.link || "",
+          }))
+        : initialContentCalendarData.driveFolders,
+    strategicObservations: savedContent.strategicObservations || initialContentCalendarData.strategicObservations,
+    references:
+      Array.isArray(savedContent.references) && savedContent.references.length
+        ? savedContent.references.map((r) => ({ title: r.title || "", link: r.link || "" }))
+        : initialContentCalendarData.references,
+  });
+}
+
+function isContentCalendarData(value: unknown): value is ContentCalendarData {
+  if (!value || typeof value !== "object") return false;
+  return (
+    "calendarTitle" in value ||
+    "calendarFunction" in value ||
+    "approvalSteps" in value ||
+    "driveFolders" in value ||
+    "driveMainFolderTitle" in value
+  );
+}
+
       if (!isSpecialistModule && isGenericModuleData(savedContent)) {
         setGenericData({
           mainText: savedContent.mainText || "",
@@ -2074,7 +2132,9 @@ function isProjectObjectivesData(
                                                                 ? automationSystemData
                                                                 : isTimelineModule
                                                                   ? timelineData
-                                                                  : {
+                                                                  : isContentCalendarModule
+                                                                    ? contentCalendarData
+                                                                    : {
                                                             mainText:
                                                               genericData.mainText?.trim() || "",
                                                             notes: genericData.notes?.trim() || "",
@@ -2595,6 +2655,16 @@ function isProjectObjectivesData(
   <LinhaDoTempoForm
     data={timelineData}
     setData={setTimelineData}
+    clientSlug={clientSlug}
+    presentationHref={`/apresentacao/${project.slug}`}
+    isSaving={isSaving}
+    isDisabled={!isModuleSelected}
+    onSave={() => saveModule()}
+  />
+) : isContentCalendarModule ? (
+  <CalendarioConteudoForm
+    data={contentCalendarData}
+    setData={setContentCalendarData}
     clientSlug={clientSlug}
     presentationHref={`/apresentacao/${project.slug}`}
     isSaving={isSaving}
