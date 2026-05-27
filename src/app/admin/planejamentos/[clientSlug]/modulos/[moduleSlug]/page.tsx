@@ -181,6 +181,11 @@ import FluxoAutomacaoForm, {
   AutomationSystemData,
 } from "@/Components/modulos/FluxoAutomacaoForm";
 
+import LinhaDoTempoForm, {
+  initialTimelineData,
+  TimelineData,
+} from "@/Components/modulos/LinhaDoTempoForm";
+
 type ClientRecord = {
   id: string;
   name: string;
@@ -350,6 +355,8 @@ const [toneVoiceData, setToneVoiceData] =
   useState<ContentDistributionCampaignData>(initialContentDistributionCampaignData);
   const [automationSystemData, setAutomationSystemData] =
   useState<AutomationSystemData>(initialAutomationSystemData);
+  const [timelineData, setTimelineData] =
+  useState<TimelineData>(initialTimelineData);
 
   const module = useMemo(() => {
     return planningModules.find((item) => item.slug === moduleSlug) ?? null;
@@ -398,6 +405,7 @@ const [toneVoiceData, setToneVoiceData] =
   const isContentDistributionCampaignModule =
   moduleSlug === "campanha-distribuicao-de-conteudo";
   const isAutomationSystemModule = moduleSlug === "fluxo-de-automacao";
+  const isTimelineModule = moduleSlug === "linha-do-tempo";
 
   const relatedModules = useMemo(() => {
     return planningModules.filter(
@@ -1868,6 +1876,53 @@ function isAutomationSystemData(value: unknown): value is AutomationSystemData {
   );
 }
 
+if (isTimelineModule && isTimelineData(savedContent)) {
+  setTimelineData({
+    events:
+      Array.isArray(savedContent.events) && savedContent.events.length
+        ? savedContent.events.map((event) => ({
+            title: event.title || "",
+            description: event.description || "",
+            date: event.date || "",
+            phase: event.phase || "Diagnóstico",
+            priority: event.priority || "Alta",
+            status: event.status || "Não iniciado",
+            responsible: event.responsible || "",
+            dependency: event.dependency || "",
+            sprints:
+              Array.isArray(event.sprints) && event.sprints.length
+                ? event.sprints.map((sprint) => ({
+                    title: sprint.title || "",
+                    startDate: sprint.startDate || "",
+                    endDate: sprint.endDate || "",
+                    period: sprint.period || "",
+                    deliverables: sprint.deliverables || "",
+                  }))
+                : [{ title: "", startDate: "", endDate: "", period: "", deliverables: "" }],
+          }))
+        : initialTimelineData.events,
+    macroVision: savedContent.macroVision || "",
+    firstMilestone: savedContent.firstMilestone || "",
+    secondMilestone: savedContent.secondMilestone || "",
+    thirdMilestone: savedContent.thirdMilestone || "",
+    risks: savedContent.risks || "",
+    references:
+      Array.isArray(savedContent.references) && savedContent.references.length
+        ? savedContent.references.map((r) => ({ title: r.title || "", link: r.link || "" }))
+        : initialTimelineData.references,
+  });
+}
+
+function isTimelineData(value: unknown): value is TimelineData {
+  if (!value || typeof value !== "object") return false;
+  return (
+    "macroVision" in value ||
+    "firstMilestone" in value ||
+    "secondMilestone" in value ||
+    "thirdMilestone" in value
+  );
+}
+
       if (!isSpecialistModule && isGenericModuleData(savedContent)) {
         setGenericData({
           mainText: savedContent.mainText || "",
@@ -2017,7 +2072,9 @@ function isProjectObjectivesData(
                                                               ? contentDistributionCampaignData
                                                               : isAutomationSystemModule
                                                                 ? automationSystemData
-                                                                : {
+                                                                : isTimelineModule
+                                                                  ? timelineData
+                                                                  : {
                                                             mainText:
                                                               genericData.mainText?.trim() || "",
                                                             notes: genericData.notes?.trim() || "",
@@ -2528,6 +2585,16 @@ function isProjectObjectivesData(
   <FluxoAutomacaoForm
     data={automationSystemData}
     setData={setAutomationSystemData}
+    clientSlug={clientSlug}
+    presentationHref={`/apresentacao/${project.slug}`}
+    isSaving={isSaving}
+    isDisabled={!isModuleSelected}
+    onSave={() => saveModule()}
+  />
+) : isTimelineModule ? (
+  <LinhaDoTempoForm
+    data={timelineData}
+    setData={setTimelineData}
     clientSlug={clientSlug}
     presentationHref={`/apresentacao/${project.slug}`}
     isSaving={isSaving}
