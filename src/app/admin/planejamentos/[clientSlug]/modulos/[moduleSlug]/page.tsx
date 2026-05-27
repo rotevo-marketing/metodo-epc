@@ -34,6 +34,10 @@ import ReferenciasConcorrentesForm, {
   initialReferencesCompetitorsData,
   ReferencesCompetitorsData,
 } from "@/Components/modulos/ReferenciasConcorrentesForm";
+import PesquisaConcorrenciaForm, {
+  CompetitorResearchData,
+  initialCompetitorResearchData,
+} from "@/Components/modulos/PesquisaConcorrenciaForm";
 
 type ClientRecord = {
   id: string;
@@ -155,6 +159,8 @@ const [toneVoiceData, setToneVoiceData] =
   useState<ProjectObjectivesData>(initialProjectObjectivesData);
   const [referencesCompetitorsData, setReferencesCompetitorsData] =
   useState<ReferencesCompetitorsData>(initialReferencesCompetitorsData);
+  const [competitorResearchData, setCompetitorResearchData] =
+  useState<CompetitorResearchData>(initialCompetitorResearchData);
   
 
   const module = useMemo(() => {
@@ -176,6 +182,7 @@ const [toneVoiceData, setToneVoiceData] =
   const isProjectObjectivesModule = moduleSlug === "objetivos-do-projeto";
   const isReferencesCompetitorsModule =
   moduleSlug === "referencias-e-concorrentes";
+  const isCompetitorResearchModule = moduleSlug === "pesquisa-de-concorrencia";
 
   const relatedModules = useMemo(() => {
     return planningModules.filter(
@@ -350,6 +357,41 @@ if (
   });
 }
 
+if (
+  isCompetitorResearchModule &&
+  isCompetitorResearchData(savedContent)
+) {
+  setCompetitorResearchData({
+    competitors:
+      Array.isArray(savedContent.competitors) &&
+      savedContent.competitors.length
+        ? savedContent.competitors.map((competitor) => ({
+            image: competitor.image || "",
+            name: competitor.name || "",
+            website: competitor.website || "",
+            positioning: competitor.positioning || "",
+            targetAudience: competitor.targetAudience || "",
+            productAndDelivery: competitor.productAndDelivery || "",
+            channelsAndVisibility: competitor.channelsAndVisibility || "",
+            contentAndCommunication: competitor.contentAndCommunication || "",
+            funnelAndConversion: competitor.funnelAndConversion || "",
+            strengths: competitor.strengths || "",
+            opportunities: competitor.opportunities || "",
+          }))
+        : initialCompetitorResearchData.competitors,
+  });
+}
+
+function isCompetitorResearchData(
+  value: unknown
+): value is CompetitorResearchData {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  return "competitors" in value;
+}
+
 function isReferencesCompetitorsData(
   value: unknown
 ): value is ReferencesCompetitorsData {
@@ -472,11 +514,13 @@ function isProjectObjectivesData(
             ? projectObjectivesData
             : isReferencesCompetitorsModule
               ? referencesCompetitorsData
-              : {
-                  mainText: genericData.mainText?.trim() || "",
-                  notes: genericData.notes?.trim() || "",
-                  references: genericData.references?.trim() || "",
-                };
+              : isCompetitorResearchModule
+                ? competitorResearchData
+                : {
+                    mainText: genericData.mainText?.trim() || "",
+                    notes: genericData.notes?.trim() || "",
+                    references: genericData.references?.trim() || "",
+                  };
 
     const nextData: ProjectData = {
       ...currentData,
@@ -722,6 +766,17 @@ function isProjectObjectivesData(
   <ReferenciasConcorrentesForm
     data={referencesCompetitorsData}
     setData={setReferencesCompetitorsData}
+    clientSlug={clientSlug}
+    presentationHref={`/apresentacao/${project.slug}`}
+    isSaving={isSaving}
+    isDisabled={!isModuleSelected}
+    onSave={() => saveModule()}
+  />
+
+  ) : isCompetitorResearchModule ? (
+  <PesquisaConcorrenciaForm
+    data={competitorResearchData}
+    setData={setCompetitorResearchData}
     clientSlug={clientSlug}
     presentationHref={`/apresentacao/${project.slug}`}
     isSaving={isSaving}
