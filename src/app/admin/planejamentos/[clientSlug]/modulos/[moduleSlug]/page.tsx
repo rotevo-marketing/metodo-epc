@@ -22,6 +22,10 @@ import TomDeVozForm, {
   initialToneVoiceData,
   ToneVoiceData,
 } from "@/Components/modulos/TomDeVozForm";
+import IdentidadeVisualForm, {
+  initialVisualIdentityData,
+  VisualIdentityData,
+} from "@/Components/modulos/IdentidadeVisualForm";
 
 type ClientRecord = {
   id: string;
@@ -133,6 +137,8 @@ const [toneVoiceData, setToneVoiceData] =
     notes: "",
     references: "",
   });
+  const [visualIdentityData, setVisualIdentityData] =
+  useState<VisualIdentityData>(initialVisualIdentityData);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -153,6 +159,7 @@ const [toneVoiceData, setToneVoiceData] =
   const isCompanyModule = moduleSlug === "dna-da-empresa";
   const isContentDnaModule = moduleSlug === "dna-de-conteudo";
   const isToneVoiceModule = moduleSlug === "tom-de-voz";
+  const isVisualIdentityModule = moduleSlug === "identidade-visual";
 
   const relatedModules = useMemo(() => {
     return planningModules.filter(
@@ -276,6 +283,35 @@ if (isToneVoiceModule && isToneVoiceData(savedContent)) {
   });
 }
 
+if (isVisualIdentityModule && isVisualIdentityData(savedContent)) {
+  setVisualIdentityData({
+    fields: savedContent.fields || {},
+    colors:
+      Array.isArray(savedContent.colors) && savedContent.colors.length
+        ? savedContent.colors
+        : initialVisualIdentityData.colors,
+    visualReferences: savedContent.visualReferences?.length
+      ? savedContent.visualReferences
+      : initialVisualIdentityData.visualReferences,
+    externalReferences: savedContent.externalReferences?.length
+      ? savedContent.externalReferences
+      : initialVisualIdentityData.externalReferences,
+  });
+}
+
+function isVisualIdentityData(value: unknown): value is VisualIdentityData {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  return (
+    "fields" in value ||
+    "colors" in value ||
+    "visualReferences" in value ||
+    "externalReferences" in value
+  );
+}
+
       if (!isSpecialistModule && isGenericModuleData(savedContent)) {
         setGenericData({
           mainText: savedContent.mainText || "",
@@ -350,11 +386,13 @@ function isToneVoiceData(value: unknown): value is ToneVoiceData {
       ? contentDnaData
       : isToneVoiceModule
         ? toneVoiceData
-        : {
-            mainText: genericData.mainText?.trim() || "",
-            notes: genericData.notes?.trim() || "",
-            references: genericData.references?.trim() || "",
-          };
+        : isVisualIdentityModule
+          ? visualIdentityData
+          : {
+              mainText: genericData.mainText?.trim() || "",
+              notes: genericData.notes?.trim() || "",
+              references: genericData.references?.trim() || "",
+            };
 
     const nextData: ProjectData = {
       ...currentData,
@@ -569,6 +607,16 @@ function isToneVoiceData(value: unknown): value is ToneVoiceData {
   <TomDeVozForm
     data={toneVoiceData}
     setData={setToneVoiceData}
+    clientSlug={clientSlug}
+    presentationHref={`/apresentacao/${project.slug}`}
+    isSaving={isSaving}
+    isDisabled={!isModuleSelected}
+    onSave={() => saveModule()}
+  />
+) : isVisualIdentityModule ? (
+  <IdentidadeVisualForm
+    data={visualIdentityData}
+    setData={setVisualIdentityData}
     clientSlug={clientSlug}
     presentationHref={`/apresentacao/${project.slug}`}
     isSaving={isSaving}
