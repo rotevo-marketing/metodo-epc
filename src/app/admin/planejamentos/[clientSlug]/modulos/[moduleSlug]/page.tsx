@@ -58,6 +58,13 @@ import JornadaCompraForm, {
   initialBuyingJourneyData,
   journeyStages,
 } from "@/Components/modulos/JornadaCompraForm";
+
+import CanaisDigitaisAtuaisForm, {
+  CurrentChannelsData,
+  initialChannels,
+  initialCurrentChannelsData,
+} from "@/Components/modulos/CanaisDigitaisAtuaisForm";
+
 type ClientRecord = {
   id: string;
   name: string;
@@ -187,6 +194,8 @@ const [toneVoiceData, setToneVoiceData] =
   useState<PersonasData>(initialPersonasData);
   const [buyingJourneyData, setBuyingJourneyData] =
   useState<BuyingJourneyData>(initialBuyingJourneyData);
+  const [currentChannelsData, setCurrentChannelsData] =
+  useState<CurrentChannelsData>(initialCurrentChannelsData);
   
 
   const module = useMemo(() => {
@@ -213,6 +222,7 @@ const [toneVoiceData, setToneVoiceData] =
   const isKeywordsModule = moduleSlug === "palavras-chave";
   const isPersonasModule = moduleSlug === "personas";
   const isBuyingJourneyModule = moduleSlug === "jornada-de-compra";
+  const isCurrentChannelsModule = moduleSlug === "canais-digitais-atuais";
 
   const relatedModules = useMemo(() => {
     return planningModules.filter(
@@ -509,6 +519,27 @@ if (isBuyingJourneyModule && isBuyingJourneyData(savedContent)) {
   });
 }
 
+if (isCurrentChannelsModule && isCurrentChannelsData(savedContent)) {
+  setCurrentChannelsData({
+    channels:
+      Array.isArray(savedContent.channels) && savedContent.channels.length
+        ? savedContent.channels.map((channel) => ({
+            nome: channel.nome || "",
+            descricao: channel.descricao || "",
+            link: channel.link || "",
+          }))
+        : initialChannels,
+    observation: savedContent.observation || "",
+    references:
+      Array.isArray(savedContent.references) && savedContent.references.length
+        ? savedContent.references.map((reference) => ({
+            title: reference.title || "",
+            link: reference.link || "",
+          }))
+        : initialCurrentChannelsData.references,
+  });
+}
+
 function isPersonasData(value: unknown): value is PersonasData {
   if (!value || typeof value !== "object") {
     return false;
@@ -521,7 +552,7 @@ function isBuyingJourneyData(value: unknown): value is BuyingJourneyData {
   if (!value || typeof value !== "object") {
     return false;
   }
-
+  
   return (
     "overview" in value ||
     "stages" in value ||
@@ -532,6 +563,14 @@ function isBuyingJourneyData(value: unknown): value is BuyingJourneyData {
     "funnelCampaignsAutomation" in value ||
     "references" in value
   );
+}
+
+function isCurrentChannelsData(value: unknown): value is CurrentChannelsData {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  return "channels" in value || "observation" in value || "references" in value;
 }
 
 function isKeywordsData(value: unknown): value is KeywordsData {
@@ -686,11 +725,13 @@ function isProjectObjectivesData(
                       ? personasData
                       : isBuyingJourneyModule
                         ? buyingJourneyData
-                        : {
-                            mainText: genericData.mainText?.trim() || "",
-                            notes: genericData.notes?.trim() || "",
-                            references: genericData.references?.trim() || "",
-                          };
+                        : isCurrentChannelsModule
+                          ? currentChannelsData
+                          : {
+                              mainText: genericData.mainText?.trim() || "",
+                              notes: genericData.notes?.trim() || "",
+                              references: genericData.references?.trim() || "",
+                            };
 
     const nextData: ProjectData = {
       ...currentData,
@@ -991,6 +1032,17 @@ function isProjectObjectivesData(
   <JornadaCompraForm
     data={buyingJourneyData}
     setData={setBuyingJourneyData}
+    clientSlug={clientSlug}
+    presentationHref={`/apresentacao/${project.slug}`}
+    isSaving={isSaving}
+    isDisabled={!isModuleSelected}
+    onSave={() => saveModule()}
+  />
+
+  ) : isCurrentChannelsModule ? (
+  <CanaisDigitaisAtuaisForm
+    data={currentChannelsData}
+    setData={setCurrentChannelsData}
     clientSlug={clientSlug}
     presentationHref={`/apresentacao/${project.slug}`}
     isSaving={isSaving}
