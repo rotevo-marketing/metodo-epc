@@ -97,6 +97,13 @@ import YoutubeForm, {
   normalizeYoutubeTextList,
 } from "@/Components/modulos/YoutubeForm";
 
+import FacebookForm, {
+  initialFacebookData,
+  initialFacebookFrequencyItems,
+  FacebookData,
+  normalizeFacebookTextList,
+} from "@/Components/modulos/FacebookForm";
+
 type ClientRecord = {
   id: string;
   name: string;
@@ -238,6 +245,8 @@ const [toneVoiceData, setToneVoiceData] =
   useState<TikTokData>(initialTikTokData);
   const [youtubeData, setYoutubeData] =
   useState<YoutubeData>(initialYoutubeData);
+  const [facebookData, setFacebookData] =
+  useState<FacebookData>(initialFacebookData);
 
 
   const module = useMemo(() => {
@@ -270,6 +279,7 @@ const [toneVoiceData, setToneVoiceData] =
   const isInstagramModule = moduleSlug === "instagram";
   const isTiktokModule = moduleSlug === "tiktok";
   const isYoutubeModule = moduleSlug === "youtube";
+  const isFacebookModule = moduleSlug === "facebook";
 
   const relatedModules = useMemo(() => {
     return planningModules.filter(
@@ -776,6 +786,48 @@ if (isYoutubeModule && isYoutubeData(savedContent)) {
   });
 }
 
+if (isFacebookModule && isFacebookData(savedContent)) {
+  setFacebookData({
+    frequencyItems:
+      Array.isArray(savedContent.frequencyItems) &&
+      savedContent.frequencyItems.length
+        ? savedContent.frequencyItems.map((item) => ({
+            format: item.format || "",
+            quantity: item.quantity || "",
+            period: item.period || "por semana",
+            observation: item.observation || "",
+          }))
+        : initialFacebookFrequencyItems,
+    objectives: normalizeFacebookTextList(savedContent.objectives),
+    languageStructures: normalizeFacebookTextList(savedContent.languageStructures),
+    contents: normalizeFacebookTextList(savedContent.contents),
+    visualStrategy: savedContent.visualStrategy || "",
+    visualReferences:
+      Array.isArray(savedContent.visualReferences) &&
+      savedContent.visualReferences.length
+        ? savedContent.visualReferences.map((reference) => ({
+            image: reference.image || "",
+          }))
+        : initialFacebookData.visualReferences,
+    pagePhoto: savedContent.pagePhoto || "",
+    pageCover: savedContent.pageCover || "",
+    pageName: savedContent.pageName || "",
+    pageCategory: savedContent.pageCategory || "",
+    pageDescription: savedContent.pageDescription || "",
+    siteLink: savedContent.siteLink || "",
+    contactLink: savedContent.contactLink || "",
+    serviceRegion: savedContent.serviceRegion || "",
+    otherLinks: savedContent.otherLinks || "",
+    references:
+      Array.isArray(savedContent.references) && savedContent.references.length
+        ? savedContent.references.map((reference) => ({
+            title: reference.title || "",
+            link: reference.link || "",
+          }))
+        : initialFacebookData.references,
+  });
+}
+
 function isContentFunnelData(value: unknown): value is ContentFunnelData {
   if (!value || typeof value !== "object") {
     return false;
@@ -850,6 +902,20 @@ function isYoutubeData(value: unknown): value is YoutubeData {
     "channelName" in value ||
     "channelDescription" in value ||
     "suggestedPlaylists" in value
+  );
+}
+
+function isFacebookData(value: unknown): value is FacebookData {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  return (
+    "pageName" in value ||
+    "pageCategory" in value ||
+    "pageDescription" in value ||
+    "visualStrategy" in value ||
+    "siteLink" in value
   );
 }
 
@@ -1050,7 +1116,9 @@ function isProjectObjectivesData(
                                   ? tiktokData
                                   : isYoutubeModule
                                     ? youtubeData
-                                    : {
+                                    : isFacebookModule
+                                      ? facebookData
+                                      : {
                                         mainText:
                                           genericData.mainText?.trim() || "",
                                         notes: genericData.notes?.trim() || "",
@@ -1421,6 +1489,16 @@ function isProjectObjectivesData(
   <YoutubeForm
     data={youtubeData}
     setData={setYoutubeData}
+    clientSlug={clientSlug}
+    presentationHref={`/apresentacao/${project.slug}`}
+    isSaving={isSaving}
+    isDisabled={!isModuleSelected}
+    onSave={() => saveModule()}
+  />
+) : isFacebookModule ? (
+  <FacebookForm
+    data={facebookData}
+    setData={setFacebookData}
     clientSlug={clientSlug}
     presentationHref={`/apresentacao/${project.slug}`}
     isSaving={isSaving}
