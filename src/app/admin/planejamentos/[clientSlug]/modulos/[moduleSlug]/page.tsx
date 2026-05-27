@@ -176,6 +176,11 @@ import CampanhaDistribuicaoConteudoForm, {
   ContentDistributionCampaignData,
 } from "@/Components/modulos/CampanhaDistribuicaoConteudoForm";
 
+import FluxoAutomacaoForm, {
+  initialAutomationSystemData,
+  AutomationSystemData,
+} from "@/Components/modulos/FluxoAutomacaoForm";
+
 type ClientRecord = {
   id: string;
   name: string;
@@ -343,7 +348,8 @@ const [toneVoiceData, setToneVoiceData] =
   useState<SalesConversionCampaignData>(initialSalesConversionCampaignData);
   const [contentDistributionCampaignData, setContentDistributionCampaignData] =
   useState<ContentDistributionCampaignData>(initialContentDistributionCampaignData);
-
+  const [automationSystemData, setAutomationSystemData] =
+  useState<AutomationSystemData>(initialAutomationSystemData);
 
   const module = useMemo(() => {
     return planningModules.find((item) => item.slug === moduleSlug) ?? null;
@@ -391,6 +397,7 @@ const [toneVoiceData, setToneVoiceData] =
   moduleSlug === "campanha-conversao-de-vendas";
   const isContentDistributionCampaignModule =
   moduleSlug === "campanha-distribuicao-de-conteudo";
+  const isAutomationSystemModule = moduleSlug === "fluxo-de-automacao";
 
   const relatedModules = useMemo(() => {
     return planningModules.filter(
@@ -1790,6 +1797,77 @@ function isVisualIdentityData(value: unknown): value is VisualIdentityData {
   );
 }
 
+if (isAutomationSystemModule && isAutomationSystemData(savedContent)) {
+  setAutomationSystemData({
+    strategicVision: savedContent.strategicVision || initialAutomationSystemData.strategicVision,
+    centralPrinciple: savedContent.centralPrinciple || initialAutomationSystemData.centralPrinciple,
+    systemFunction: savedContent.systemFunction || initialAutomationSystemData.systemFunction,
+    successCondition: savedContent.successCondition || initialAutomationSystemData.successCondition,
+    failureRisk: savedContent.failureRisk || initialAutomationSystemData.failureRisk,
+    architecture: savedContent.architecture || initialAutomationSystemData.architecture,
+    architectureCharacteristics: savedContent.architectureCharacteristics || initialAutomationSystemData.architectureCharacteristics,
+    entryTriggers: savedContent.entryTriggers || initialAutomationSystemData.entryTriggers,
+    advanceTriggers: savedContent.advanceTriggers || initialAutomationSystemData.advanceTriggers,
+    reentryTriggers: savedContent.reentryTriggers || initialAutomationSystemData.reentryTriggers,
+    exitTriggers: savedContent.exitTriggers || initialAutomationSystemData.exitTriggers,
+    tags: Array.isArray(savedContent.tags) && savedContent.tags.length
+      ? savedContent.tags.map((t) => ({ name: t.name || "", description: t.description || "" }))
+      : initialAutomationSystemData.tags,
+    channelPriorities: Array.isArray(savedContent.channelPriorities) && savedContent.channelPriorities.length
+      ? savedContent.channelPriorities.map((i) => ({ flow: i.flow || "", dominantChannel: i.dominantChannel || "", supportChannel: i.supportChannel || "" }))
+      : initialAutomationSystemData.channelPriorities,
+    cadences: Array.isArray(savedContent.cadences) && savedContent.cadences.length
+      ? savedContent.cadences.map((i) => ({ flow: i.flow || "", cadence: i.cadence || "" }))
+      : initialAutomationSystemData.cadences,
+    flows: Array.isArray(savedContent.flows) && savedContent.flows.length
+      ? savedContent.flows.map((f) => ({
+          code: f.code || "",
+          name: f.name || "",
+          objective: f.objective || "",
+          dominantChannel: f.dominantChannel || "",
+          supportChannel: f.supportChannel || "",
+          cadence: f.cadence || "",
+          entryTrigger: f.entryTrigger || "",
+          advanceTrigger: f.advanceTrigger || "",
+          exitCondition: f.exitCondition || "",
+          strategicNotes: f.strategicNotes || "",
+          steps: Array.isArray(f.steps) && f.steps.length
+            ? f.steps.map((s) => ({
+                moment: s.moment || "",
+                channel: s.channel || "E-mail",
+                type: s.type || "Mensagem",
+                title: s.title || "",
+                purpose: s.purpose || "",
+                condition: s.condition || "",
+                cta: s.cta || "",
+              }))
+            : [{ moment: "", channel: "E-mail", type: "Mensagem", title: "", purpose: "", condition: "", cta: "" }],
+        }))
+      : initialAutomationSystemData.flows,
+    transmissionIntegration: savedContent.transmissionIntegration || initialAutomationSystemData.transmissionIntegration,
+    mainKpi: savedContent.mainKpi || initialAutomationSystemData.mainKpi,
+    secondaryKpis: savedContent.secondaryKpis || initialAutomationSystemData.secondaryKpis,
+    platforms: Array.isArray(savedContent.platforms) && savedContent.platforms.length
+      ? savedContent.platforms.map((p) => ({ category: p.category || "", tool: p.tool || "", purpose: p.purpose || "" }))
+      : initialAutomationSystemData.platforms,
+    references: Array.isArray(savedContent.references) && savedContent.references.length
+      ? savedContent.references.map((r) => ({ title: r.title || "", link: r.link || "" }))
+      : initialAutomationSystemData.references,
+  });
+}
+
+function isAutomationSystemData(value: unknown): value is AutomationSystemData {
+  if (!value || typeof value !== "object") return false;
+  return (
+    "strategicVision" in value ||
+    "flows" in value ||
+    "transmissionIntegration" in value ||
+    "mainKpi" in value ||
+    "centralPrinciple" in value ||
+    "entryTriggers" in value
+  );
+}
+
       if (!isSpecialistModule && isGenericModuleData(savedContent)) {
         setGenericData({
           mainText: savedContent.mainText || "",
@@ -1937,7 +2015,9 @@ function isProjectObjectivesData(
                                                             ? salesConversionCampaignData
                                                             : isContentDistributionCampaignModule
                                                               ? contentDistributionCampaignData
-                                                              : {
+                                                              : isAutomationSystemModule
+                                                                ? automationSystemData
+                                                                : {
                                                             mainText:
                                                               genericData.mainText?.trim() || "",
                                                             notes: genericData.notes?.trim() || "",
@@ -2438,6 +2518,16 @@ function isProjectObjectivesData(
   <CampanhaDistribuicaoConteudoForm
     data={contentDistributionCampaignData}
     setData={setContentDistributionCampaignData}
+    clientSlug={clientSlug}
+    presentationHref={`/apresentacao/${project.slug}`}
+    isSaving={isSaving}
+    isDisabled={!isModuleSelected}
+    onSave={() => saveModule()}
+  />
+) : isAutomationSystemModule ? (
+  <FluxoAutomacaoForm
+    data={automationSystemData}
+    setData={setAutomationSystemData}
     clientSlug={clientSlug}
     presentationHref={`/apresentacao/${project.slug}`}
     isSaving={isSaving}
