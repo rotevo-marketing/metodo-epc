@@ -10,6 +10,10 @@ import EspecialistaForm, {
   SpecialistData,
 } from "@/Components/modulos/EspecialistaForm";
 import { supabase } from "@/lib/supabase";
+import EmpresaForm, {
+  CompanyData,
+  initialCompanyData,
+} from "@/Components/modulos/EmpresaForm";
 
 type ClientRecord = {
   id: string;
@@ -108,6 +112,9 @@ export default function ModuloPlanejamentoPage() {
   const [specialistData, setSpecialistData] = useState<SpecialistData>(
     initialSpecialistData
   );
+  const [companyData, setCompanyData] = useState<CompanyData>(
+  initialCompanyData
+);
   const [genericData, setGenericData] = useState<GenericModuleData>({
     mainText: "",
     notes: "",
@@ -130,6 +137,7 @@ export default function ModuloPlanejamentoPage() {
 
   const isModuleSelected = selectedModules.includes(moduleSlug);
   const isSpecialistModule = moduleSlug === "dna-do-especialista";
+  const isCompanyModule = moduleSlug === "dna-da-empresa";
 
   const relatedModules = useMemo(() => {
     return planningModules.filter(
@@ -221,6 +229,12 @@ export default function ModuloPlanejamentoPage() {
         });
       }
 
+      if (isCompanyModule && isCompanyData(savedContent)) {
+  setCompanyData({
+    fields: savedContent.fields || {},
+  });
+}
+
       if (!isSpecialistModule && isGenericModuleData(savedContent)) {
         setGenericData({
           mainText: savedContent.mainText || "",
@@ -228,6 +242,14 @@ export default function ModuloPlanejamentoPage() {
           references: savedContent.references || "",
         });
       }
+
+      function isCompanyData(value: unknown): value is CompanyData {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  return "fields" in value;
+}
 
       setIsLoading(false);
     }
@@ -258,12 +280,14 @@ export default function ModuloPlanejamentoPage() {
     const currentData = project.data ?? {};
 
     const contentToSave = isSpecialistModule
-      ? specialistData
-      : {
-          mainText: genericData.mainText?.trim() || "",
-          notes: genericData.notes?.trim() || "",
-          references: genericData.references?.trim() || "",
-        };
+  ? specialistData
+  : isCompanyModule
+    ? companyData
+    : {
+        mainText: genericData.mainText?.trim() || "",
+        notes: genericData.notes?.trim() || "",
+        references: genericData.references?.trim() || "",
+      };
 
     const nextData: ProjectData = {
       ...currentData,
@@ -445,16 +469,26 @@ export default function ModuloPlanejamentoPage() {
               </div>
 
               {isSpecialistModule ? (
-                <EspecialistaForm
-                  data={specialistData}
-                  setData={setSpecialistData}
-                  clientSlug={clientSlug}
-                  presentationHref={`/apresentacao/${project.slug}`}
-                  isSaving={isSaving}
-                  isDisabled={!isModuleSelected}
-                  onSave={() => saveModule()}
-                />
-              ) : (
+  <EspecialistaForm
+    data={specialistData}
+    setData={setSpecialistData}
+    clientSlug={clientSlug}
+    presentationHref={`/apresentacao/${project.slug}`}
+    isSaving={isSaving}
+    isDisabled={!isModuleSelected}
+    onSave={() => saveModule()}
+  />
+) : isCompanyModule ? (
+  <EmpresaForm
+    data={companyData}
+    setData={setCompanyData}
+    clientSlug={clientSlug}
+    presentationHref={`/apresentacao/${project.slug}`}
+    isSaving={isSaving}
+    isDisabled={!isModuleSelected}
+    onSave={() => saveModule()}
+  />
+) : (
                 <form
                   onSubmit={saveModule}
                   className="mt-6 rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-10"
