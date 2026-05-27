@@ -171,6 +171,11 @@ import CampanhaConversaoVendasForm, {
   SalesConversionCampaignData,
 } from "@/Components/modulos/CampanhaConversaoVendasForm";
 
+import CampanhaDistribuicaoConteudoForm, {
+  initialContentDistributionCampaignData,
+  ContentDistributionCampaignData,
+} from "@/Components/modulos/CampanhaDistribuicaoConteudoForm";
+
 type ClientRecord = {
   id: string;
   name: string;
@@ -336,6 +341,8 @@ const [toneVoiceData, setToneVoiceData] =
   useState<LeadCaptureCampaignData>(initialLeadCaptureCampaignData);
   const [salesConversionCampaignData, setSalesConversionCampaignData] =
   useState<SalesConversionCampaignData>(initialSalesConversionCampaignData);
+  const [contentDistributionCampaignData, setContentDistributionCampaignData] =
+  useState<ContentDistributionCampaignData>(initialContentDistributionCampaignData);
 
 
   const module = useMemo(() => {
@@ -382,6 +389,8 @@ const [toneVoiceData, setToneVoiceData] =
   moduleSlug === "campanha-captacao-de-lead";
   const isSalesConversionCampaignModule =
   moduleSlug === "campanha-conversao-de-vendas";
+  const isContentDistributionCampaignModule =
+  moduleSlug === "campanha-distribuicao-de-conteudo";
 
   const relatedModules = useMemo(() => {
     return planningModules.filter(
@@ -1280,6 +1289,75 @@ if (isPinterestModule && isPinterestData(savedContent)) {
 }
 
 if (
+  isContentDistributionCampaignModule &&
+  isContentDistributionCampaignData(savedContent)
+) {
+  setContentDistributionCampaignData({
+    campaignType: savedContent.campaignType || "Distribuição de conteúdo",
+    campaignPhase: savedContent.campaignPhase || "Teste inicial",
+    mediaObjective: savedContent.mediaObjective || "Alcance",
+    audienceTemperature: savedContent.audienceTemperature || "Frio",
+    recommendedChannels: savedContent.recommendedChannels || "",
+    budget: savedContent.budget || "",
+    materials:
+      Array.isArray(savedContent.materials) && savedContent.materials.length
+        ? savedContent.materials.map((material) => ({
+            title: material.title || "",
+            link: material.link || "",
+          }))
+        : initialContentDistributionCampaignData.materials,
+    objective: savedContent.objective || "",
+    audience: savedContent.audience || "",
+    positioning: savedContent.positioning || "",
+    creativeDirection: savedContent.creativeDirection || "",
+    strategicScenario: savedContent.strategicScenario || "",
+    authorityContent: savedContent.authorityContent || "",
+    relationshipContent: savedContent.relationshipContent || "",
+    indirectConversionContent: savedContent.indirectConversionContent || "",
+    remarketingContent: savedContent.remarketingContent || "",
+    channelPlans:
+      Array.isArray(savedContent.channelPlans) && savedContent.channelPlans.length
+        ? savedContent.channelPlans.map((plan) => ({
+            channel: plan.channel || "",
+            contentType: plan.contentType || "",
+            channelRole: plan.channelRole || "",
+          }))
+        : initialContentDistributionCampaignData.channelPlans,
+    mainContent: savedContent.mainContent || "",
+    possibleDerivations: savedContent.possibleDerivations || "",
+    distributionSequence: savedContent.distributionSequence || "",
+    metrics: savedContent.metrics || "",
+    references:
+      Array.isArray(savedContent.references) && savedContent.references.length
+        ? savedContent.references.map((reference) => ({
+            title: reference.title || "",
+            link: reference.link || "",
+          }))
+        : initialContentDistributionCampaignData.references,
+  });
+}
+
+function isContentDistributionCampaignData(
+  value: unknown
+): value is ContentDistributionCampaignData {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  return (
+    "mediaObjective" in value ||
+    "authorityContent" in value ||
+    "relationshipContent" in value ||
+    "indirectConversionContent" in value ||
+    "remarketingContent" in value ||
+    "channelPlans" in value ||
+    "mainContent" in value ||
+    "possibleDerivations" in value ||
+    "distributionSequence" in value
+  );
+}
+
+if (
   isSalesConversionCampaignModule &&
   isSalesConversionCampaignData(savedContent)
 ) {
@@ -1857,7 +1935,9 @@ function isProjectObjectivesData(
                                                           ? leadCaptureCampaignData
                                                           : isSalesConversionCampaignModule
                                                             ? salesConversionCampaignData
-                                                            : {
+                                                            : isContentDistributionCampaignModule
+                                                              ? contentDistributionCampaignData
+                                                              : {
                                                             mainText:
                                                               genericData.mainText?.trim() || "",
                                                             notes: genericData.notes?.trim() || "",
@@ -2348,6 +2428,16 @@ function isProjectObjectivesData(
   <CampanhaConversaoVendasForm
     data={salesConversionCampaignData}
     setData={setSalesConversionCampaignData}
+    clientSlug={clientSlug}
+    presentationHref={`/apresentacao/${project.slug}`}
+    isSaving={isSaving}
+    isDisabled={!isModuleSelected}
+    onSave={() => saveModule()}
+  />
+) : isContentDistributionCampaignModule ? (
+  <CampanhaDistribuicaoConteudoForm
+    data={contentDistributionCampaignData}
+    setData={setContentDistributionCampaignData}
     clientSlug={clientSlug}
     presentationHref={`/apresentacao/${project.slug}`}
     isSaving={isSaving}
