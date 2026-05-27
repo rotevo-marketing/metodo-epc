@@ -104,6 +104,13 @@ import FacebookForm, {
   normalizeFacebookTextList,
 } from "@/Components/modulos/FacebookForm";
 
+import LinkedInForm, {
+  initialLinkedInData,
+  initialLinkedInFrequencyItems,
+  LinkedInData,
+  normalizeLinkedInTextList,
+} from "@/Components/modulos/LinkedInForm";
+
 type ClientRecord = {
   id: string;
   name: string;
@@ -247,7 +254,8 @@ const [toneVoiceData, setToneVoiceData] =
   useState<YoutubeData>(initialYoutubeData);
   const [facebookData, setFacebookData] =
   useState<FacebookData>(initialFacebookData);
-
+  const [linkedinData, setLinkedinData] =
+  useState<LinkedInData>(initialLinkedInData);
 
   const module = useMemo(() => {
     return planningModules.find((item) => item.slug === moduleSlug) ?? null;
@@ -280,6 +288,7 @@ const [toneVoiceData, setToneVoiceData] =
   const isTiktokModule = moduleSlug === "tiktok";
   const isYoutubeModule = moduleSlug === "youtube";
   const isFacebookModule = moduleSlug === "facebook";
+  const isLinkedinModule = moduleSlug === "linkedin";
 
   const relatedModules = useMemo(() => {
     return planningModules.filter(
@@ -828,6 +837,45 @@ if (isFacebookModule && isFacebookData(savedContent)) {
   });
 }
 
+if (isLinkedinModule && isLinkedInData(savedContent)) {
+  setLinkedinData({
+    frequencyItems:
+      Array.isArray(savedContent.frequencyItems) &&
+      savedContent.frequencyItems.length
+        ? savedContent.frequencyItems.map((item) => ({
+            format: item.format || "",
+            quantity: item.quantity || "",
+            period: item.period || "por semana",
+            observation: item.observation || "",
+          }))
+        : initialLinkedInFrequencyItems,
+    objectives: normalizeLinkedInTextList(savedContent.objectives),
+    languageStructures: normalizeLinkedInTextList(savedContent.languageStructures),
+    contents: normalizeLinkedInTextList(savedContent.contents),
+    visualStrategy: savedContent.visualStrategy || "",
+    visualReferences:
+      Array.isArray(savedContent.visualReferences) &&
+      savedContent.visualReferences.length
+        ? savedContent.visualReferences.map((r) => ({
+            image: r.image || "",
+          }))
+        : initialLinkedInData.visualReferences,
+    profilePhoto: savedContent.profilePhoto || "",
+    profileCover: savedContent.profileCover || "",
+    profileName: savedContent.profileName || "",
+    headline: savedContent.headline || "",
+    authorityThemes: savedContent.authorityThemes || "",
+    aboutProfile: savedContent.aboutProfile || "",
+    references:
+      Array.isArray(savedContent.references) && savedContent.references.length
+        ? savedContent.references.map((r) => ({
+            title: r.title || "",
+            link: r.link || "",
+          }))
+        : initialLinkedInData.references,
+  });
+}
+
 function isContentFunnelData(value: unknown): value is ContentFunnelData {
   if (!value || typeof value !== "object") {
     return false;
@@ -916,6 +964,19 @@ function isFacebookData(value: unknown): value is FacebookData {
     "pageDescription" in value ||
     "visualStrategy" in value ||
     "siteLink" in value
+  );
+}
+
+function isLinkedInData(value: unknown): value is LinkedInData {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  return (
+    "profileName" in value ||
+    "headline" in value ||
+    "authorityThemes" in value ||
+    "aboutProfile" in value
   );
 }
 
@@ -1118,13 +1179,15 @@ function isProjectObjectivesData(
                                     ? youtubeData
                                     : isFacebookModule
                                       ? facebookData
-                                      : {
-                                        mainText:
-                                          genericData.mainText?.trim() || "",
-                                        notes: genericData.notes?.trim() || "",
-                                        references:
-                                          genericData.references?.trim() || "",
-                                      };
+                                      : isLinkedinModule
+                                        ? linkedinData
+                                        : {
+                                          mainText:
+                                            genericData.mainText?.trim() || "",
+                                          notes: genericData.notes?.trim() || "",
+                                          references:
+                                            genericData.references?.trim() || "",
+                                        };
 
     const nextData: ProjectData = {
       ...currentData,
@@ -1499,6 +1562,16 @@ function isProjectObjectivesData(
   <FacebookForm
     data={facebookData}
     setData={setFacebookData}
+    clientSlug={clientSlug}
+    presentationHref={`/apresentacao/${project.slug}`}
+    isSaving={isSaving}
+    isDisabled={!isModuleSelected}
+    onSave={() => saveModule()}
+  />
+) : isLinkedinModule ? (
+  <LinkedInForm
+    data={linkedinData}
+    setData={setLinkedinData}
     clientSlug={clientSlug}
     presentationHref={`/apresentacao/${project.slug}`}
     isSaving={isSaving}
