@@ -11,6 +11,14 @@ import EmpresaPresentation from "@/Components/apresentacao/EmpresaPresentation";
 import DnaConteudoPresentation from "@/Components/apresentacao/DnaConteudoPresentation";
 import TomDeVozPresentation from "@/Components/apresentacao/TomDeVozPresentation";
 import IdentidadeVisualPresentation from "@/Components/apresentacao/IdentidadeVisualPresentation";
+import ObjetivosPresentation from "@/Components/apresentacao/ObjetivosPresentation";
+import ReferenciasConcorrentesPresentation from "@/Components/apresentacao/ReferenciasConcorrentesPresentation";
+import PesquisaConcorrenciaPresentation from "@/Components/apresentacao/PesquisaConcorrenciaPresentation";
+import AnaliseSwotPresentation from "@/Components/apresentacao/AnaliseSwotPresentation";
+import PalavrasChavePresentation from "@/Components/apresentacao/PalavrasChavePresentation";
+import PersonasPresentation from "@/Components/apresentacao/PersonasPresentation";
+import JornadaCompraPresentation from "@/Components/apresentacao/JornadaCompraPresentation";
+import CanaisDigitaisPresentation from "@/Components/apresentacao/CanaisDigitaisPresentation";
 import { ModuleIcon } from "@/Components/apresentacao/ModuleIcon";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -449,6 +457,22 @@ function DetailMode({
               <TomDeVozPresentation data={moduleContent["tom-de-voz"]} />
             ) : activeSection.slug === "identidade-visual" ? (
               <IdentidadeVisualPresentation data={moduleContent["identidade-visual"]} />
+            ) : activeSection.slug === "objetivos-do-projeto" ? (
+              <ObjetivosPresentation data={moduleContent["objetivos-do-projeto"]} />
+            ) : activeSection.slug === "referencias-e-concorrentes" ? (
+              <ReferenciasConcorrentesPresentation data={moduleContent["referencias-e-concorrentes"]} />
+            ) : activeSection.slug === "pesquisa-de-concorrencia" ? (
+              <PesquisaConcorrenciaPresentation data={moduleContent["pesquisa-de-concorrencia"]} />
+            ) : activeSection.slug === "analise-swot" ? (
+              <AnaliseSwotPresentation data={moduleContent["analise-swot"]} />
+            ) : activeSection.slug === "palavras-chave" ? (
+              <PalavrasChavePresentation data={moduleContent["palavras-chave"]} />
+            ) : activeSection.slug === "personas" ? (
+              <PersonasPresentation data={moduleContent["personas"]} />
+            ) : activeSection.slug === "jornada-de-compra" ? (
+              <JornadaCompraPresentation data={moduleContent["jornada-de-compra"]} />
+            ) : activeSection.slug === "canais-digitais-atuais" ? (
+              <CanaisDigitaisPresentation data={moduleContent["canais-digitais-atuais"]} />
             ) : (
               <ModulePlaceholder section={activeSection} />
             )}
