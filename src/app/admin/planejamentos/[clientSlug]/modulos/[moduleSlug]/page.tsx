@@ -83,6 +83,13 @@ import InstagramForm, {
   normalizeInstagramTextList,
 } from "@/Components/modulos/InstagramForm";
 
+import TikTokForm, {
+  initialTikTokData,
+  initialTikTokFrequencyItems,
+  TikTokData,
+  normalizeTikTokTextList,
+} from "@/Components/modulos/TikTokForm";
+
 type ClientRecord = {
   id: string;
   name: string;
@@ -220,7 +227,9 @@ const [toneVoiceData, setToneVoiceData] =
   useState<EditorialLinesData>(initialEditorialLinesData);
   const [instagramData, setInstagramData] =
   useState<InstagramData>(initialInstagramData);
-  
+  const [tiktokData, setTiktokData] =
+  useState<TikTokData>(initialTikTokData);
+
 
   const module = useMemo(() => {
     return planningModules.find((item) => item.slug === moduleSlug) ?? null;
@@ -250,6 +259,7 @@ const [toneVoiceData, setToneVoiceData] =
   const isContentFunnelModule = moduleSlug === "funil-de-conteudo";
   const isEditorialLinesModule = moduleSlug === "linhas-editoriais";
   const isInstagramModule = moduleSlug === "instagram";
+  const isTiktokModule = moduleSlug === "tiktok";
 
   const relatedModules = useMemo(() => {
     return planningModules.filter(
@@ -679,6 +689,43 @@ if (isInstagramModule && isInstagramData(savedContent)) {
   });
 }
 
+if (isTiktokModule && isTikTokData(savedContent)) {
+  setTiktokData({
+    frequencyItems:
+      Array.isArray(savedContent.frequencyItems) &&
+      savedContent.frequencyItems.length
+        ? savedContent.frequencyItems.map((item) => ({
+            format: item.format || "",
+            quantity: item.quantity || "",
+            period: item.period || "por semana",
+            observation: item.observation || "",
+          }))
+        : initialTikTokFrequencyItems,
+    objectives: normalizeTikTokTextList(savedContent.objectives),
+    languageStructures: normalizeTikTokTextList(savedContent.languageStructures),
+    contents: normalizeTikTokTextList(savedContent.contents),
+    mainFormats: savedContent.mainFormats || "",
+    contentSeries: savedContent.contentSeries || "",
+    visualStrategy: savedContent.visualStrategy || "",
+    visualReferences:
+      Array.isArray(savedContent.visualReferences) &&
+      savedContent.visualReferences.length
+        ? savedContent.visualReferences.map((reference) => ({
+            image: reference.image || "",
+          }))
+        : initialTikTokData.visualReferences,
+    openingHooks: savedContent.openingHooks || "",
+    retentionResources: savedContent.retentionResources || "",
+    references:
+      Array.isArray(savedContent.references) && savedContent.references.length
+        ? savedContent.references.map((reference) => ({
+            title: reference.title || "",
+            link: reference.link || "",
+          }))
+        : initialTikTokData.references,
+  });
+}
+
 function isContentFunnelData(value: unknown): value is ContentFunnelData {
   if (!value || typeof value !== "object") {
     return false;
@@ -724,6 +771,21 @@ function isInstagramData(value: unknown): value is InstagramData {
     "bioLink" in value ||
     "highlights" in value ||
     "references" in value
+  );
+}
+
+function isTikTokData(value: unknown): value is TikTokData {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  return (
+    "frequencyItems" in value ||
+    "languageStructures" in value ||
+    "mainFormats" in value ||
+    "contentSeries" in value ||
+    "openingHooks" in value ||
+    "retentionResources" in value
   );
 }
 
