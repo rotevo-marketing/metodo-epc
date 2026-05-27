@@ -42,6 +42,10 @@ import AnaliseSwotForm, {
   initialSwotData,
   SwotData,
 } from "@/Components/modulos/AnaliseSwotForm";
+import PalavrasChaveForm, {
+  initialKeywordsData,
+  KeywordsData,
+} from "@/Components/modulos/PalavrasChaveForm";
 
 type ClientRecord = {
   id: string;
@@ -166,6 +170,8 @@ const [toneVoiceData, setToneVoiceData] =
   const [competitorResearchData, setCompetitorResearchData] =
   useState<CompetitorResearchData>(initialCompetitorResearchData);
   const [swotData, setSwotData] = useState<SwotData>(initialSwotData);
+  const [keywordsData, setKeywordsData] =
+  useState<KeywordsData>(initialKeywordsData);
   
 
   const module = useMemo(() => {
@@ -189,6 +195,7 @@ const [toneVoiceData, setToneVoiceData] =
   moduleSlug === "referencias-e-concorrentes";
   const isCompetitorResearchModule = moduleSlug === "pesquisa-de-concorrencia";
   const isSwotModule = moduleSlug === "analise-swot";
+  const isKeywordsModule = moduleSlug === "palavras-chave";
 
   const relatedModules = useMemo(() => {
     return planningModules.filter(
@@ -405,6 +412,33 @@ if (isSwotModule && isSwotData(savedContent)) {
   });
 }
 
+if (isKeywordsModule && isKeywordsData(savedContent)) {
+  setKeywordsData({
+    sortBy: savedContent.sortBy || "adicao",
+    keywords:
+      Array.isArray(savedContent.keywords) && savedContent.keywords.length
+        ? savedContent.keywords.map((item) => ({
+            keyword: item.keyword || "",
+            volume: item.volume || "",
+            observation: item.observation || "",
+          }))
+        : initialKeywordsData.keywords,
+    strategicObservation: savedContent.strategicObservation || "",
+  });
+}
+
+function isKeywordsData(value: unknown): value is KeywordsData {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  return (
+    "sortBy" in value ||
+    "keywords" in value ||
+    "strategicObservation" in value
+  );
+}
+
 function isSwotData(value: unknown): value is SwotData {
   if (!value || typeof value !== "object") {
     return false;
@@ -539,11 +573,13 @@ function isProjectObjectivesData(
                 ? competitorResearchData
                 : isSwotModule
                   ? swotData
-                  : {
-                      mainText: genericData.mainText?.trim() || "",
-                      notes: genericData.notes?.trim() || "",
-                      references: genericData.references?.trim() || "",
-                    };
+                  : isKeywordsModule
+                    ? keywordsData
+                    : {
+                        mainText: genericData.mainText?.trim() || "",
+                        notes: genericData.notes?.trim() || "",
+                        references: genericData.references?.trim() || "",
+                      };
 
     const nextData: ProjectData = {
       ...currentData,
@@ -811,6 +847,17 @@ function isProjectObjectivesData(
   <AnaliseSwotForm
     data={swotData}
     setData={setSwotData}
+    clientSlug={clientSlug}
+    presentationHref={`/apresentacao/${project.slug}`}
+    isSaving={isSaving}
+    isDisabled={!isModuleSelected}
+    onSave={() => saveModule()}
+  />
+
+  ) : isKeywordsModule ? (
+  <PalavrasChaveForm
+    data={keywordsData}
+    setData={setKeywordsData}
     clientSlug={clientSlug}
     presentationHref={`/apresentacao/${project.slug}`}
     isSaving={isSaving}
