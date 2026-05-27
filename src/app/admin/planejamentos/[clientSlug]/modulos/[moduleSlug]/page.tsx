@@ -18,6 +18,10 @@ import DnaConteudoForm, {
   ContentDnaData,
   initialContentDnaData,
 } from "@/Components/modulos/DnaConteudoForm";
+import TomDeVozForm, {
+  initialToneVoiceData,
+  ToneVoiceData,
+} from "@/Components/modulos/TomDeVozForm";
 
 type ClientRecord = {
   id: string;
@@ -122,6 +126,8 @@ export default function ModuloPlanejamentoPage() {
 const [contentDnaData, setContentDnaData] = useState<ContentDnaData>(
   initialContentDnaData
 );
+const [toneVoiceData, setToneVoiceData] =
+  useState<ToneVoiceData>(initialToneVoiceData);
   const [genericData, setGenericData] = useState<GenericModuleData>({
     mainText: "",
     notes: "",
@@ -146,6 +152,7 @@ const [contentDnaData, setContentDnaData] = useState<ContentDnaData>(
   const isSpecialistModule = moduleSlug === "dna-do-especialista";
   const isCompanyModule = moduleSlug === "dna-da-empresa";
   const isContentDnaModule = moduleSlug === "dna-de-conteudo";
+  const isToneVoiceModule = moduleSlug === "tom-de-voz";
 
   const relatedModules = useMemo(() => {
     return planningModules.filter(
@@ -252,6 +259,23 @@ if (isContentDnaModule && isContentDnaData(savedContent)) {
   });
 }
 
+if (isToneVoiceModule && isToneVoiceData(savedContent)) {
+  setToneVoiceData({
+    characteristics: savedContent.characteristics?.length
+      ? savedContent.characteristics
+      : initialToneVoiceData.characteristics,
+    toneChoices: savedContent.toneChoices || {},
+    vocabulary: savedContent.vocabulary || {},
+    emotions: Array.isArray(savedContent.emotions)
+      ? savedContent.emotions
+      : [],
+    observations: savedContent.observations || "",
+    references: savedContent.references?.length
+      ? savedContent.references
+      : initialToneVoiceData.references,
+  });
+}
+
       if (!isSpecialistModule && isGenericModuleData(savedContent)) {
         setGenericData({
           mainText: savedContent.mainText || "",
@@ -274,6 +298,21 @@ function isContentDnaData(value: unknown): value is ContentDnaData {
   }
 
   return "fields" in value || "secondaryIdeas" in value;
+}
+
+function isToneVoiceData(value: unknown): value is ToneVoiceData {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  return (
+    "characteristics" in value ||
+    "toneChoices" in value ||
+    "vocabulary" in value ||
+    "emotions" in value ||
+    "observations" in value ||
+    "references" in value
+  );
 }
       setIsLoading(false);
     }
@@ -309,11 +348,13 @@ function isContentDnaData(value: unknown): value is ContentDnaData {
     ? companyData
     : isContentDnaModule
       ? contentDnaData
-      : {
-          mainText: genericData.mainText?.trim() || "",
-          notes: genericData.notes?.trim() || "",
-          references: genericData.references?.trim() || "",
-        };
+      : isToneVoiceModule
+        ? toneVoiceData
+        : {
+            mainText: genericData.mainText?.trim() || "",
+            notes: genericData.notes?.trim() || "",
+            references: genericData.references?.trim() || "",
+          };
 
     const nextData: ProjectData = {
       ...currentData,
@@ -524,7 +565,18 @@ function isContentDnaData(value: unknown): value is ContentDnaData {
     isDisabled={!isModuleSelected}
     onSave={() => saveModule()}
   />
+) : isToneVoiceModule ? (
+  <TomDeVozForm
+    data={toneVoiceData}
+    setData={setToneVoiceData}
+    clientSlug={clientSlug}
+    presentationHref={`/apresentacao/${project.slug}`}
+    isSaving={isSaving}
+    isDisabled={!isModuleSelected}
+    onSave={() => saveModule()}
+  />
 ) : (
+
                 <form
                   onSubmit={saveModule}
                   className="mt-6 rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-10"
