@@ -1,16 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { planningModules } from "@/data/modules";
-import { MetodoLogo } from "@/Components/MetodoBrand";
+import { moduleCategories, planningModules } from "@/data/modules";
+import { MetodoFooter, MetodoLogo } from "@/Components/MetodoBrand";
+import ResumoEstrategico from "@/Components/apresentacao/ResumoEstrategico";
+import { ModuleIcon } from "@/Components/apresentacao/ModuleIcon";
 
-type ClientRecord = {
-  id: string;
-  name: string;
-  slug: string;
-};
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+type ClientRecord = { id: string; name: string; slug: string };
 
 type ProjectData = {
   selectedModules?: string[];
@@ -28,10 +28,423 @@ type PlanningProject = {
   clients: ClientRecord | ClientRecord[] | null;
 };
 
+type PresentationSection = {
+  slug: string;
+  title: string;
+  category: string;
+  description: string;
+  hasContent: boolean;
+};
+
+// ─── Constants ────────────────────────────────────────────────────────────────
+
+const introSection: PresentationSection = {
+  slug: "resumo-estrategico",
+  title: "Comece por aqui",
+  category: "Apresentação",
+  description:
+    "Entenda como navegar pelo planejamento, o que você vai encontrar em cada área e como usar este ambiente para orientar decisões estratégicas.",
+  hasContent: true,
+};
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
 function getProjectClient(project: PlanningProject): ClientRecord | null {
   if (Array.isArray(project.clients)) return project.clients[0] ?? null;
   return project.clients ?? null;
 }
+
+function displayTitle(section: PresentationSection): string {
+  const map: Record<string, string> = {
+    "dna-do-especialista": "Especialista",
+    "dna-da-empresa": "Empresa",
+  };
+  return map[section.slug] ?? section.title;
+}
+
+function cx(...classes: Array<string | false | undefined>) {
+  return classes.filter(Boolean).join(" ");
+}
+
+// ─── Svg icons ────────────────────────────────────────────────────────────────
+
+function ArrowIcon() {
+  return (
+    <svg viewBox="0 0 64 64" aria-hidden="true" className="h-5 w-5" fill="none">
+      <path
+        d="M14 32h34M36 20l12 12-12 12"
+        stroke="currentColor"
+        strokeWidth="4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+// ─── Overview (cards grid) ────────────────────────────────────────────────────
+
+function OverviewMode({
+  sections,
+  clientName,
+  coverImageUrl,
+  isStrategist,
+  projectSlug,
+  onSelect,
+}: {
+  sections: PresentationSection[];
+  clientName: string;
+  coverImageUrl: string | null;
+  isStrategist: boolean;
+  projectSlug: string;
+  onSelect: (slug: string) => void;
+}) {
+  const groupedSections = [
+    { category: "Apresentação", items: [introSection] },
+    ...moduleCategories
+      .map((cat) => ({
+        category: cat,
+        items: sections.filter((s) => s.category === cat),
+      }))
+      .filter((g) => g.items.length > 0),
+  ];
+
+  return (
+    <main className="min-h-screen bg-slate-100 text-slate-950">
+      {/* Hero */}
+      <section className="relative min-h-[520px] overflow-hidden bg-slate-950 text-white">
+        {coverImageUrl && (
+          <div
+            className="absolute inset-0 bg-cover bg-center opacity-35"
+            style={{ backgroundImage: `url(${coverImageUrl})` }}
+          />
+        )}
+        <div className="absolute inset-0 bg-slate-950/70" />
+
+        <div className="relative z-10 flex min-h-[520px] flex-col justify-between px-6 py-8 lg:px-16">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <MetodoLogo href="/" size="sm" className="brightness-0 invert" />
+
+            <div className="flex flex-wrap items-center justify-end gap-3">
+              {isStrategist && (
+                <a
+                  href={`/admin/planejamentos/${projectSlug}`}
+                  className="rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white hover:text-slate-950"
+                >
+                  Voltar para planejamentos
+                </a>
+              )}
+
+              <a
+                href="#modulos"
+                className="rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white hover:text-slate-950"
+              >
+                Ver módulos
+              </a>
+            </div>
+          </div>
+
+          <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col items-center justify-center text-center">
+            <p className="text-sm font-medium uppercase tracking-[0.55em] text-white/70">
+              Planejamento Estratégico
+            </p>
+            <h1 className="mt-6 text-5xl font-light tracking-[-0.06em] text-white lg:text-7xl">
+              {clientName}
+            </h1>
+          </div>
+        </div>
+      </section>
+
+      {/* Module grid */}
+      <section id="modulos" className="mx-auto max-w-7xl px-6 py-16 lg:px-10">
+        <div className="mb-10">
+          <p className="text-xs font-semibold uppercase tracking-[0.35em] text-slate-400">
+            Planejamento
+          </p>
+          <h2 className="mt-3 text-5xl font-light tracking-[-0.05em] text-slate-950">
+            {clientName}
+          </h2>
+          <p className="mt-5 max-w-3xl text-lg leading-9 text-slate-600">
+            Selecione abaixo o módulo que deseja visualizar. Cada área abre a
+            apresentação estratégica correspondente.
+          </p>
+        </div>
+
+        {sections.length === 0 && (
+          <div className="rounded-[2rem] bg-white p-8 text-center ring-1 ring-slate-200">
+            <p className="text-slate-500">
+              Nenhum módulo foi selecionado para este planejamento ainda.
+            </p>
+          </div>
+        )}
+
+        <div className="space-y-14 border-t border-slate-200 pt-10">
+          {groupedSections.map((group) => {
+            if (!group.items.length) return null;
+
+            return (
+              <section key={group.category}>
+                <p className="text-xs font-semibold uppercase tracking-[0.35em] text-slate-400">
+                  {group.category}
+                </p>
+
+                <div className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                  {group.items.map((section) => (
+                    <button
+                      key={section.slug}
+                      type="button"
+                      onClick={() => onSelect(section.slug)}
+                      className="group min-h-[150px] cursor-pointer rounded-[1.5rem] bg-white p-6 text-left shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-950/5 hover:ring-slate-300"
+                    >
+                      <div className="flex gap-5">
+                        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-slate-100 ring-1 ring-slate-200 transition group-hover:bg-slate-950">
+                          <ModuleIcon slug={section.slug} hoverInvert />
+                        </div>
+
+                        <div className="flex-1">
+                          <div className="flex items-start justify-between gap-2">
+                            <h3 className="text-xl font-semibold tracking-[-0.03em] text-slate-950">
+                              {displayTitle(section)}
+                            </h3>
+                            {section.slug !== "resumo-estrategico" && (
+                              <span
+                                className={cx(
+                                  "mt-0.5 shrink-0 rounded-full px-2.5 py-0.5 text-xs font-bold",
+                                  section.hasContent
+                                    ? "bg-emerald-100 text-emerald-700"
+                                    : "bg-amber-100 text-amber-700"
+                                )}
+                              >
+                                {section.hasContent ? "Preenchido" : "Vazio"}
+                              </span>
+                            )}
+                          </div>
+
+                          <p className="mt-3 text-sm leading-7 text-slate-600">
+                            {section.description}
+                          </p>
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </section>
+            );
+          })}
+        </div>
+      </section>
+
+      <MetodoFooter description="Planejamento estratégico desenvolvido pelo Método EPC." />
+    </main>
+  );
+}
+
+// ─── Module placeholder (for modules not yet migrated to dynamic view) ────────
+
+function ModulePlaceholder({ section }: { section: PresentationSection }) {
+  return (
+    <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
+      <div className="flex items-center gap-5">
+        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-slate-950">
+          <ModuleIcon slug={section.slug} size="lg" inverted />
+        </div>
+
+        <div>
+          <p className="text-xs font-medium uppercase tracking-[0.35em] text-slate-400">
+            {section.category}
+          </p>
+          <h2 className="mt-2 text-4xl font-light tracking-[-0.05em] text-slate-950">
+            {displayTitle(section)}
+          </h2>
+        </div>
+      </div>
+
+      <p className="mt-6 max-w-2xl text-base leading-8 text-slate-600">
+        {section.description}
+      </p>
+
+      <div className="mt-8 rounded-2xl bg-slate-50 px-6 py-5 ring-1 ring-slate-200">
+        <div className="flex items-center gap-3">
+          <span
+            className={cx(
+              "rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.12em]",
+              section.hasContent
+                ? "bg-emerald-100 text-emerald-700"
+                : "bg-amber-100 text-amber-700"
+            )}
+          >
+            {section.hasContent ? "Conteúdo salvo" : "Sem conteúdo"}
+          </span>
+          <p className="text-sm text-slate-500">
+            {section.hasContent
+              ? "Este módulo possui dados preenchidos no planejamento."
+              : "Este módulo ainda não foi preenchido no planejamento."}
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Detail (sidebar + content) ───────────────────────────────────────────────
+
+function DetailMode({
+  sections,
+  activeSlug,
+  clientName,
+  coverImageUrl,
+  onChangeSlug,
+  onBackToOverview,
+}: {
+  sections: PresentationSection[];
+  activeSlug: string;
+  clientName: string;
+  coverImageUrl: string | null;
+  onChangeSlug: (slug: string) => void;
+  onBackToOverview: () => void;
+}) {
+  const allSections = [introSection, ...sections];
+  const activeSection =
+    allSections.find((s) => s.slug === activeSlug) ?? introSection;
+
+  const groupedSections = [
+    { category: "Apresentação", items: [introSection] },
+    ...moduleCategories
+      .map((cat) => ({
+        category: cat,
+        items: sections.filter((s) => s.category === cat),
+      }))
+      .filter((g) => g.items.length > 0),
+  ];
+
+  return (
+    <main className="min-h-screen bg-slate-100 text-slate-950">
+      {/* Hero */}
+      <section className="relative min-h-[580px] overflow-hidden bg-slate-950">
+        {coverImageUrl && (
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: `url(${coverImageUrl})` }}
+          />
+        )}
+        <div className="absolute inset-0 bg-slate-950/65" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/25 to-transparent" />
+
+        <div className="absolute left-6 right-6 top-6 z-20 flex flex-wrap items-center justify-between gap-4">
+          <MetodoLogo href="/" size="sm" className="brightness-0 invert" />
+
+          <button
+            type="button"
+            onClick={onBackToOverview}
+            className="inline-flex cursor-pointer items-center rounded-full border border-white/20 bg-white/10 px-5 py-3 text-sm font-medium text-white backdrop-blur transition hover:bg-white hover:text-slate-950"
+          >
+            Ver módulos
+          </button>
+        </div>
+
+        <div className="relative z-10 flex min-h-[580px] items-center justify-center px-6 py-16 text-center">
+          <div className="max-w-5xl">
+            <p className="text-xs font-medium uppercase tracking-[0.55em] text-white/70 sm:text-sm">
+              Planejamento Estratégico
+            </p>
+            <h1 className="mt-6 text-5xl font-light tracking-[-0.05em] text-white sm:text-6xl lg:text-7xl">
+              {clientName}
+            </h1>
+          </div>
+        </div>
+      </section>
+
+      {/* Content area */}
+      <section className="px-6 py-8 lg:px-10 lg:py-10 xl:px-14">
+        <div className="mx-auto grid max-w-[1520px] gap-8 lg:grid-cols-[315px_minmax(0,1fr)] xl:gap-10">
+          {/* Sidebar */}
+          <aside className="h-fit rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-slate-200 lg:sticky lg:top-6">
+            <p className="text-xs font-medium uppercase tracking-[0.32em] text-slate-400">
+              Navegação
+            </p>
+            <h2 className="mt-3 text-2xl font-light tracking-[-0.03em] text-slate-950">
+              {clientName}
+            </h2>
+
+            <div className="mt-5 flex gap-3 rounded-[1.25rem] bg-slate-50 p-4 text-slate-600 ring-1 ring-slate-200">
+              <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-slate-950 shadow-sm ring-1 ring-slate-200">
+                <ArrowIcon />
+              </div>
+              <p className="text-sm leading-6">
+                Selecione uma seção para visualizar a apresentação estratégica.
+              </p>
+            </div>
+
+            <nav className="mt-7 max-h-[700px] space-y-6 overflow-y-auto pr-1">
+              {groupedSections.map((group) => (
+                <div key={group.category}>
+                  <p className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-400">
+                    {group.category}
+                  </p>
+
+                  <div className="space-y-1.5">
+                    {group.items.map((section) => {
+                      const isActive = section.slug === activeSlug;
+
+                      return (
+                        <button
+                          key={section.slug}
+                          type="button"
+                          onClick={() => onChangeSlug(section.slug)}
+                          className={cx(
+                            "grid w-full grid-cols-[30px_1fr_auto] items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm transition",
+                            isActive
+                              ? "bg-slate-950 text-white"
+                              : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"
+                          )}
+                        >
+                          <span
+                            className={cx(
+                              "flex h-7 w-7 items-center justify-center rounded-full",
+                              isActive ? "bg-white/10" : "bg-slate-100"
+                            )}
+                          >
+                            <ModuleIcon slug={section.slug} inverted={isActive} />
+                          </span>
+
+                          <span className="font-medium">{displayTitle(section)}</span>
+
+                          {section.slug !== "resumo-estrategico" && (
+                            <span
+                              className={cx(
+                                "h-2 w-2 rounded-full shrink-0",
+                                section.hasContent
+                                  ? "bg-emerald-400"
+                                  : "bg-amber-400"
+                              )}
+                            />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </nav>
+          </aside>
+
+          {/* Main content */}
+          <section className="min-w-0">
+            {activeSection.slug === "resumo-estrategico" ? (
+              <ResumoEstrategico />
+            ) : (
+              <ModulePlaceholder section={activeSection} />
+            )}
+          </section>
+        </div>
+      </section>
+
+      <MetodoFooter description="Planejamento estratégico desenvolvido pelo Método EPC." />
+    </main>
+  );
+}
+
+// ─── Main page ────────────────────────────────────────────────────────────────
 
 export default function ApresentacaoDinamicaPage() {
   const params = useParams();
@@ -40,29 +453,30 @@ export default function ApresentacaoDinamicaPage() {
   const [project, setProject] = useState<PlanningProject | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [isStrategist, setIsStrategist] = useState(false);
+  const [viewMode, setViewMode] = useState<"overview" | "detail">("overview");
+  const [activeSlug, setActiveSlug] = useState("resumo-estrategico");
 
   useEffect(() => {
     if (!slug) return;
 
-    async function loadProject() {
+    async function load() {
       setIsLoading(true);
+
+      const { data: userData } = await supabase.auth.getUser();
+      if (userData.user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", userData.user.id)
+          .single();
+        if (profile?.role === "strategist") setIsStrategist(true);
+      }
 
       const { data, error } = await supabase
         .from("planning_projects")
         .select(
-          `
-          id,
-          title,
-          slug,
-          description,
-          status,
-          data,
-          clients (
-            id,
-            name,
-            slug
-          )
-        `
+          `id, title, slug, description, status, data, clients (id, name, slug)`
         )
         .eq("slug", slug)
         .single();
@@ -77,8 +491,27 @@ export default function ApresentacaoDinamicaPage() {
       setIsLoading(false);
     }
 
-    loadProject();
+    load();
   }, [slug]);
+
+  const client = project ? getProjectClient(project) : null;
+  const clientName = client?.name ?? project?.title ?? "";
+  const selectedModuleSlugs = project?.data?.selectedModules ?? [];
+  const coverImageUrl = project?.data?.coverImageUrl ?? null;
+  const moduleContent = project?.data?.moduleContent ?? {};
+
+  const sections = useMemo<PresentationSection[]>(() => {
+    return selectedModuleSlugs.map((moduleSlug) => {
+      const mod = planningModules.find((m) => m.slug === moduleSlug);
+      return {
+        slug: moduleSlug,
+        title: mod?.title ?? moduleSlug,
+        category: mod?.category ?? "Outros",
+        description: mod?.description ?? "",
+        hasContent: moduleSlug in moduleContent,
+      };
+    });
+  }, [selectedModuleSlugs, moduleContent]);
 
   if (isLoading) {
     return (
@@ -91,7 +524,7 @@ export default function ApresentacaoDinamicaPage() {
   if (notFound || !project) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-slate-100">
-        <div className="rounded-[2rem] bg-white p-10 shadow-sm ring-1 ring-slate-200 text-center max-w-md">
+        <div className="max-w-md rounded-[2rem] bg-white p-10 text-center shadow-sm ring-1 ring-slate-200">
           <p className="text-sm font-bold uppercase tracking-[0.18em] text-red-500">
             Não encontrado
           </p>
@@ -99,204 +532,39 @@ export default function ApresentacaoDinamicaPage() {
             Apresentação não encontrada.
           </h1>
           <p className="mt-3 text-sm text-slate-500">
-            O projeto com slug <span className="font-mono font-semibold">"{slug}"</span> não existe ou não está disponível.
+            O projeto{" "}
+            <span className="font-mono font-semibold">"{slug}"</span> não existe
+            ou não está disponível.
           </p>
         </div>
       </main>
     );
   }
 
-  const client = getProjectClient(project);
-  const selectedModules: string[] = project.data?.selectedModules ?? [];
-  const coverImageUrl: string | null = project.data?.coverImageUrl ?? null;
-  const moduleContent: Record<string, unknown> = project.data?.moduleContent ?? {};
-
-  const selectedModulesWithTitle = selectedModules.map((moduleSlug) => {
-    const found = planningModules.find((m) => m.slug === moduleSlug);
-    return {
-      slug: moduleSlug,
-      title: found?.title ?? moduleSlug,
-      category: found?.category ?? "—",
-      hasContent: moduleSlug in moduleContent,
-    };
-  });
-
-  const modulesWithContent = selectedModulesWithTitle.filter((m) => m.hasContent);
-  const modulesWithoutContent = selectedModulesWithTitle.filter((m) => !m.hasContent);
+  if (viewMode === "overview") {
+    return (
+      <OverviewMode
+        sections={sections}
+        clientName={clientName}
+        coverImageUrl={coverImageUrl}
+        isStrategist={isStrategist}
+        projectSlug={project.slug}
+        onSelect={(s) => {
+          setActiveSlug(s);
+          setViewMode("detail");
+        }}
+      />
+    );
+  }
 
   return (
-    <main className="min-h-screen bg-slate-100 text-slate-950">
-      <header className="mx-auto flex max-w-5xl items-center justify-between px-6 py-8 lg:px-10">
-        <MetodoLogo />
-        <span className="rounded-full bg-emerald-100 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.15em] text-emerald-700">
-          Apresentação dinâmica
-        </span>
-      </header>
-
-      <section className="mx-auto max-w-5xl space-y-6 px-6 pb-20 lg:px-10">
-
-        {/* Capa */}
-        {coverImageUrl && (
-          <div className="overflow-hidden rounded-[2rem] shadow-sm ring-1 ring-slate-200 h-56 relative">
-            <img
-              src={coverImageUrl}
-              alt="Capa do planejamento"
-              className="absolute inset-0 h-full w-full object-cover"
-            />
-            <div className="absolute inset-0 bg-slate-950/50" />
-            <div className="absolute bottom-6 left-8">
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/70">
-                Planejamento Estratégico
-              </p>
-              <h1 className="mt-1 text-3xl font-bold tracking-[-0.04em] text-white">
-                {client?.name ?? project.title}
-              </h1>
-            </div>
-          </div>
-        )}
-
-        {/* Cabeçalho do projeto */}
-        <div className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-10">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">
-            Projeto carregado com sucesso
-          </p>
-
-          <h1 className="mt-3 text-3xl font-bold tracking-[-0.04em]">
-            {project.title}
-          </h1>
-
-          {project.description && (
-            <p className="mt-3 text-base leading-7 text-slate-500">
-              {project.description}
-            </p>
-          )}
-
-          <dl className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-            <div className="rounded-2xl bg-slate-50 px-4 py-4 ring-1 ring-slate-200">
-              <dt className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
-                Slug
-              </dt>
-              <dd className="mt-1 font-mono text-sm font-semibold text-slate-950">
-                {project.slug}
-              </dd>
-            </div>
-
-            <div className="rounded-2xl bg-slate-50 px-4 py-4 ring-1 ring-slate-200">
-              <dt className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
-                Cliente
-              </dt>
-              <dd className="mt-1 text-sm font-semibold text-slate-950">
-                {client?.name ?? "—"}
-              </dd>
-            </div>
-
-            <div className="rounded-2xl bg-slate-50 px-4 py-4 ring-1 ring-slate-200">
-              <dt className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
-                Status
-              </dt>
-              <dd className="mt-1 text-sm font-semibold text-slate-950 capitalize">
-                {project.status}
-              </dd>
-            </div>
-
-            <div className="rounded-2xl bg-slate-50 px-4 py-4 ring-1 ring-slate-200">
-              <dt className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
-                ID do projeto
-              </dt>
-              <dd className="mt-1 font-mono text-xs font-semibold text-slate-500 truncate">
-                {project.id}
-              </dd>
-            </div>
-          </dl>
-        </div>
-
-        {/* Diagnóstico de módulos */}
-        <div className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-10">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold tracking-[-0.03em]">
-              Módulos selecionados
-            </h2>
-            <span className="rounded-full bg-slate-100 px-4 py-1.5 text-sm font-semibold text-slate-700">
-              {selectedModules.length} módulos
-            </span>
-          </div>
-
-          {selectedModules.length === 0 ? (
-            <p className="mt-4 text-sm text-slate-500">
-              Nenhum módulo selecionado neste planejamento.
-            </p>
-          ) : (
-            <div className="mt-6 space-y-3">
-              {selectedModulesWithTitle.map((mod) => (
-                <div
-                  key={mod.slug}
-                  className="flex items-center justify-between rounded-2xl bg-slate-50 px-5 py-3.5 ring-1 ring-slate-200"
-                >
-                  <div>
-                    <p className="text-sm font-semibold text-slate-950">
-                      {mod.title}
-                    </p>
-                    <p className="text-xs text-slate-400">{mod.category}</p>
-                  </div>
-
-                  {mod.hasContent ? (
-                    <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold uppercase tracking-[0.12em] text-emerald-700">
-                      Com conteúdo
-                    </span>
-                  ) : (
-                    <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold uppercase tracking-[0.12em] text-amber-700">
-                      Sem conteúdo
-                    </span>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Resumo do diagnóstico */}
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="rounded-[2rem] bg-emerald-50 p-6 ring-1 ring-emerald-200">
-            <p className="text-xs font-bold uppercase tracking-[0.15em] text-emerald-600">
-              Módulos com conteúdo salvo
-            </p>
-            <p className="mt-2 text-4xl font-bold tracking-[-0.04em] text-emerald-800">
-              {modulesWithContent.length}
-            </p>
-            {modulesWithContent.length > 0 && (
-              <ul className="mt-3 space-y-1">
-                {modulesWithContent.map((m) => (
-                  <li key={m.slug} className="text-xs font-medium text-emerald-700">
-                    {m.title}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-
-          <div className="rounded-[2rem] bg-amber-50 p-6 ring-1 ring-amber-200">
-            <p className="text-xs font-bold uppercase tracking-[0.15em] text-amber-600">
-              Módulos sem conteúdo ainda
-            </p>
-            <p className="mt-2 text-4xl font-bold tracking-[-0.04em] text-amber-800">
-              {modulesWithoutContent.length}
-            </p>
-            {modulesWithoutContent.length > 0 && (
-              <ul className="mt-3 space-y-1">
-                {modulesWithoutContent.map((m) => (
-                  <li key={m.slug} className="text-xs font-medium text-amber-700">
-                    {m.title}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div>
-
-        <p className="text-center text-xs text-slate-400">
-          Fase 1 — Rota dinâmica com dados reais do Supabase. Layout completo da apresentação em construção.
-        </p>
-      </section>
-    </main>
+    <DetailMode
+      sections={sections}
+      activeSlug={activeSlug}
+      clientName={clientName}
+      coverImageUrl={coverImageUrl}
+      onChangeSlug={setActiveSlug}
+      onBackToOverview={() => setViewMode("overview")}
+    />
   );
 }
