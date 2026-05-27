@@ -111,6 +111,13 @@ import LinkedInForm, {
   normalizeLinkedInTextList,
 } from "@/Components/modulos/LinkedInForm";
 
+import WhatsAppForm, {
+  initialWhatsAppData,
+  initialWhatsAppFrequencyItems,
+  WhatsAppData,
+  normalizeWhatsAppTextList,
+} from "@/Components/modulos/WhatsAppForm";
+
 type ClientRecord = {
   id: string;
   name: string;
@@ -256,6 +263,8 @@ const [toneVoiceData, setToneVoiceData] =
   useState<FacebookData>(initialFacebookData);
   const [linkedinData, setLinkedinData] =
   useState<LinkedInData>(initialLinkedInData);
+  const [whatsappData, setWhatsappData] =
+  useState<WhatsAppData>(initialWhatsAppData);
 
   const module = useMemo(() => {
     return planningModules.find((item) => item.slug === moduleSlug) ?? null;
@@ -289,6 +298,7 @@ const [toneVoiceData, setToneVoiceData] =
   const isYoutubeModule = moduleSlug === "youtube";
   const isFacebookModule = moduleSlug === "facebook";
   const isLinkedinModule = moduleSlug === "linkedin";
+  const isWhatsappModule = moduleSlug === "whatsapp";
 
   const relatedModules = useMemo(() => {
     return planningModules.filter(
@@ -876,6 +886,47 @@ if (isLinkedinModule && isLinkedInData(savedContent)) {
   });
 }
 
+if (isWhatsappModule && isWhatsAppData(savedContent)) {
+  setWhatsappData({
+    frequencyItems:
+      Array.isArray(savedContent.frequencyItems) &&
+      savedContent.frequencyItems.length
+        ? savedContent.frequencyItems.map((item) => ({
+            format: item.format || "",
+            quantity: item.quantity || "",
+            period: item.period || "por semana",
+            observation: item.observation || "",
+          }))
+        : initialWhatsAppFrequencyItems,
+    objectives: normalizeWhatsAppTextList(savedContent.objectives),
+    languageStructures: normalizeWhatsAppTextList(savedContent.languageStructures),
+    contents: normalizeWhatsAppTextList(savedContent.contents),
+    firstContactFlow: savedContent.firstContactFlow || "",
+    nurtureFlow: savedContent.nurtureFlow || "",
+    salesFlow: savedContent.salesFlow || "",
+    postSaleFlow: savedContent.postSaleFlow || "",
+    visualStrategy: savedContent.visualStrategy || "",
+    visualReferences:
+      Array.isArray(savedContent.visualReferences) &&
+      savedContent.visualReferences.length
+        ? savedContent.visualReferences.map((r) => ({
+            image: r.image || "",
+          }))
+        : initialWhatsAppData.visualReferences,
+    mainNumber: savedContent.mainNumber || "",
+    directLink: savedContent.directLink || "",
+    initialMessage: savedContent.initialMessage || "",
+    serviceNotes: savedContent.serviceNotes || "",
+    references:
+      Array.isArray(savedContent.references) && savedContent.references.length
+        ? savedContent.references.map((r) => ({
+            title: r.title || "",
+            link: r.link || "",
+          }))
+        : initialWhatsAppData.references,
+  });
+}
+
 function isContentFunnelData(value: unknown): value is ContentFunnelData {
   if (!value || typeof value !== "object") {
     return false;
@@ -977,6 +1028,21 @@ function isLinkedInData(value: unknown): value is LinkedInData {
     "headline" in value ||
     "authorityThemes" in value ||
     "aboutProfile" in value
+  );
+}
+
+function isWhatsAppData(value: unknown): value is WhatsAppData {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  return (
+    "firstContactFlow" in value ||
+    "nurtureFlow" in value ||
+    "salesFlow" in value ||
+    "postSaleFlow" in value ||
+    "mainNumber" in value ||
+    "directLink" in value
   );
 }
 
@@ -1181,13 +1247,15 @@ function isProjectObjectivesData(
                                       ? facebookData
                                       : isLinkedinModule
                                         ? linkedinData
-                                        : {
-                                          mainText:
-                                            genericData.mainText?.trim() || "",
-                                          notes: genericData.notes?.trim() || "",
-                                          references:
-                                            genericData.references?.trim() || "",
-                                        };
+                                        : isWhatsappModule
+                                          ? whatsappData
+                                          : {
+                                            mainText:
+                                              genericData.mainText?.trim() || "",
+                                            notes: genericData.notes?.trim() || "",
+                                            references:
+                                              genericData.references?.trim() || "",
+                                          };
 
     const nextData: ProjectData = {
       ...currentData,
@@ -1572,6 +1640,16 @@ function isProjectObjectivesData(
   <LinkedInForm
     data={linkedinData}
     setData={setLinkedinData}
+    clientSlug={clientSlug}
+    presentationHref={`/apresentacao/${project.slug}`}
+    isSaving={isSaving}
+    isDisabled={!isModuleSelected}
+    onSave={() => saveModule()}
+  />
+) : isWhatsappModule ? (
+  <WhatsAppForm
+    data={whatsappData}
+    setData={setWhatsappData}
     clientSlug={clientSlug}
     presentationHref={`/apresentacao/${project.slug}`}
     isSaving={isSaving}
