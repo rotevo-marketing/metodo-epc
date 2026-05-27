@@ -38,6 +38,10 @@ import PesquisaConcorrenciaForm, {
   CompetitorResearchData,
   initialCompetitorResearchData,
 } from "@/Components/modulos/PesquisaConcorrenciaForm";
+import AnaliseSwotForm, {
+  initialSwotData,
+  SwotData,
+} from "@/Components/modulos/AnaliseSwotForm";
 
 type ClientRecord = {
   id: string;
@@ -161,6 +165,7 @@ const [toneVoiceData, setToneVoiceData] =
   useState<ReferencesCompetitorsData>(initialReferencesCompetitorsData);
   const [competitorResearchData, setCompetitorResearchData] =
   useState<CompetitorResearchData>(initialCompetitorResearchData);
+  const [swotData, setSwotData] = useState<SwotData>(initialSwotData);
   
 
   const module = useMemo(() => {
@@ -183,6 +188,7 @@ const [toneVoiceData, setToneVoiceData] =
   const isReferencesCompetitorsModule =
   moduleSlug === "referencias-e-concorrentes";
   const isCompetitorResearchModule = moduleSlug === "pesquisa-de-concorrencia";
+  const isSwotModule = moduleSlug === "analise-swot";
 
   const relatedModules = useMemo(() => {
     return planningModules.filter(
@@ -392,6 +398,21 @@ function isCompetitorResearchData(
   return "competitors" in value;
 }
 
+if (isSwotModule && isSwotData(savedContent)) {
+  setSwotData({
+    fields: savedContent.fields || {},
+    synthesis: savedContent.synthesis || "",
+  });
+}
+
+function isSwotData(value: unknown): value is SwotData {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  return "fields" in value || "synthesis" in value;
+}
+
 function isReferencesCompetitorsData(
   value: unknown
 ): value is ReferencesCompetitorsData {
@@ -516,11 +537,13 @@ function isProjectObjectivesData(
               ? referencesCompetitorsData
               : isCompetitorResearchModule
                 ? competitorResearchData
-                : {
-                    mainText: genericData.mainText?.trim() || "",
-                    notes: genericData.notes?.trim() || "",
-                    references: genericData.references?.trim() || "",
-                  };
+                : isSwotModule
+                  ? swotData
+                  : {
+                      mainText: genericData.mainText?.trim() || "",
+                      notes: genericData.notes?.trim() || "",
+                      references: genericData.references?.trim() || "",
+                    };
 
     const nextData: ProjectData = {
       ...currentData,
@@ -777,6 +800,17 @@ function isProjectObjectivesData(
   <PesquisaConcorrenciaForm
     data={competitorResearchData}
     setData={setCompetitorResearchData}
+    clientSlug={clientSlug}
+    presentationHref={`/apresentacao/${project.slug}`}
+    isSaving={isSaving}
+    isDisabled={!isModuleSelected}
+    onSave={() => saveModule()}
+  />
+
+  ) : isSwotModule ? (
+  <AnaliseSwotForm
+    data={swotData}
+    setData={setSwotData}
     clientSlug={clientSlug}
     presentationHref={`/apresentacao/${project.slug}`}
     isSaving={isSaving}
