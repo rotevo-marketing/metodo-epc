@@ -118,6 +118,13 @@ import WhatsAppForm, {
   normalizeWhatsAppTextList,
 } from "@/Components/modulos/WhatsAppForm";
 
+import BlogForm, {
+  initialBlogData,
+  initialBlogFrequencyItems,
+  BlogData,
+  normalizeBlogTextList,
+} from "@/Components/modulos/BlogForm";
+
 type ClientRecord = {
   id: string;
   name: string;
@@ -265,6 +272,8 @@ const [toneVoiceData, setToneVoiceData] =
   useState<LinkedInData>(initialLinkedInData);
   const [whatsappData, setWhatsappData] =
   useState<WhatsAppData>(initialWhatsAppData);
+  const [blogData, setBlogData] =
+  useState<BlogData>(initialBlogData);
 
   const module = useMemo(() => {
     return planningModules.find((item) => item.slug === moduleSlug) ?? null;
@@ -299,6 +308,7 @@ const [toneVoiceData, setToneVoiceData] =
   const isFacebookModule = moduleSlug === "facebook";
   const isLinkedinModule = moduleSlug === "linkedin";
   const isWhatsappModule = moduleSlug === "whatsapp";
+  const isBlogModule = moduleSlug === "blog";
 
   const relatedModules = useMemo(() => {
     return planningModules.filter(
@@ -927,6 +937,49 @@ if (isWhatsappModule && isWhatsAppData(savedContent)) {
   });
 }
 
+if (isBlogModule && isBlogData(savedContent)) {
+  setBlogData({
+    frequencyItems:
+      Array.isArray(savedContent.frequencyItems) &&
+      savedContent.frequencyItems.length
+        ? savedContent.frequencyItems.map((item) => ({
+            format: item.format || "",
+            quantity: item.quantity || "",
+            period: item.period || "por semana",
+            observation: item.observation || "",
+          }))
+        : initialBlogFrequencyItems,
+    objectives: normalizeBlogTextList(savedContent.objectives),
+    languageStructures: normalizeBlogTextList(savedContent.languageStructures),
+    visualStrategy: savedContent.visualStrategy || "",
+    visualReferences:
+      Array.isArray(savedContent.visualReferences) &&
+      savedContent.visualReferences.length
+        ? savedContent.visualReferences.map((r) => ({
+            image: r.image || "",
+          }))
+        : initialBlogData.visualReferences,
+    priorityKeywords: savedContent.priorityKeywords || "",
+    blogCategories: savedContent.blogCategories || "",
+    seoGuidelines: savedContent.seoGuidelines || "",
+    contents:
+      Array.isArray(savedContent.contents) && savedContent.contents.length
+        ? savedContent.contents.map((c) => ({
+            title: c.title || "",
+            suggestedDate: c.suggestedDate || "",
+            observation: c.observation || "",
+          }))
+        : initialBlogData.contents,
+    references:
+      Array.isArray(savedContent.references) && savedContent.references.length
+        ? savedContent.references.map((r) => ({
+            title: r.title || "",
+            link: r.link || "",
+          }))
+        : initialBlogData.references,
+  });
+}
+
 function isContentFunnelData(value: unknown): value is ContentFunnelData {
   if (!value || typeof value !== "object") {
     return false;
@@ -1043,6 +1096,18 @@ function isWhatsAppData(value: unknown): value is WhatsAppData {
     "postSaleFlow" in value ||
     "mainNumber" in value ||
     "directLink" in value
+  );
+}
+
+function isBlogData(value: unknown): value is BlogData {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  return (
+    "priorityKeywords" in value ||
+    "blogCategories" in value ||
+    "seoGuidelines" in value
   );
 }
 
@@ -1249,13 +1314,15 @@ function isProjectObjectivesData(
                                         ? linkedinData
                                         : isWhatsappModule
                                           ? whatsappData
-                                          : {
-                                            mainText:
-                                              genericData.mainText?.trim() || "",
-                                            notes: genericData.notes?.trim() || "",
-                                            references:
-                                              genericData.references?.trim() || "",
-                                          };
+                                          : isBlogModule
+                                            ? blogData
+                                            : {
+                                              mainText:
+                                                genericData.mainText?.trim() || "",
+                                              notes: genericData.notes?.trim() || "",
+                                              references:
+                                                genericData.references?.trim() || "",
+                                            };
 
     const nextData: ProjectData = {
       ...currentData,
@@ -1650,6 +1717,16 @@ function isProjectObjectivesData(
   <WhatsAppForm
     data={whatsappData}
     setData={setWhatsappData}
+    clientSlug={clientSlug}
+    presentationHref={`/apresentacao/${project.slug}`}
+    isSaving={isSaving}
+    isDisabled={!isModuleSelected}
+    onSave={() => saveModule()}
+  />
+) : isBlogModule ? (
+  <BlogForm
+    data={blogData}
+    setData={setBlogData}
     clientSlug={clientSlug}
     presentationHref={`/apresentacao/${project.slug}`}
     isSaving={isSaving}
