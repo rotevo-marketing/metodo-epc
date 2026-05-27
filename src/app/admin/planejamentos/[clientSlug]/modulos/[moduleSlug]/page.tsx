@@ -146,6 +146,11 @@ import LivesForm, {
   normalizeLivesTextList,
 } from "@/Components/modulos/LivesForm";
 
+import MateriaisEducacionaisForm, {
+  initialEducationalMaterialsData,
+  EducationalMaterialsData,
+} from "@/Components/modulos/MateriaisEducacionaisForm";
+
 type ClientRecord = {
   id: string;
   name: string;
@@ -301,6 +306,8 @@ const [toneVoiceData, setToneVoiceData] =
   useState<PodcastsData>(initialPodcastsData);
   const [livesData, setLivesData] =
   useState<LivesData>(initialLivesData);
+  const [educationalMaterialsData, setEducationalMaterialsData] =
+  useState<EducationalMaterialsData>(initialEducationalMaterialsData);
 
   const module = useMemo(() => {
     return planningModules.find((item) => item.slug === moduleSlug) ?? null;
@@ -339,6 +346,7 @@ const [toneVoiceData, setToneVoiceData] =
   const isPinterestModule = moduleSlug === "pinterest";
   const isPodcastsModule = moduleSlug === "podcasts";
   const isLivesModule = moduleSlug === "lives";
+  const isEducationalMaterialsModule = moduleSlug === "materiais-educacionais";
 
   const relatedModules = useMemo(() => {
     return planningModules.filter(
@@ -1058,6 +1066,32 @@ if (isPodcastsModule && isPodcastsData(savedContent)) {
   });
 }
 
+if (isEducationalMaterialsModule && isEducationalMaterialsData(savedContent)) {
+  setEducationalMaterialsData({
+    materials:
+      Array.isArray(savedContent.materials) && savedContent.materials.length
+        ? savedContent.materials.map((m) => ({
+            title: m.title || "",
+            type: m.type || "E-book",
+            content: m.content || "",
+            objective: m.objective || "",
+            distribution: m.distribution || "",
+            fileName: m.fileName || "",
+            fileData: m.fileData || "",
+            materialLink: m.materialLink || "",
+          }))
+        : initialEducationalMaterialsData.materials,
+    strategy: savedContent.strategy || "",
+    references:
+      Array.isArray(savedContent.references) && savedContent.references.length
+        ? savedContent.references.map((r) => ({
+            title: r.title || "",
+            link: r.link || "",
+          }))
+        : initialEducationalMaterialsData.references,
+  });
+}
+
 if (isLivesModule && isLivesData(savedContent)) {
   setLivesData({
     frequencyItems:
@@ -1326,6 +1360,14 @@ function isLivesData(value: unknown): value is LivesData {
   );
 }
 
+function isEducationalMaterialsData(value: unknown): value is EducationalMaterialsData {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  return "materials" in value || "strategy" in value;
+}
+
 function isPersonasData(value: unknown): value is PersonasData {
   if (!value || typeof value !== "object") {
     return false;
@@ -1537,13 +1579,15 @@ function isProjectObjectivesData(
                                                 ? podcastsData
                                                 : isLivesModule
                                                   ? livesData
-                                                  : {
-                                                    mainText:
-                                                      genericData.mainText?.trim() || "",
-                                                    notes: genericData.notes?.trim() || "",
-                                                    references:
-                                                      genericData.references?.trim() || "",
-                                                  };
+                                                  : isEducationalMaterialsModule
+                                                    ? educationalMaterialsData
+                                                    : {
+                                                      mainText:
+                                                        genericData.mainText?.trim() || "",
+                                                      notes: genericData.notes?.trim() || "",
+                                                      references:
+                                                        genericData.references?.trim() || "",
+                                                    };
 
     const nextData: ProjectData = {
       ...currentData,
@@ -1978,6 +2022,16 @@ function isProjectObjectivesData(
   <LivesForm
     data={livesData}
     setData={setLivesData}
+    clientSlug={clientSlug}
+    presentationHref={`/apresentacao/${project.slug}`}
+    isSaving={isSaving}
+    isDisabled={!isModuleSelected}
+    onSave={() => saveModule()}
+  />
+) : isEducationalMaterialsModule ? (
+  <MateriaisEducacionaisForm
+    data={educationalMaterialsData}
+    setData={setEducationalMaterialsData}
     clientSlug={clientSlug}
     presentationHref={`/apresentacao/${project.slug}`}
     isSaving={isSaving}
