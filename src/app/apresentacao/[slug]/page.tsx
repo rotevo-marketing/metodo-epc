@@ -6,6 +6,11 @@ import { supabase } from "@/lib/supabase";
 import { moduleCategories, planningModules } from "@/data/modules";
 import { MetodoFooter, MetodoLogo } from "@/Components/MetodoBrand";
 import ResumoEstrategico from "@/Components/apresentacao/ResumoEstrategico";
+import EspecialistaPresentation from "@/Components/apresentacao/EspecialistaPresentation";
+import EmpresaPresentation from "@/Components/apresentacao/EmpresaPresentation";
+import DnaConteudoPresentation from "@/Components/apresentacao/DnaConteudoPresentation";
+import TomDeVozPresentation from "@/Components/apresentacao/TomDeVozPresentation";
+import IdentidadeVisualPresentation from "@/Components/apresentacao/IdentidadeVisualPresentation";
 import { ModuleIcon } from "@/Components/apresentacao/ModuleIcon";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -293,6 +298,7 @@ function DetailMode({
   activeSlug,
   clientName,
   coverImageUrl,
+  moduleContent,
   onChangeSlug,
   onBackToOverview,
 }: {
@@ -300,6 +306,7 @@ function DetailMode({
   activeSlug: string;
   clientName: string;
   coverImageUrl: string | null;
+  moduleContent: Record<string, unknown>;
   onChangeSlug: (slug: string) => void;
   onBackToOverview: () => void;
 }) {
@@ -432,6 +439,16 @@ function DetailMode({
           <section className="min-w-0">
             {activeSection.slug === "resumo-estrategico" ? (
               <ResumoEstrategico />
+            ) : activeSection.slug === "dna-do-especialista" ? (
+              <EspecialistaPresentation data={moduleContent["dna-do-especialista"]} />
+            ) : activeSection.slug === "dna-da-empresa" ? (
+              <EmpresaPresentation data={moduleContent["dna-da-empresa"]} />
+            ) : activeSection.slug === "dna-de-conteudo" ? (
+              <DnaConteudoPresentation data={moduleContent["dna-de-conteudo"]} />
+            ) : activeSection.slug === "tom-de-voz" ? (
+              <TomDeVozPresentation data={moduleContent["tom-de-voz"]} />
+            ) : activeSection.slug === "identidade-visual" ? (
+              <IdentidadeVisualPresentation data={moduleContent["identidade-visual"]} />
             ) : (
               <ModulePlaceholder section={activeSection} />
             )}
@@ -563,6 +580,7 @@ export default function ApresentacaoDinamicaPage() {
       activeSlug={activeSlug}
       clientName={clientName}
       coverImageUrl={coverImageUrl}
+      moduleContent={moduleContent}
       onChangeSlug={setActiveSlug}
       onBackToOverview={() => setViewMode("overview")}
     />
