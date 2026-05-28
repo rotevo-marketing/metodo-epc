@@ -76,6 +76,7 @@ export default function AdminPage() {
   const [projects, setProjects] = useState<PlanningProject[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDeletingId, setIsDeletingId] = useState("");
+  const [isPublishingId, setIsPublishingId] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
@@ -190,6 +191,38 @@ export default function AdminPage() {
 
     setSuccessMessage("Planejamento excluído com sucesso.");
     setIsDeletingId("");
+  }
+
+  async function handlePublishProject(
+    project: PlanningProject,
+    newStatus: "draft" | "published"
+  ) {
+    setIsPublishingId(project.id);
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    const { error } = await supabase
+      .from("planning_projects")
+      .update({ status: newStatus, updated_at: new Date().toISOString() })
+      .eq("id", project.id);
+
+    if (error) {
+      setErrorMessage(error.message || "Não foi possível atualizar o status.");
+      setIsPublishingId("");
+      return;
+    }
+
+    setProjects((current) =>
+      current.map((p) =>
+        p.id === project.id ? { ...p, status: newStatus } : p
+      )
+    );
+    setSuccessMessage(
+      newStatus === "published"
+        ? "Apresentação publicada com sucesso."
+        : "Planejamento voltou para rascunho."
+    );
+    setIsPublishingId("");
   }
 
   return (
@@ -378,14 +411,36 @@ export default function AdminPage() {
                         Ver apresentação
                       </Link>
 
+                      {project.status === "draft" && (
+                        <button
+                          type="button"
+                          onClick={() => handlePublishProject(project, "published")}
+                          disabled={isPublishingId === project.id || isDeleting}
+                          className="inline-flex cursor-pointer items-center justify-center rounded-full bg-emerald-600 px-7 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          {isPublishingId === project.id ? "Publicando..." : "Publicar"}
+                        </button>
+                      )}
+
+                      {project.status === "published" && (
+                        <button
+                          type="button"
+                          onClick={() => handlePublishProject(project, "draft")}
+                          disabled={isPublishingId === project.id || isDeleting}
+                          className="inline-flex cursor-pointer items-center justify-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-slate-600 ring-1 ring-slate-200 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          {isPublishingId === project.id ? "Atualizando..." : "Voltar para rascunho"}
+                        </button>
+                      )}
+
                       <button
-  type="button"
-  onClick={() => handleDeleteProject(project)}
-  disabled={isDeleting || isDemoProject}
-  className="inline-flex items-center justify-center rounded-full bg-red-50 px-7 py-3 text-sm font-semibold text-red-700 ring-1 ring-red-100 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-40"
->
-  {isDeleting ? "Excluindo..." : isDemoProject ? "Modelo" : "Excluir"}
-</button>
+                        type="button"
+                        onClick={() => handleDeleteProject(project)}
+                        disabled={isDeleting || isDemoProject}
+                        className="inline-flex cursor-pointer items-center justify-center rounded-full bg-red-50 px-7 py-3 text-sm font-semibold text-red-700 ring-1 ring-red-100 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        {isDeleting ? "Excluindo..." : isDemoProject ? "Modelo" : "Excluir"}
+                      </button>
                     </div>
                   </div>
                 </article>

@@ -89,6 +89,7 @@ export default function PlanejamentoClientePage() {
   const [selectedModuleSlugs, setSelectedModuleSlugs] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
@@ -264,6 +265,33 @@ export default function PlanejamentoClientePage() {
     setIsSaving(false);
   }
 
+  async function handlePublish(newStatus: "draft" | "published") {
+    if (!project) return;
+
+    setIsPublishing(true);
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    const { error } = await supabase
+      .from("planning_projects")
+      .update({ status: newStatus, updated_at: new Date().toISOString() })
+      .eq("id", project.id);
+
+    if (error) {
+      setErrorMessage(error.message || "Não foi possível atualizar o status.");
+      setIsPublishing(false);
+      return;
+    }
+
+    setProject({ ...project, status: newStatus, updated_at: new Date().toISOString() });
+    setSuccessMessage(
+      newStatus === "published"
+        ? "Apresentação publicada com sucesso."
+        : "Planejamento voltou para rascunho."
+    );
+    setIsPublishing(false);
+  }
+
   return (
     <main className="min-h-screen bg-slate-100 text-slate-950">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-8 lg:px-10">
@@ -368,6 +396,30 @@ export default function PlanejamentoClientePage() {
                   >
                     {getStatusLabel(project.status)}
                   </span>
+
+                  <div className="mt-4">
+                    {project.status === "draft" && (
+                      <button
+                        type="button"
+                        onClick={() => handlePublish("published")}
+                        disabled={isPublishing}
+                        className="w-full cursor-pointer rounded-2xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {isPublishing ? "Publicando..." : "Publicar apresentação"}
+                      </button>
+                    )}
+
+                    {project.status === "published" && (
+                      <button
+                        type="button"
+                        onClick={() => handlePublish("draft")}
+                        disabled={isPublishing}
+                        className="w-full cursor-pointer rounded-2xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 ring-1 ring-slate-200 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {isPublishing ? "Atualizando..." : "Voltar para rascunho"}
+                      </button>
+                    )}
+                  </div>
 
                   <div className="mt-5 border-t border-slate-200 pt-5">
                     <p className="text-sm font-semibold text-slate-500">
