@@ -471,7 +471,7 @@ export default function PlanejamentoClientePage() {
                   <button
                     type="button"
                     onClick={selectAllModules}
-                    className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40"
+                    className="cursor-pointer rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40"
                   >
                     Selecionar todos
                   </button>
@@ -479,7 +479,7 @@ export default function PlanejamentoClientePage() {
                   <button
                     type="button"
                     onClick={clearModules}
-                    className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40"
+                    className="cursor-pointer rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40"
                   >
                     Limpar
                   </button>
@@ -488,7 +488,7 @@ export default function PlanejamentoClientePage() {
                     type="button"
                     onClick={saveModuleSelection}
                     disabled={isSaving}
-                    className="rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#c79e40] hover:text-black disabled:cursor-not-allowed disabled:opacity-60"
+                    className="cursor-pointer rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#c79e40] hover:text-black disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {isSaving ? "Salvando..." : "Salvar seleção"}
                   </button>
