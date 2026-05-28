@@ -38,6 +38,10 @@ import CampanhaCaptacaoLeadPresentation from "@/Components/apresentacao/Campanha
 import CampanhaConversaoVendasPresentation from "@/Components/apresentacao/CampanhaConversaoVendasPresentation";
 import CampanhaDistribuicaoConteudoPresentation from "@/Components/apresentacao/CampanhaDistribuicaoConteudoPresentation";
 import FluxoAutomacaoPresentation from "@/Components/apresentacao/FluxoAutomacaoPresentation";
+import LinhaTempoPresentation from "@/Components/apresentacao/LinhaTempoPresentation";
+import CalendarioConteudoPresentation from "@/Components/apresentacao/CalendarioConteudoPresentation";
+import MetricasIndicadoresPresentation from "@/Components/apresentacao/MetricasIndicadoresPresentation";
+import OrientacoesAdicionaisPresentation from "@/Components/apresentacao/OrientacoesAdicionaisPresentation";
 import { ModuleIcon } from "@/Components/apresentacao/ModuleIcon";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -530,6 +534,14 @@ function DetailMode({
               <CampanhaDistribuicaoConteudoPresentation data={moduleContent["campanha-distribuicao-de-conteudo"]} />
             ) : activeSection.slug === "fluxo-de-automacao" ? (
               <FluxoAutomacaoPresentation data={moduleContent["fluxo-de-automacao"]} />
+            ) : activeSection.slug === "linha-do-tempo" ? (
+              <LinhaTempoPresentation data={moduleContent["linha-do-tempo"]} />
+            ) : activeSection.slug === "calendario-de-conteudo" ? (
+              <CalendarioConteudoPresentation data={moduleContent["calendario-de-conteudo"]} />
+            ) : activeSection.slug === "metricas-e-indicadores" ? (
+              <MetricasIndicadoresPresentation data={moduleContent["metricas-e-indicadores"]} />
+            ) : activeSection.slug === "orientacoes-adicionais" ? (
+              <OrientacoesAdicionaisPresentation data={moduleContent["orientacoes-adicionais"]} />
             ) : (
               <ModulePlaceholder section={activeSection} />
             )}
