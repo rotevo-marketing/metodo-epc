@@ -340,7 +340,7 @@ export default function SelecionarModulosPage() {
             <button
               type="button"
               onClick={selectAllModules}
-              className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-slate-50"
+              className="cursor-pointer rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-slate-50"
             >
               Selecionar todos
             </button>
@@ -348,7 +348,7 @@ export default function SelecionarModulosPage() {
             <button
               type="button"
               onClick={clearModules}
-              className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-slate-50"
+              className="cursor-pointer rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-slate-50"
             >
               Limpar seleção
             </button>
@@ -438,7 +438,7 @@ export default function SelecionarModulosPage() {
               <button
                 type="submit"
                 disabled={isSaving}
-                className="inline-flex items-center justify-center rounded-full bg-slate-950 px-8 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex cursor-pointer items-center justify-center rounded-full bg-slate-950 px-8 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isSaving ? "Criando..." : "Criar planejamento"}
               </button>

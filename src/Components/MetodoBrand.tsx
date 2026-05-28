@@ -65,7 +65,7 @@ export function MetodoFooter({
 
         <div className="space-y-2 text-sm text-slate-500 lg:text-right">
           <p>contato@metodoepc.com.br</p>
-          <p>WhatsApp: (00) 00000-0000</p>
+          <p>WhatsApp: (22) 98141-2223</p>
           <p>© 2026 Método EPC. Todos os direitos reservados.</p>
         </div>
       </div>
