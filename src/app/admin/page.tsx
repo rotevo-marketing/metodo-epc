@@ -253,51 +253,60 @@ export default function AdminPage() {
       </header>
 
       <section className="mx-auto max-w-6xl px-6 pb-20 lg:px-10">
-        <div className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-10">
-          <p className="text-sm font-bold uppercase tracking-[0.18em] text-slate-500">
-            Painel administrativo
-          </p>
+        <div className="overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
+          <div className="h-1 bg-[#c79e40]/20" />
+          <div className="p-8 lg:p-10">
+            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[#c79e40]">
+              Painel administrativo
+            </p>
 
-          <h1 className="mt-4 text-4xl font-bold tracking-[-0.04em] text-slate-950">
-            Planejamentos
-          </h1>
+            <h1 className="mt-4 text-4xl font-bold tracking-[-0.04em] text-slate-950">
+              Planejamentos
+            </h1>
 
-          <p className="mt-4 max-w-3xl text-base leading-7 text-slate-600">
-            Aqui você acessa todos os planejamentos criados, acompanha o status
-            dos projetos e cria novos planejamentos para clientes.
-          </p>
+            <p className="mt-4 max-w-3xl text-base leading-7 text-slate-600">
+              Aqui você acessa todos os planejamentos criados, acompanha o status
+              dos projetos e cria novos planejamentos para clientes.
+            </p>
 
-          <div className="mt-10 grid gap-4 md:grid-cols-3">
-            <div className="rounded-2xl border border-slate-200 p-6">
-              <p className="text-sm text-slate-500">Total de planejamentos</p>
-              <strong className="mt-3 block text-4xl text-slate-950">
-                {isLoading ? "..." : totalProjects}
-              </strong>
-            </div>
+            <div className="mt-10 grid gap-4 md:grid-cols-3">
+              <div className="overflow-hidden rounded-2xl border border-slate-200">
+                <div className="h-0.5 bg-[#c79e40]/30" />
+                <div className="p-6">
+                  <p className="text-sm text-slate-500">Total de planejamentos</p>
+                  <strong className="mt-3 block text-4xl font-bold tracking-[-0.04em] text-slate-950">
+                    {isLoading ? "..." : totalProjects}
+                  </strong>
+                </div>
+              </div>
 
-            <div className="rounded-2xl border border-slate-200 p-6">
-              <p className="text-sm text-slate-500">Em produção</p>
-              <strong className="mt-3 block text-4xl text-slate-950">
-                {isLoading ? "..." : inProgressProjects}
-              </strong>
-            </div>
+              <div className="overflow-hidden rounded-2xl border border-slate-200">
+                <div className="h-0.5 bg-[#c79e40]/30" />
+                <div className="p-6">
+                  <p className="text-sm text-slate-500">Em produção</p>
+                  <strong className="mt-3 block text-4xl font-bold tracking-[-0.04em] text-slate-950">
+                    {isLoading ? "..." : inProgressProjects}
+                  </strong>
+                </div>
+              </div>
 
-            <div className="rounded-2xl border border-slate-200 p-6">
-              <p className="text-sm text-slate-500">Publicados</p>
-              <strong className="mt-3 block text-4xl text-slate-950">
-                {isLoading ? "..." : publishedProjects}
-              </strong>
+              <div className="overflow-hidden rounded-2xl border border-slate-200">
+                <div className="h-0.5 bg-[#c79e40]/30" />
+                <div className="p-6">
+                  <p className="text-sm text-slate-500">Publicados</p>
+                  <strong className="mt-3 block text-4xl font-bold tracking-[-0.04em] text-slate-950">
+                    {isLoading ? "..." : publishedProjects}
+                  </strong>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="mt-10 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-          <div>
-            <h2 className="text-2xl font-bold tracking-[-0.03em]">
-              Projetos recentes
-            </h2>
-          </div>
-
+        <div className="mt-10 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+          <h2 className="text-2xl font-bold tracking-[-0.03em]">
+            Projetos recentes
+          </h2>
           <p className="text-sm text-slate-500">
             Clique em um planejamento para configurar os módulos.
           </p>
@@ -351,10 +360,10 @@ export default function AdminPage() {
               return (
                 <article
                   key={project.id}
-                  className="rounded-[1.5rem] bg-white p-6 shadow-sm ring-1 ring-slate-200 transition hover:shadow-md hover:ring-slate-300"
+                  className="rounded-[1.5rem] bg-white p-6 shadow-sm ring-1 ring-slate-200 transition hover:shadow-md hover:ring-slate-300 lg:p-7"
                 >
                   <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
-                    {/* Info area — expands freely */}
+                    {/* Info area */}
                     <div className="flex min-w-0 flex-1 items-start gap-4">
                       <div className="h-14 w-14 shrink-0 overflow-hidden rounded-full bg-slate-100 ring-1 ring-slate-200">
                         {coverImageUrl ? (
@@ -364,7 +373,7 @@ export default function AdminPage() {
                             className="h-full w-full object-cover"
                           />
                         ) : (
-                          <div className="flex h-full w-full items-center justify-center text-xl font-bold text-slate-500">
+                          <div className="flex h-full w-full items-center justify-center text-xl font-bold text-slate-400">
                             {clientName.charAt(0).toUpperCase()}
                           </div>
                         )}
@@ -385,12 +394,12 @@ export default function AdminPage() {
                           </span>
                         </div>
 
-                        <p className="mt-2 text-sm text-slate-600">
+                        <p className="mt-1.5 text-sm font-medium text-slate-500">
                           {project.title}
                         </p>
 
                         {project.description ? (
-                          <p className="mt-1.5 text-sm leading-6 text-slate-500">
+                          <p className="mt-1.5 max-w-lg text-sm leading-6 text-slate-400">
                             {project.description}
                           </p>
                         ) : null}
@@ -401,22 +410,15 @@ export default function AdminPage() {
                       </div>
                     </div>
 
-                    {/* Actions area — fixed column, two rows */}
+                    {/* Actions area */}
                     <div className="flex shrink-0 flex-col gap-2 lg:items-end">
-                      {/* Row 1: navigation actions */}
+                      {/* Primary actions */}
                       <div className="flex flex-wrap gap-2">
                         <Link
                           href={`/admin/planejamentos/${clientSlug}`}
                           className="inline-flex items-center justify-center rounded-full bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#f4f1ea] hover:text-black hover:ring-1 hover:ring-[#c79e40]/30"
                         >
                           Editar planejamento
-                        </Link>
-
-                        <Link
-                          href={`/admin/planejamentos/${clientSlug}/acesso`}
-                          className="inline-flex items-center justify-center rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40"
-                        >
-                          Configurar acesso
                         </Link>
 
                         <Link
@@ -427,8 +429,15 @@ export default function AdminPage() {
                         </Link>
                       </div>
 
-                      {/* Row 2: publish status + delete */}
-                      <div className="flex flex-wrap gap-2">
+                      {/* Secondary + destructive */}
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Link
+                          href={`/admin/planejamentos/${clientSlug}/acesso`}
+                          className="inline-flex items-center justify-center rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40"
+                        >
+                          Configurar acesso
+                        </Link>
+
                         {project.status === "draft" && (
                           <button
                             type="button"
@@ -450,6 +459,8 @@ export default function AdminPage() {
                             {isPublishingId === project.id ? "Atualizando..." : "Voltar para rascunho"}
                           </button>
                         )}
+
+                        <div className="h-4 w-px bg-slate-200" />
 
                         <button
                           type="button"
