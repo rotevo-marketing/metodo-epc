@@ -240,7 +240,7 @@ export default function AcessoClientePage() {
             <h1 className="mt-4 text-2xl font-bold tracking-[-0.04em]">{errorMessage}</h1>
             <Link
               href="/admin"
-              className="mt-8 inline-flex rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-[#c79e40] hover:text-black"
+              className="mt-8 inline-flex rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-slate-900 hover:ring-2 hover:ring-[#c79e40]/40"
             >
               Voltar ao painel
             </Link>
@@ -337,7 +337,7 @@ export default function AcessoClientePage() {
                       type="button"
                       onClick={handleCreateAccess}
                       disabled={isCreating || !email || !password}
-                      className="cursor-pointer rounded-full bg-slate-950 px-8 py-3.5 text-sm font-semibold text-white transition hover:bg-[#c79e40] hover:text-black disabled:cursor-not-allowed disabled:opacity-50"
+                      className="cursor-pointer rounded-full bg-slate-950 px-8 py-3.5 text-sm font-semibold text-white transition hover:bg-slate-900 hover:ring-2 hover:ring-[#c79e40]/40 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {isCreating ? "Criando acesso..." : "Criar acesso automaticamente"}
                     </button>

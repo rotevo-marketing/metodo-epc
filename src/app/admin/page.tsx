@@ -245,7 +245,7 @@ export default function AdminPage() {
 
           <Link
             href="/admin/novo-planejamento"
-            className="rounded-full bg-slate-950 px-8 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#c79e40] hover:text-black"
+            className="rounded-full bg-slate-950 px-8 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-900 hover:ring-2 hover:ring-[#c79e40]/40"
           >
             Criar novo planejamento
           </Link>
@@ -331,7 +331,7 @@ export default function AdminPage() {
 
             <Link
               href="/admin/novo-planejamento"
-              className="mt-6 inline-flex rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#c79e40] hover:text-black"
+              className="mt-6 inline-flex rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-900 hover:ring-2 hover:ring-[#c79e40]/40"
             >
               Criar novo planejamento
             </Link>
@@ -407,7 +407,7 @@ export default function AdminPage() {
                       <div className="flex flex-wrap gap-2">
                         <Link
                           href={`/admin/planejamentos/${clientSlug}`}
-                          className="inline-flex items-center justify-center rounded-full bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#c79e40] hover:text-black"
+                          className="inline-flex items-center justify-center rounded-full bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-900 hover:ring-2 hover:ring-[#c79e40]/40"
                         >
                           Editar planejamento
                         </Link>

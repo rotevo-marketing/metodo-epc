@@ -258,7 +258,7 @@ export default function ClientAreaPage() {
                     <div className="mt-6 flex justify-end">
                       <a
                         href={`/apresentacao/${project.slug}`}
-                        className="inline-flex items-center justify-center rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-[#c79e40] hover:text-black"
+                        className="inline-flex items-center justify-center rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-slate-900 hover:ring-2 hover:ring-[#c79e40]/40"
                       >
                         Ver status do planejamento
                       </a>
@@ -319,7 +319,7 @@ export default function ClientAreaPage() {
 
                     <a
                       href={`/apresentacao/${project.slug}`}
-                      className="inline-flex shrink-0 items-center justify-center rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-[#c79e40] hover:text-black"
+                      className="inline-flex shrink-0 items-center justify-center rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-slate-900 hover:ring-2 hover:ring-[#c79e40]/40"
                     >
                       Ver apresentação
                     </a>

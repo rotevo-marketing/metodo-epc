@@ -317,7 +317,7 @@ export default function PlanejamentoClientePage() {
           {project ? (
             <Link
               href={`/apresentacao/${project.slug}`}
-              className="rounded-full bg-slate-950 px-8 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#c79e40] hover:text-black"
+              className="rounded-full bg-slate-950 px-8 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-900 hover:ring-2 hover:ring-[#c79e40]/40"
             >
               Ver apresentação
             </Link>
@@ -344,7 +344,7 @@ export default function PlanejamentoClientePage() {
 
             <Link
               href="/admin"
-              className="mt-8 inline-flex rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-[#c79e40] hover:text-black"
+              className="mt-8 inline-flex rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-slate-900 hover:ring-2 hover:ring-[#c79e40]/40"
             >
               Voltar ao painel
             </Link>
@@ -488,7 +488,7 @@ export default function PlanejamentoClientePage() {
                     type="button"
                     onClick={saveModuleSelection}
                     disabled={isSaving}
-                    className="cursor-pointer rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#c79e40] hover:text-black disabled:cursor-not-allowed disabled:opacity-60"
+                    className="cursor-pointer rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-900 hover:ring-2 hover:ring-[#c79e40]/40 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {isSaving ? "Salvando..." : "Salvar seleção"}
                   </button>
@@ -578,7 +578,7 @@ export default function PlanejamentoClientePage() {
                               {isSelected ? (
                                 <Link
                                   href={`/admin/planejamentos/${clientSlug}/modulos/${module.slug}`}
-                                  className="inline-flex rounded-full bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#c79e40] hover:text-black"
+                                  className="inline-flex rounded-full bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-900 hover:ring-2 hover:ring-[#c79e40]/40"
                                 >
                                   Preencher módulo
                                 </Link>
