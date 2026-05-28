@@ -53,6 +53,7 @@ type ProjectData = {
   selectedModules?: string[];
   coverImageUrl?: string | null;
   moduleContent?: Record<string, unknown>;
+  deliverySchedule?: Record<string, string> | null;
 };
 
 type PlanningProject = {
@@ -75,6 +76,14 @@ type PresentationSection = {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
+const SCHEDULE_GROUPS: { key: string; label: string }[] = [
+  { key: "essencia-do-projeto", label: "Essência do Projeto" },
+  { key: "fundamentos-estrategicos", label: "Fundamentos Estratégicos do Projeto" },
+  { key: "estrategia-editorial-e-canais", label: "Estratégia Editorial e Canais de Conteúdo" },
+  { key: "campanhas-automacoes-e-conversao", label: "Campanhas, Automações e Conversão" },
+  { key: "execucao-acompanhamento-e-gestao", label: "Execução, Acompanhamento e Gestão" },
+];
+
 const introSection: PresentationSection = {
   slug: "resumo-estrategico",
   title: "Comece por aqui",
@@ -85,6 +94,12 @@ const introSection: PresentationSection = {
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function formatScheduleDate(dateStr: string) {
+  if (!dateStr) return "A definir";
+  const [y, m, d] = dateStr.split("-");
+  return `${d}/${m}/${y}`;
+}
 
 function getProjectClient(project: PlanningProject): ClientRecord | null {
   if (Array.isArray(project.clients)) return project.clients[0] ?? null;
@@ -116,6 +131,113 @@ function ArrowIcon() {
         strokeLinejoin="round"
       />
     </svg>
+  );
+}
+
+// ─── In-production screen (client + draft) ───────────────────────────────────
+
+function InProducaoMode({
+  clientName,
+  projectTitle,
+  coverImageUrl,
+  deliverySchedule,
+}: {
+  clientName: string;
+  projectTitle: string;
+  coverImageUrl: string | null;
+  deliverySchedule: Record<string, string> | null | undefined;
+}) {
+  const hasSchedule =
+    deliverySchedule !== null &&
+    deliverySchedule !== undefined &&
+    Object.values(deliverySchedule).some(Boolean);
+
+  return (
+    <main className="min-h-screen bg-slate-100 text-slate-950">
+      <section className="relative min-h-[420px] overflow-hidden bg-slate-950 text-white">
+        {coverImageUrl && (
+          <div
+            className="absolute inset-0 bg-cover bg-center opacity-35"
+            style={{ backgroundImage: `url(${coverImageUrl})` }}
+          />
+        )}
+        <div className="absolute inset-0 bg-slate-950/70" />
+
+        <div className="relative z-10 flex min-h-[420px] flex-col justify-between px-6 py-8 lg:px-16">
+          <div>
+            <MetodoLogo href="/cliente" size="sm" className="brightness-0 invert" />
+          </div>
+
+          <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col items-center justify-center text-center">
+            <p className="text-sm font-medium uppercase tracking-[0.55em] text-white/70">
+              Planejamento Estratégico
+            </p>
+            <h1 className="mt-6 text-5xl font-light tracking-[-0.06em] text-white lg:text-7xl">
+              {clientName}
+            </h1>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-4xl px-6 py-12 lg:px-10">
+        <div className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-10">
+          <span className="inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-700">
+            Em produção
+          </span>
+
+          <h2 className="mt-5 text-3xl font-bold tracking-[-0.04em]">
+            {projectTitle}
+          </h2>
+
+          <p className="mt-5 text-base leading-7 text-slate-600">
+            Seu planejamento estratégico está em produção.
+          </p>
+          <p className="mt-3 text-base leading-7 text-slate-600">
+            Nossa equipe já iniciou a construção da sua estratégia. Assim que os
+            módulos forem finalizados, eles serão liberados para visualização
+            neste ambiente.
+          </p>
+
+          <Link
+            href="/cliente"
+            className="mt-8 inline-flex items-center justify-center rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+          >
+            Voltar para minha área
+          </Link>
+        </div>
+
+        {hasSchedule && (
+          <div className="mt-6 rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-10">
+            <p className="text-sm font-bold uppercase tracking-[0.18em] text-slate-500">
+              Cronograma previsto
+            </p>
+            <h3 className="mt-3 text-2xl font-bold tracking-[-0.03em]">
+              Entregas por grupo
+            </h3>
+
+            <div className="mt-6 divide-y divide-slate-100">
+              {SCHEDULE_GROUPS.map(({ key, label }) => {
+                const dateStr = deliverySchedule?.[key] ?? "";
+                return (
+                  <div key={key} className="flex items-center justify-between py-4">
+                    <p className="text-sm font-medium text-slate-700">{label}</p>
+                    <p
+                      className={`text-sm font-semibold ${
+                        dateStr ? "text-slate-950" : "text-slate-400"
+                      }`}
+                    >
+                      {dateStr ? formatScheduleDate(dateStr) : "A definir"}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </section>
+
+      <MetodoFooter description="Planejamento estratégico desenvolvido pelo Método EPC." />
+    </main>
   );
 }
 
@@ -706,6 +828,17 @@ export default function ApresentacaoDinamicaPage() {
           </p>
         </div>
       </main>
+    );
+  }
+
+  if (!isStrategist && project.status === "draft") {
+    return (
+      <InProducaoMode
+        clientName={clientName}
+        projectTitle={project.title}
+        coverImageUrl={coverImageUrl}
+        deliverySchedule={project.data?.deliverySchedule}
+      />
     );
   }
 

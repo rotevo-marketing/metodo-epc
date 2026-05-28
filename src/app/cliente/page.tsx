@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { MetodoFooter, MetodoLogo } from "@/Components/MetodoBrand";
 
+type DeliverySchedule = Record<string, string>;
+
 type Project = {
   id: string;
   title: string;
@@ -12,11 +14,25 @@ type Project = {
   description: string | null;
   status: string;
   updated_at: string;
-  data: { coverImageUrl?: string | null } | null;
+  data: { coverImageUrl?: string | null; deliverySchedule?: DeliverySchedule | null } | null;
 };
+
+const SCHEDULE_GROUPS: { key: string; label: string }[] = [
+  { key: "essencia-do-projeto", label: "Essência do Projeto" },
+  { key: "fundamentos-estrategicos", label: "Fundamentos Estratégicos do Projeto" },
+  { key: "estrategia-editorial-e-canais", label: "Estratégia Editorial e Canais de Conteúdo" },
+  { key: "campanhas-automacoes-e-conversao", label: "Campanhas, Automações e Conversão" },
+  { key: "execucao-acompanhamento-e-gestao", label: "Execução, Acompanhamento e Gestão" },
+];
 
 function formatDate(date: string) {
   return new Intl.DateTimeFormat("pt-BR").format(new Date(date));
+}
+
+function formatScheduleDate(dateStr: string) {
+  if (!dateStr) return "A definir";
+  const [y, m, d] = dateStr.split("-");
+  return `${d}/${m}/${y}`;
 }
 
 function getStatusLabel(status: string) {
@@ -162,6 +178,90 @@ export default function ClientAreaPage() {
           <div className="mt-6 space-y-4">
             {projects.map((project) => {
               const coverImageUrl = project.data?.coverImageUrl ?? "";
+              const isDraft = project.status === "draft";
+              const deliverySchedule = project.data?.deliverySchedule ?? null;
+              const hasSchedule =
+                deliverySchedule !== null &&
+                Object.values(deliverySchedule).some(Boolean);
+
+              if (isDraft) {
+                return (
+                  <article
+                    key={project.id}
+                    className="rounded-[1.5rem] bg-white p-6 shadow-sm ring-1 ring-slate-200"
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="h-14 w-14 shrink-0 overflow-hidden rounded-full bg-slate-100 ring-1 ring-slate-200">
+                        {coverImageUrl ? (
+                          <img
+                            src={coverImageUrl}
+                            alt={project.title}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center text-lg font-bold text-slate-400">
+                            {project.title.charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex-1">
+                        <div className="flex flex-wrap items-center gap-3">
+                          <h3 className="text-xl font-bold tracking-[-0.03em]">
+                            {project.title}
+                          </h3>
+                          <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-700">
+                            Em produção
+                          </span>
+                        </div>
+
+                        <p className="mt-3 max-w-xl text-sm leading-6 text-slate-500">
+                          Seu planejamento estratégico está em produção. Em breve, os módulos serão liberados para visualização.
+                        </p>
+                      </div>
+                    </div>
+
+                    {hasSchedule && (
+                      <div className="mt-6 rounded-2xl bg-slate-50 p-5 ring-1 ring-slate-200">
+                        <p className="mb-4 text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
+                          Cronograma previsto
+                        </p>
+                        <div className="divide-y divide-slate-200">
+                          {SCHEDULE_GROUPS.map(({ key, label }) => {
+                            const dateStr = deliverySchedule?.[key] ?? "";
+                            return (
+                              <div
+                                key={key}
+                                className="flex items-center justify-between py-3"
+                              >
+                                <p className="text-sm text-slate-600">{label}</p>
+                                <p
+                                  className={`text-sm font-semibold ${
+                                    dateStr ? "text-slate-950" : "text-slate-400"
+                                  }`}
+                                >
+                                  {dateStr
+                                    ? formatScheduleDate(dateStr)
+                                    : "A definir"}
+                                </p>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="mt-6 flex justify-end">
+                      <a
+                        href={`/apresentacao/${project.slug}`}
+                        className="inline-flex items-center justify-center rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+                      >
+                        Ver status do planejamento
+                      </a>
+                    </div>
+                  </article>
+                );
+              }
 
               return (
                 <article
@@ -190,7 +290,9 @@ export default function ClientAreaPage() {
                             {project.title}
                           </h3>
 
-                          <span className={`rounded-full px-3 py-1 text-xs font-bold ${getStatusClass(project.status)}`}>
+                          <span
+                            className={`rounded-full px-3 py-1 text-xs font-bold ${getStatusClass(project.status)}`}
+                          >
                             {getStatusLabel(project.status)}
                           </span>
                         </div>
