@@ -105,7 +105,7 @@ export default function ClientAreaPage() {
         .order("updated_at", { ascending: false });
 
       if (error) {
-        setErrorMessage("Não foi possível carregar os planejamentos.");
+        setErrorMessage(error.message || "Não foi possível carregar os planejamentos.");
         setIsLoading(false);
         return;
       }
