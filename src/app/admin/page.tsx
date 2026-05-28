@@ -234,14 +234,14 @@ export default function AdminPage() {
           <button
             type="button"
             onClick={handleLogout}
-            className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-50"
+            className="cursor-pointer rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40"
           >
             Sair
           </button>
 
           <Link
             href="/admin/novo-planejamento"
-            className="rounded-full bg-slate-950 px-8 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
+            className="rounded-full bg-slate-950 px-8 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#c79e40] hover:text-black"
           >
             Criar novo planejamento
           </Link>
@@ -327,7 +327,7 @@ export default function AdminPage() {
 
             <Link
               href="/admin/novo-planejamento"
-              className="mt-6 inline-flex rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+              className="mt-6 inline-flex rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#c79e40] hover:text-black"
             >
               Criar novo planejamento
             </Link>
@@ -403,21 +403,21 @@ export default function AdminPage() {
                       <div className="flex flex-wrap gap-2">
                         <Link
                           href={`/admin/planejamentos/${clientSlug}`}
-                          className="inline-flex items-center justify-center rounded-full bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800"
+                          className="inline-flex items-center justify-center rounded-full bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#c79e40] hover:text-black"
                         >
                           Editar planejamento
                         </Link>
 
                         <Link
                           href={`/admin/planejamentos/${clientSlug}/acesso`}
-                          className="inline-flex items-center justify-center rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-slate-50"
+                          className="inline-flex items-center justify-center rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40"
                         >
                           Configurar acesso
                         </Link>
 
                         <Link
                           href={`/apresentacao/${project.slug}`}
-                          className="inline-flex items-center justify-center rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-slate-50"
+                          className="inline-flex items-center justify-center rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40"
                         >
                           Ver apresentação
                         </Link>
@@ -441,7 +441,7 @@ export default function AdminPage() {
                             type="button"
                             onClick={() => handlePublishProject(project, "draft")}
                             disabled={isPublishingId === project.id || isDeleting}
-                            className="inline-flex cursor-pointer items-center justify-center rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-slate-600 ring-1 ring-slate-200 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                            className="inline-flex cursor-pointer items-center justify-center rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-slate-600 ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40 disabled:cursor-not-allowed disabled:opacity-40"
                           >
                             {isPublishingId === project.id ? "Atualizando..." : "Voltar para rascunho"}
                           </button>

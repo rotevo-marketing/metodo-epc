@@ -167,7 +167,7 @@ export default function EstrategistaLoginPage() {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="h-14 cursor-pointer rounded-2xl bg-slate-950 px-8 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="h-14 cursor-pointer rounded-2xl bg-slate-950 px-8 text-sm font-semibold text-white transition hover:bg-[#c79e40] hover:text-black disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {isLoading ? "Entrando..." : "Entrar no painel"}
                   </button>

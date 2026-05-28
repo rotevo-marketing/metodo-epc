@@ -215,7 +215,7 @@ export default function SelecionarModulosPage() {
           <MetodoLogo variant="dark" />
           <Link
             href="/admin"
-            className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-50"
+            className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40"
           >
             Voltar
           </Link>
@@ -238,13 +238,13 @@ export default function SelecionarModulosPage() {
         <div className="flex items-center gap-3">
           <Link
             href="/admin/novo-planejamento"
-            className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-50"
+            className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40"
           >
             Voltar
           </Link>
           <Link
             href="/admin"
-            className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-50"
+            className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40"
           >
             Cancelar
           </Link>
@@ -334,14 +334,14 @@ export default function SelecionarModulosPage() {
             <button
               type="button"
               onClick={selectAllModules}
-              className="cursor-pointer rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-slate-50"
+              className="cursor-pointer rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40"
             >
               Selecionar todos
             </button>
             <button
               type="button"
               onClick={clearModules}
-              className="cursor-pointer rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-slate-50"
+              className="cursor-pointer rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40"
             >
               Limpar seleção
             </button>
@@ -448,7 +448,7 @@ export default function SelecionarModulosPage() {
             <div className="flex flex-col gap-3 border-t border-slate-200 pt-8 sm:flex-row sm:items-center sm:justify-between">
               <Link
                 href="/admin/novo-planejamento"
-                className="inline-flex items-center justify-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-slate-50"
+                className="inline-flex items-center justify-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40"
               >
                 Voltar aos dados
               </Link>
@@ -456,7 +456,7 @@ export default function SelecionarModulosPage() {
               <button
                 type="submit"
                 disabled={isSaving}
-                className="inline-flex cursor-pointer items-center justify-center rounded-full bg-slate-950 px-8 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex cursor-pointer items-center justify-center rounded-full bg-slate-950 px-8 py-3 text-sm font-semibold text-white transition hover:bg-[#c79e40] hover:text-black disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isSaving ? "Criando..." : "Criar planejamento"}
               </button>

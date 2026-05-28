@@ -138,7 +138,7 @@ export default function ClientAreaPage() {
         <button
           type="button"
           onClick={handleLogout}
-          className="cursor-pointer rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-50"
+          className="cursor-pointer rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40"
         >
           Sair
         </button>
@@ -258,7 +258,7 @@ export default function ClientAreaPage() {
                     <div className="mt-6 flex justify-end">
                       <a
                         href={`/apresentacao/${project.slug}`}
-                        className="inline-flex items-center justify-center rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+                        className="inline-flex items-center justify-center rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-[#c79e40] hover:text-black"
                       >
                         Ver status do planejamento
                       </a>
@@ -315,7 +315,7 @@ export default function ClientAreaPage() {
 
                     <a
                       href={`/apresentacao/${project.slug}`}
-                      className="inline-flex shrink-0 items-center justify-center rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+                      className="inline-flex shrink-0 items-center justify-center rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-[#c79e40] hover:text-black"
                     >
                       Ver apresentação
                     </a>

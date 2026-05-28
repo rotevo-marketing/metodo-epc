@@ -57,7 +57,7 @@ function CopyButton({ value, label }: { value: string; label?: string }) {
     <button
       type="button"
       onClick={handleCopy}
-      className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-slate-100 px-4 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-200 active:bg-slate-300"
+      className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-slate-100 px-4 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-[#c79e40]/10 hover:text-[#7a5c0a] active:bg-[#c79e40]/15"
     >
       {copied ? "Copiado!" : (label ?? "Copiar")}
     </button>
@@ -221,7 +221,7 @@ export default function AcessoClientePage() {
 
         <Link
           href={`/admin/planejamentos/${clientSlug}`}
-          className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-50"
+          className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40"
         >
           Voltar ao planejamento
         </Link>
@@ -240,7 +240,7 @@ export default function AcessoClientePage() {
             <h1 className="mt-4 text-2xl font-bold tracking-[-0.04em]">{errorMessage}</h1>
             <Link
               href="/admin"
-              className="mt-8 inline-flex rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+              className="mt-8 inline-flex rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-[#c79e40] hover:text-black"
             >
               Voltar ao painel
             </Link>
@@ -337,7 +337,7 @@ export default function AcessoClientePage() {
                       type="button"
                       onClick={handleCreateAccess}
                       disabled={isCreating || !email || !password}
-                      className="cursor-pointer rounded-full bg-slate-950 px-8 py-3.5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                      className="cursor-pointer rounded-full bg-slate-950 px-8 py-3.5 text-sm font-semibold text-white transition hover:bg-[#c79e40] hover:text-black disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {isCreating ? "Criando acesso..." : "Criar acesso automaticamente"}
                     </button>

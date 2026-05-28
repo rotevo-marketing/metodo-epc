@@ -205,7 +205,7 @@ function InProducaoMode({
 
           <Link
             href="/cliente"
-            className="mt-8 inline-flex items-center justify-center rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+            className="mt-8 inline-flex items-center justify-center rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-[#c79e40] hover:text-black"
           >
             Voltar para minha área
           </Link>
@@ -839,7 +839,7 @@ export default function ApresentacaoDinamicaPage() {
           </p>
           <Link
             href="/cliente"
-            className="mt-6 inline-flex items-center justify-center rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+            className="mt-6 inline-flex items-center justify-center rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-[#c79e40] hover:text-black"
           >
             Ir para minha área
           </Link>
