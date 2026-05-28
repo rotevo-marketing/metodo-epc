@@ -81,9 +81,19 @@ export default function AcessoClientePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
 
+  // Credential fields
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  // Automatic creation state
+  const [isCreating, setIsCreating] = useState(false);
+  const [createError, setCreateError] = useState("");
+  const [createSuccess, setCreateSuccess] = useState(false);
+  const [createdUid, setCreatedUid] = useState("");
+
+  // Manual fallback state
   const [uid, setUid] = useState("");
+  const [showManual, setShowManual] = useState(false);
 
   const client = project ? getProjectClient(project) : null;
 
@@ -114,9 +124,7 @@ export default function AcessoClientePage() {
 
       const { data, error } = await supabase
         .from("planning_projects")
-        .select(
-          `id, title, slug, status, clients!inner (id, name, slug)`
-        )
+        .select(`id, title, slug, status, clients!inner (id, name, slug)`)
         .eq("clients.slug", clientSlug)
         .order("updated_at", { ascending: false })
         .limit(1);
@@ -147,8 +155,61 @@ export default function AcessoClientePage() {
     if (clientSlug) load();
   }, [clientSlug, router]);
 
-  const profileSql = uid.trim()
-    ? `insert into profiles (id, full_name, email, role, client_id)\nvalues (\n  '${uid.trim()}',\n  '${client?.name ?? ""}',\n  '${email}',\n  'client',\n  '${client?.id ?? ""}'\n)\non conflict (id) do update set\n  full_name = excluded.full_name,\n  email = excluded.email,\n  role = excluded.role,\n  client_id = excluded.client_id,\n  updated_at = now();`
+  async function handleCreateAccess() {
+    if (!client || !email || !password) return;
+
+    setIsCreating(true);
+    setCreateError("");
+    setCreateSuccess(false);
+    setCreatedUid("");
+
+    // Get the current session token to send to the API route
+    const { data: sessionData } = await supabase.auth.getSession();
+    const token = sessionData.session?.access_token;
+
+    if (!token) {
+      setCreateError("Sessão expirada. Faça login novamente.");
+      setIsCreating(false);
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/admin/create-client-access", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          fullName: client.name,
+          clientId: client.id,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!result.success) {
+        setCreateError(result.error ?? "Erro desconhecido ao criar acesso.");
+        setIsCreating(false);
+        return;
+      }
+
+      setCreatedUid(result.userId);
+      setUid(result.userId); // also populate manual UID field
+      setCreateSuccess(true);
+    } catch {
+      setCreateError("Erro de conexão. Tente novamente.");
+    } finally {
+      setIsCreating(false);
+    }
+  }
+
+  // SQL used in manual fallback (also shown after auto-creation)
+  const activeUid = createdUid || uid;
+  const profileSql = activeUid
+    ? `insert into profiles (id, full_name, email, role, client_id)\nvalues (\n  '${activeUid}',\n  '${client?.name ?? ""}',\n  '${email}',\n  'client',\n  '${client?.id ?? ""}'\n)\non conflict (id) do update set\n  full_name = excluded.full_name,\n  email = excluded.email,\n  role = excluded.role,\n  client_id = excluded.client_id,\n  updated_at = now();`
     : null;
 
   const clientMessage = `Olá, ${client?.name ?? ""}.\nSeu acesso ao planejamento estratégico está disponível:\n\nURL: https://app.metodoepc.com.br\nLogin: ${email}\nSenha provisória: ${password}`;
@@ -158,14 +219,12 @@ export default function AcessoClientePage() {
       <header className="mx-auto flex max-w-5xl items-center justify-between px-6 py-8 lg:px-10">
         <MetodoLogo />
 
-        <div className="flex items-center gap-3">
-          <Link
-            href={`/admin/planejamentos/${clientSlug}`}
-            className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-50"
-          >
-            Voltar ao planejamento
-          </Link>
-        </div>
+        <Link
+          href={`/admin/planejamentos/${clientSlug}`}
+          className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-50"
+        >
+          Voltar ao planejamento
+        </Link>
       </header>
 
       <section className="mx-auto max-w-5xl px-6 pb-24 lg:px-10">
@@ -190,7 +249,7 @@ export default function AcessoClientePage() {
 
         {!isLoading && project && client && (
           <div className="space-y-6">
-            {/* Header card */}
+            {/* ── Header card ──────────────────────────────────────────────── */}
             <div className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-10">
               <p className="text-sm font-bold uppercase tracking-[0.18em] text-slate-500">
                 Acesso do cliente
@@ -199,11 +258,11 @@ export default function AcessoClientePage() {
                 Configurar acesso
               </h1>
               <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600">
-                Use esta tela para montar manualmente o acesso do cliente no Supabase. Nenhuma ação é executada automaticamente — os dados abaixo são apenas para guiar a criação.
+                Crie o acesso do cliente diretamente por aqui. O usuário é criado no Supabase Auth e o perfil é configurado automaticamente — sem precisar acessar o painel do Supabase.
               </p>
             </div>
 
-            {/* Client data */}
+            {/* ── Client data ───────────────────────────────────────────────── */}
             <div className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-10">
               <p className="text-sm font-bold uppercase tracking-[0.18em] text-slate-500">
                 Dados do cliente e planejamento
@@ -223,13 +282,13 @@ export default function AcessoClientePage() {
               </div>
             </div>
 
-            {/* Credentials */}
+            {/* ── Credentials ──────────────────────────────────────────────── */}
             <div className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-10">
               <p className="text-sm font-bold uppercase tracking-[0.18em] text-slate-500">
                 Credenciais de acesso
               </p>
               <p className="mt-2 text-sm text-slate-500">
-                Defina o e-mail e a senha provisória que serão usados para criar o usuário no Supabase Auth. A senha não é salva em nenhum lugar.
+                Defina o e-mail e a senha provisória. A senha não é salva em nenhum lugar — apenas exibida nesta tela durante a criação.
               </p>
 
               <div className="mt-6 grid gap-5 sm:grid-cols-2">
@@ -243,7 +302,8 @@ export default function AcessoClientePage() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="email@cliente.com"
-                      className="flex-1 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 placeholder-slate-400 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
+                      disabled={createSuccess}
+                      className="flex-1 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 placeholder-slate-400 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200 disabled:opacity-60"
                     />
                     {email && <CopyButton value={email} label="Copiar e-mail" />}
                   </div>
@@ -258,7 +318,8 @@ export default function AcessoClientePage() {
                       type="text"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="flex-1 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-mono text-sm text-slate-950 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
+                      disabled={createSuccess}
+                      className="flex-1 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-mono text-sm text-slate-950 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200 disabled:opacity-60"
                     />
                     <CopyButton value={password} label="Copiar senha" />
                   </div>
@@ -267,154 +328,69 @@ export default function AcessoClientePage() {
                   </p>
                 </div>
               </div>
-            </div>
 
-            {/* Step by step */}
-            <div className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-10">
-              <p className="text-sm font-bold uppercase tracking-[0.18em] text-slate-500">
-                Passo a passo
-              </p>
+              {/* Auto-create button */}
+              <div className="mt-8 border-t border-slate-100 pt-6">
+                {!createSuccess ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={handleCreateAccess}
+                      disabled={isCreating || !email || !password}
+                      className="cursor-pointer rounded-full bg-slate-950 px-8 py-3.5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {isCreating ? "Criando acesso..." : "Criar acesso automaticamente"}
+                    </button>
 
-              {/* Step 1 */}
-              <div className="mt-8">
-                <div className="flex items-center gap-3">
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-950 text-sm font-bold text-white">
-                    1
-                  </span>
-                  <h2 className="text-xl font-bold tracking-[-0.03em]">
-                    Criar usuário no Supabase Auth
-                  </h2>
-                </div>
-
-                <div className="mt-5 rounded-2xl bg-slate-50 p-5 ring-1 ring-slate-200">
-                  <p className="text-sm font-semibold text-slate-700">No painel do Supabase, vá em:</p>
-                  <p className="mt-1 font-mono text-sm text-slate-500">
-                    Authentication → Users → Add user → Create new user
-                  </p>
-
-                  <div className="mt-4 divide-y divide-slate-200">
-                    <div className="flex items-center justify-between py-3">
-                      <p className="text-sm text-slate-700">
-                        <span className="font-semibold">Email:</span>{" "}
-                        {email || <span className="italic text-slate-400">preencha o e-mail acima</span>}
-                      </p>
-                      {email && <CopyButton value={email} />}
-                    </div>
-
-                    <div className="flex items-center justify-between py-3">
-                      <p className="text-sm text-slate-700">
-                        <span className="font-semibold">Password:</span>{" "}
-                        <span className="font-mono">{password}</span>
-                      </p>
-                      <CopyButton value={password} />
-                    </div>
-
-                    <div className="flex items-start gap-3 py-3">
-                      <div className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded bg-emerald-500">
-                        <svg viewBox="0 0 12 12" fill="none" className="h-2.5 w-2.5">
-                          <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    {createError && (
+                      <div className="mt-4 rounded-2xl bg-red-50 px-5 py-4 text-sm font-medium text-red-700">
+                        {createError}
+                        {createError.includes("SUPABASE_SERVICE_ROLE_KEY") && (
+                          <p className="mt-2 text-xs font-normal text-red-600">
+                            Configure a variável <span className="font-mono font-semibold">SUPABASE_SERVICE_ROLE_KEY</span> no painel da Vercel (Settings → Environment Variables) ou no arquivo <span className="font-mono">.env.local</span>.
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="rounded-2xl bg-emerald-50 p-6 ring-1 ring-emerald-200">
+                    <div className="flex items-start gap-3">
+                      <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-500">
+                        <svg viewBox="0 0 12 12" fill="none" className="h-3 w-3">
+                          <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                       </div>
-                      <p className="text-sm text-slate-700">
-                        <span className="font-semibold">Auto confirm user</span> — marque esta opção para o acesso funcionar imediatamente.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 rounded-xl bg-amber-50 px-4 py-3 text-xs leading-5 text-amber-700 ring-1 ring-amber-100">
-                    O cliente não receberá nenhum e-mail automático se você usar{" "}
-                    <span className="font-semibold">Create new user</span> com{" "}
-                    <span className="font-semibold">Auto confirm user</span> marcado.
-                  </div>
-                </div>
-              </div>
-
-              {/* Step 2 */}
-              <div className="mt-8">
-                <div className="flex items-center gap-3">
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-950 text-sm font-bold text-white">
-                    2
-                  </span>
-                  <h2 className="text-xl font-bold tracking-[-0.03em]">
-                    Copiar o UID gerado
-                  </h2>
-                </div>
-
-                <div className="mt-5 rounded-2xl bg-slate-50 p-5 ring-1 ring-slate-200">
-                  <p className="text-sm text-slate-700">
-                    Após criar o usuário, copie o <span className="font-semibold">UID</span> exibido na lista de usuários do Supabase e cole abaixo.
-                  </p>
-
-                  <div className="mt-4">
-                    <label className="block text-sm font-semibold text-slate-700">
-                      UID do usuário criado
-                    </label>
-                    <div className="mt-2 flex gap-2">
-                      <input
-                        type="text"
-                        value={uid}
-                        onChange={(e) => setUid(e.target.value)}
-                        placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-                        className="flex-1 rounded-2xl border border-slate-200 bg-white px-4 py-3 font-mono text-sm text-slate-950 placeholder-slate-400 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
-                      />
-                      {uid.trim() && <CopyButton value={uid.trim()} label="Copiar UID" />}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Step 3 */}
-              <div className="mt-8">
-                <div className="flex items-center gap-3">
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-950 text-sm font-bold text-white">
-                    3
-                  </span>
-                  <h2 className="text-xl font-bold tracking-[-0.03em]">
-                    Inserir profile no banco
-                  </h2>
-                </div>
-
-                <div className="mt-5 rounded-2xl bg-slate-50 p-5 ring-1 ring-slate-200">
-                  <p className="text-sm text-slate-700">
-                    No painel do Supabase, vá em{" "}
-                    <span className="font-mono font-semibold">SQL Editor</span> e execute o SQL abaixo. O comando usa{" "}
-                    <span className="font-mono">on conflict</span> para evitar duplicatas.
-                  </p>
-
-                  {!uid.trim() ? (
-                    <div className="mt-4 rounded-2xl bg-white px-5 py-4 text-sm text-slate-400 ring-1 ring-slate-200">
-                      Cole o UID no campo acima para gerar o SQL.
-                    </div>
-                  ) : (
-                    <>
-                      <div className="mt-4">
-                        <MonoBlock>{profileSql}</MonoBlock>
-                      </div>
-                      <div className="mt-3 flex justify-end">
-                        <CopyButton value={profileSql ?? ""} label="Copiar SQL do profile" />
-                      </div>
-                    </>
-                  )}
-
-                  {!uid.trim() && (
-                    <div className="mt-4">
-                      <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
-                        Prévia do profile que será criado
-                      </p>
-                      <div className="divide-y divide-slate-200 rounded-2xl bg-white ring-1 ring-slate-200">
-                        <DataRowSimple label="id" value="(UID do Auth)" mono placeholder />
-                        <DataRowSimple label="full_name" value={client.name} mono />
-                        <DataRowSimple label="email" value={email || "(preencha o e-mail)"} mono placeholder={!email} />
-                        <DataRowSimple label="role" value="client" mono />
-                        <DataRowSimple label="client_id" value={client.id} mono />
+                      <div>
+                        <p className="font-semibold text-emerald-800">Acesso criado com sucesso.</p>
+                        <p className="mt-1 text-sm text-emerald-700">
+                          Usuário criado no Supabase Auth e perfil configurado automaticamente.
+                        </p>
                       </div>
                     </div>
-                  )}
-                </div>
+
+                    <div className="mt-4 divide-y divide-emerald-100 rounded-2xl bg-white px-4 ring-1 ring-emerald-100">
+                      <div className="flex items-center justify-between py-3">
+                        <div>
+                          <p className="text-xs font-semibold text-slate-400">UID criado</p>
+                          <p className="mt-0.5 font-mono text-sm text-slate-900">{createdUid}</p>
+                        </div>
+                        <CopyButton value={createdUid} label="Copiar UID" />
+                      </div>
+                      <div className="flex items-center justify-between py-3">
+                        <div>
+                          <p className="text-xs font-semibold text-slate-400">E-mail</p>
+                          <p className="mt-0.5 text-sm text-slate-900">{email}</p>
+                        </div>
+                        <CopyButton value={email} />
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Client message */}
+            {/* ── Client message ────────────────────────────────────────────── */}
             <div className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-10">
               <p className="text-sm font-bold uppercase tracking-[0.18em] text-slate-500">
                 Mensagem para o cliente
@@ -430,6 +406,141 @@ export default function AcessoClientePage() {
               <div className="mt-3 flex justify-end">
                 <CopyButton value={clientMessage} label="Copiar mensagem para cliente" />
               </div>
+            </div>
+
+            {/* ── Manual fallback ───────────────────────────────────────────── */}
+            <div className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-10">
+              <button
+                type="button"
+                onClick={() => setShowManual((v) => !v)}
+                className="flex w-full cursor-pointer items-center justify-between text-left"
+              >
+                <div>
+                  <p className="text-sm font-bold uppercase tracking-[0.18em] text-slate-400">
+                    Fallback
+                  </p>
+                  <h2 className="mt-1 text-xl font-bold tracking-[-0.03em] text-slate-700">
+                    Criar manualmente pelo Supabase
+                  </h2>
+                </div>
+                <span className="text-slate-400">{showManual ? "▲" : "▼"}</span>
+              </button>
+
+              {showManual && (
+                <div className="mt-8 space-y-8">
+                  {/* Step 1 */}
+                  <div>
+                    <div className="flex items-center gap-3">
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-950 text-sm font-bold text-white">
+                        1
+                      </span>
+                      <h3 className="text-lg font-bold tracking-[-0.03em]">
+                        Criar usuário no Supabase Auth
+                      </h3>
+                    </div>
+
+                    <div className="mt-4 rounded-2xl bg-slate-50 p-5 ring-1 ring-slate-200">
+                      <p className="text-sm font-semibold text-slate-700">
+                        Authentication → Users → Add user → Create new user
+                      </p>
+
+                      <div className="mt-4 divide-y divide-slate-200">
+                        <div className="flex items-center justify-between py-3">
+                          <p className="text-sm text-slate-700">
+                            <span className="font-semibold">Email:</span>{" "}
+                            {email || <span className="italic text-slate-400">preencha o e-mail acima</span>}
+                          </p>
+                          {email && <CopyButton value={email} />}
+                        </div>
+
+                        <div className="flex items-center justify-between py-3">
+                          <p className="text-sm text-slate-700">
+                            <span className="font-semibold">Password:</span>{" "}
+                            <span className="font-mono">{password}</span>
+                          </p>
+                          <CopyButton value={password} />
+                        </div>
+
+                        <div className="flex items-start gap-3 py-3">
+                          <div className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded bg-emerald-500">
+                            <svg viewBox="0 0 12 12" fill="none" className="h-2.5 w-2.5">
+                              <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                          </div>
+                          <p className="text-sm text-slate-700">
+                            <span className="font-semibold">Auto confirm user</span> — marque esta opção para o acesso funcionar imediatamente.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="mt-4 rounded-xl bg-amber-50 px-4 py-3 text-xs leading-5 text-amber-700 ring-1 ring-amber-100">
+                        Com <span className="font-semibold">Auto confirm user</span> marcado, o cliente não recebe e-mail automático.
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Step 2 */}
+                  <div>
+                    <div className="flex items-center gap-3">
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-950 text-sm font-bold text-white">
+                        2
+                      </span>
+                      <h3 className="text-lg font-bold tracking-[-0.03em]">
+                        Copiar o UID gerado
+                      </h3>
+                    </div>
+
+                    <div className="mt-4 rounded-2xl bg-slate-50 p-5 ring-1 ring-slate-200">
+                      <label className="block text-sm font-semibold text-slate-700">
+                        UID do usuário criado
+                      </label>
+                      <div className="mt-2 flex gap-2">
+                        <input
+                          type="text"
+                          value={uid}
+                          onChange={(e) => setUid(e.target.value)}
+                          placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                          className="flex-1 rounded-2xl border border-slate-200 bg-white px-4 py-3 font-mono text-sm text-slate-950 placeholder-slate-400 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
+                        />
+                        {uid.trim() && <CopyButton value={uid.trim()} label="Copiar UID" />}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Step 3 */}
+                  <div>
+                    <div className="flex items-center gap-3">
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-950 text-sm font-bold text-white">
+                        3
+                      </span>
+                      <h3 className="text-lg font-bold tracking-[-0.03em]">
+                        Inserir profile no banco
+                      </h3>
+                    </div>
+
+                    <div className="mt-4 rounded-2xl bg-slate-50 p-5 ring-1 ring-slate-200">
+                      <p className="text-sm text-slate-700">
+                        Execute no <span className="font-mono font-semibold">SQL Editor</span> do Supabase:
+                      </p>
+
+                      {!activeUid ? (
+                        <div className="mt-4 rounded-2xl bg-white px-5 py-4 text-sm text-slate-400 ring-1 ring-slate-200">
+                          Cole o UID no campo acima para gerar o SQL.
+                        </div>
+                      ) : (
+                        <>
+                          <div className="mt-4">
+                            <MonoBlock>{profileSql}</MonoBlock>
+                          </div>
+                          <div className="mt-3 flex justify-end">
+                            <CopyButton value={profileSql ?? ""} label="Copiar SQL do profile" />
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -472,29 +583,6 @@ function DataRow({
         )}
       </div>
       {copyable && <CopyButton value={value} />}
-    </div>
-  );
-}
-
-function DataRowSimple({
-  label,
-  value,
-  mono,
-  placeholder,
-}: {
-  label: string;
-  value: string;
-  mono?: boolean;
-  placeholder?: boolean;
-}) {
-  return (
-    <div className="flex items-baseline justify-between gap-4 px-5 py-3">
-      <p className={`shrink-0 text-xs font-semibold text-slate-400 ${mono ? "font-mono" : ""}`}>
-        {label}
-      </p>
-      <p className={`break-all text-sm ${mono ? "font-mono" : ""} ${placeholder ? "italic text-slate-400" : "text-slate-700"}`}>
-        {value}
-      </p>
     </div>
   );
 }
