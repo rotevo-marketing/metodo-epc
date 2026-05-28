@@ -181,61 +181,64 @@ function InProducaoMode({
       </section>
 
       <section className="mx-auto max-w-4xl px-6 py-12 lg:px-10">
-        <div className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-10">
-          <span className="inline-block rounded-full bg-[#c79e40]/10 px-3 py-1 text-xs font-bold text-[#7a5c0a]">
-            Em produção
-          </span>
+        <div className="overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
+          <div className="h-1 bg-[#c79e40]/40" />
+          <div className="p-8 lg:p-10">
+            <span className="inline-block rounded-full bg-[#c79e40]/10 px-3 py-1 text-xs font-bold text-[#7a5c0a]">
+              Em produção
+            </span>
 
-          <h2 className="mt-5 text-3xl font-bold tracking-[-0.04em]">
-            {clientName}
-          </h2>
+            <h2 className="mt-5 text-3xl font-bold tracking-[-0.04em] text-slate-950">
+              {clientName}
+            </h2>
 
-          <p className="mt-1 text-base font-medium text-slate-500">
-            {projectTitle}
-          </p>
+            <p className="mt-1 text-base font-medium text-slate-500">
+              {projectTitle}
+            </p>
 
-          <p className="mt-5 text-base leading-7 text-slate-600">
-            Seu planejamento estratégico está em produção.
-          </p>
-          <p className="mt-3 text-base leading-7 text-slate-600">
-            Nossa equipe já iniciou a construção da sua estratégia. Assim que os
-            módulos forem finalizados, eles serão liberados para visualização
-            neste ambiente.
-          </p>
+            <p className="mt-6 max-w-xl text-base leading-7 text-slate-600">
+              Seu planejamento estratégico está em produção. Nossa equipe está organizando os módulos e preparando a apresentação final. Assim que a entrega for liberada, você poderá visualizar tudo por aqui.
+            </p>
 
-          <Link
-            href="/cliente"
-            className="mt-8 inline-flex items-center justify-center rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-[#c79e40] hover:text-black"
-          >
-            Voltar para minha área
-          </Link>
+            <div className="mt-8 border-t border-slate-100 pt-6">
+              <Link
+                href="/cliente"
+                className="inline-flex items-center justify-center rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-[#c79e40] hover:text-black"
+              >
+                Voltar para minha área
+              </Link>
+            </div>
+          </div>
         </div>
 
         {hasSchedule && (
-          <div className="mt-6 rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-10">
-            <p className="text-sm font-bold uppercase tracking-[0.18em] text-slate-500">
-              Cronograma previsto
-            </p>
-            <h3 className="mt-3 text-2xl font-bold tracking-[-0.03em]">
-              Entregas por grupo
-            </h3>
+          <div className="mt-6 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
+            <div className="h-1 bg-[#c79e40]/20" />
+            <div className="p-8 lg:p-10">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">
+                Cronograma previsto
+              </p>
+              <h3 className="mt-2 text-xl font-bold tracking-[-0.03em] text-slate-950">
+                Entregas por grupo
+              </h3>
 
-            <div className="mt-6 divide-y divide-slate-100">
-              {SCHEDULE_GROUPS.map(({ key, label }) => {
-                const dateStr = deliverySchedule?.[key] ?? "";
-                return (
-                  <div key={key} className="flex items-center justify-between py-4">
-                    <p className="text-sm font-medium text-slate-700">{label}</p>
-                    <p
-                      className={`text-sm font-semibold ${
-                        dateStr ? "text-slate-950" : "text-slate-400"
-                      }`}
-                    >
-                      {dateStr ? formatScheduleDate(dateStr) : "A definir"}
-                    </p>
-                  </div>
-                );
-              })}
+              <div className="mt-5 divide-y divide-slate-100">
+                {SCHEDULE_GROUPS.map(({ key, label }) => {
+                  const dateStr = deliverySchedule?.[key] ?? "";
+                  return (
+                    <div key={key} className="flex flex-col gap-0.5 py-4 sm:flex-row sm:items-center sm:justify-between">
+                      <p className="text-sm font-medium text-slate-600">{label}</p>
+                      <p
+                        className={`text-sm font-semibold ${
+                          dateStr ? "text-slate-950" : "text-slate-400"
+                        }`}
+                      >
+                        {dateStr ? formatScheduleDate(dateStr) : "A definir"}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         )}

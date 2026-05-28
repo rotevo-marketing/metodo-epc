@@ -36,7 +36,7 @@ function formatScheduleDate(dateStr: string) {
 }
 
 function getStatusLabel(status: string) {
-  if (status === "draft") return "Rascunho";
+  if (status === "draft") return "Em produção";
   if (status === "in_progress") return "Em andamento";
   if (status === "published") return "Publicado";
   return "Arquivado";
@@ -146,7 +146,7 @@ export default function ClientAreaPage() {
 
       <section className="mx-auto max-w-5xl px-6 pb-20 lg:px-10">
         <div className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-10">
-          <p className="text-sm font-bold uppercase tracking-[0.18em] text-slate-500">
+          <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[#c79e40]">
             Área do cliente
           </p>
 
@@ -155,7 +155,7 @@ export default function ClientAreaPage() {
           </h1>
 
           <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600">
-            Acesse abaixo o planejamento estratégico do seu projeto.
+            Este é o seu ambiente estratégico. Aqui você acompanha o andamento do planejamento e acessa os módulos assim que forem liberados.
           </p>
         </div>
 
@@ -166,10 +166,10 @@ export default function ClientAreaPage() {
         )}
 
         {!isLoading && projects.length === 0 && !errorMessage && (
-          <div className="mt-6 rounded-[1.5rem] bg-white p-8 shadow-sm ring-1 ring-slate-200">
-            <h3 className="text-xl font-bold">Nenhum planejamento disponível</h3>
-            <p className="mt-2 text-slate-600">
-              Seu planejamento ainda não está disponível. Entre em contato com o estrategista.
+          <div className="mt-6 rounded-[2rem] bg-white p-10 text-center shadow-sm ring-1 ring-slate-200">
+            <h3 className="text-xl font-bold tracking-[-0.03em]">Planejamento em preparação</h3>
+            <p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-slate-500">
+              Seu ambiente estratégico está sendo configurado. Em breve você terá acesso completo ao planejamento.
             </p>
           </div>
         )}
@@ -220,23 +220,23 @@ export default function ClientAreaPage() {
                         </p>
 
                         <p className="mt-3 max-w-xl text-sm leading-6 text-slate-500">
-                          Seu planejamento estratégico está em produção. Em breve, os módulos serão liberados para visualização.
+                          Nosso time está desenvolvendo a sua estratégia. Em breve, os módulos serão liberados para visualização neste ambiente.
                         </p>
                       </div>
                     </div>
 
                     {hasSchedule && (
-                      <div className="mt-6 rounded-2xl bg-slate-50 p-5 ring-1 ring-slate-200">
-                        <p className="mb-4 text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
+                      <div className="mt-6 rounded-2xl border-l-4 border-[#c79e40]/30 bg-slate-50 px-5 py-5">
+                        <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-slate-400">
                           Cronograma previsto
                         </p>
-                        <div className="divide-y divide-slate-200">
+                        <div className="divide-y divide-slate-200/70">
                           {SCHEDULE_GROUPS.map(({ key, label }) => {
                             const dateStr = deliverySchedule?.[key] ?? "";
                             return (
                               <div
                                 key={key}
-                                className="flex items-center justify-between py-3"
+                                className="flex flex-col gap-0.5 py-3 sm:flex-row sm:items-center sm:justify-between"
                               >
                                 <p className="text-sm text-slate-600">{label}</p>
                                 <p
@@ -291,7 +291,7 @@ export default function ClientAreaPage() {
                       <div>
                         <div className="flex flex-wrap items-center gap-3">
                           <h3 className="text-xl font-bold tracking-[-0.03em]">
-                            {project.title}
+                            {clientName || project.title}
                           </h3>
 
                           <span
@@ -300,6 +300,10 @@ export default function ClientAreaPage() {
                             {getStatusLabel(project.status)}
                           </span>
                         </div>
+
+                        <p className="mt-1 text-sm font-medium text-slate-500">
+                          {project.title}
+                        </p>
 
                         {project.description && (
                           <p className="mt-2 max-w-xl text-sm leading-6 text-slate-500">
