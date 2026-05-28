@@ -430,7 +430,7 @@ function DetailMode({
                           type="button"
                           onClick={() => onChangeSlug(section.slug)}
                           className={cx(
-                            "grid w-full grid-cols-[30px_1fr_auto] items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm transition",
+                            "grid w-full cursor-pointer grid-cols-[30px_1fr_auto] items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm transition",
                             isActive
                               ? "bg-slate-950 text-white"
                               : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"
