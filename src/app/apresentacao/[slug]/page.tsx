@@ -187,8 +187,12 @@ function InProducaoMode({
           </span>
 
           <h2 className="mt-5 text-3xl font-bold tracking-[-0.04em]">
-            {projectTitle}
+            {clientName}
           </h2>
+
+          <p className="mt-1 text-base font-medium text-slate-500">
+            {projectTitle}
+          </p>
 
           <p className="mt-5 text-base leading-7 text-slate-600">
             Seu planejamento estratégico está em produção.
