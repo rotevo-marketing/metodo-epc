@@ -63,6 +63,7 @@ type PlanningProject = {
   description: string | null;
   status: string;
   data: ProjectData | null;
+  client_id: string | null;
   clients: ClientRecord | ClientRecord[] | null;
 };
 
@@ -725,7 +726,7 @@ export default function ApresentacaoDinamicaPage() {
       const { data, error } = await supabase
         .from("planning_projects")
         .select(
-          `id, title, slug, description, status, data, clients (id, name, slug)`
+          `id, title, slug, description, status, data, client_id, clients (id, name, slug)`
         )
         .eq("slug", slug)
         .single();
@@ -736,12 +737,9 @@ export default function ApresentacaoDinamicaPage() {
         return;
       }
 
-      // 4. If client, verify ownership
+      // 4. If client, verify ownership using client_id directly from the project row
       if (!isStrat && profile.role === "client") {
-        const projectClient = Array.isArray(data.clients)
-          ? data.clients[0]
-          : data.clients;
-        if (!projectClient || projectClient.id !== profile.client_id) {
+        if (data.client_id !== profile.client_id) {
           setIsUnauthorized(true);
           setIsLoading(false);
           return;
