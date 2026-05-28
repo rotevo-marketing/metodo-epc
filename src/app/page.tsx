@@ -1,14 +1,14 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { supabase } from "@/lib/supabase";
 import { MetodoLogo } from "@/Components/MetodoBrand";
 
 function LockIcon() {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      aria-hidden="true"
-      className="h-5 w-5"
-    >
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-5 w-5">
       <path
         d="M7 10V8a5 5 0 1 1 10 0v2"
         stroke="currentColor"
@@ -37,12 +37,7 @@ function LockIcon() {
 
 function EyeIcon() {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      aria-hidden="true"
-      className="h-4 w-4"
-    >
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-4 w-4">
       <path
         d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"
         stroke="currentColor"
@@ -56,6 +51,67 @@ function EyeIcon() {
 }
 
 export default function HomePage() {
+  const router = useRouter();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  async function handleLogin(event: React.SyntheticEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setErrorMessage("");
+    setIsLoading(true);
+
+    const trimmedEmail = email.trim().toLowerCase();
+    const trimmedPassword = password.trim();
+
+    if (!trimmedEmail || !trimmedPassword) {
+      setErrorMessage("Informe o e-mail e a senha para acessar.");
+      setIsLoading(false);
+      return;
+    }
+
+    const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
+      email: trimmedEmail,
+      password: trimmedPassword,
+    });
+
+    if (loginError || !loginData.user) {
+      setErrorMessage("E-mail ou senha inválidos.");
+      setIsLoading(false);
+      return;
+    }
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", loginData.user.id)
+      .single();
+
+    if (!profile) {
+      await supabase.auth.signOut();
+      setErrorMessage("Usuário sem perfil configurado. Fale com o estrategista.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (profile.role === "client") {
+      router.push("/cliente");
+      return;
+    }
+
+    if (profile.role === "strategist") {
+      router.push("/admin");
+      return;
+    }
+
+    await supabase.auth.signOut();
+    setErrorMessage("Acesso não autorizado. Fale com o estrategista.");
+    setIsLoading(false);
+  }
+
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#020617] text-white">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -66,14 +122,7 @@ export default function HomePage() {
 
       <div className="relative z-10 flex min-h-screen flex-col px-6 py-6 sm:px-8 lg:px-14">
         <header className="flex items-start justify-between gap-6">
-          <div className="flex items-center gap-4">
-            <MetodoLogo
-  href="/"
-  size="md"
-  className="brightness-0 invert"
-/>
-
-          </div>
+          <MetodoLogo href="/" size="md" className="brightness-0 invert" />
 
           <Link
             href="/estrategista/login"
@@ -122,49 +171,55 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                <form className="mt-8 space-y-5">
-                  <div>
-                    <input
-                      type="email"
-                      placeholder="Email"
-                      className="h-14 w-full rounded-2xl border border-slate-200 bg-white px-5 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-400"
-                    />
-                  </div>
+                <form onSubmit={handleLogin} className="mt-8 space-y-5">
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Email"
+                    className="h-14 w-full rounded-2xl border border-slate-200 bg-white px-5 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-400"
+                  />
 
                   <div className="relative">
                     <input
-                      type="password"
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                       placeholder="Senha"
                       className="h-14 w-full rounded-2xl border border-slate-200 bg-white px-5 pr-12 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-400"
                     />
 
-                    <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((v) => !v)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-700"
+                    >
                       <EyeIcon />
-                    </span>
+                    </button>
                   </div>
 
                   <button
                     type="button"
-                    className="text-sm text-slate-400 transition hover:text-slate-700"
+                    className="cursor-default text-sm text-slate-400"
+                    title="Recuperação de senha disponível em breve. Fale com o estrategista."
                   >
                     Esqueci minha senha
                   </button>
 
-                  <label className="flex items-center gap-3 text-sm text-slate-700">
-                    <input
-                      type="checkbox"
-                      className="h-5 w-5 rounded border-slate-300 accent-[#020617]"
-                    />
-                    <span>Lembrar de mim</span>
-                  </label>
+                  {errorMessage && (
+                    <p className="rounded-2xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+                      {errorMessage}
+                    </p>
+                  )}
 
                   <div className="flex flex-col gap-4 pt-1 sm:flex-row sm:items-center">
-                    <Link
-                      href="/apresentacao/demo"
-                      className="inline-flex h-12 items-center justify-center rounded-2xl bg-[#020617] px-7 text-sm font-semibold text-white transition hover:opacity-90"
+                    <button
+                      type="submit"
+                      disabled={isLoading}
+                      className="inline-flex h-12 cursor-pointer items-center justify-center rounded-2xl bg-[#020617] px-7 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                      Login
-                    </Link>
+                      {isLoading ? "Entrando..." : "Login"}
+                    </button>
 
                     <p className="text-sm text-slate-500">
                       Ainda não tem acesso?{" "}

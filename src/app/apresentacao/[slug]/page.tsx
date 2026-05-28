@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { moduleCategories, planningModules } from "@/data/modules";
 import { MetodoFooter, MetodoLogo } from "@/Components/MetodoBrand";
@@ -558,11 +559,13 @@ function DetailMode({
 
 export default function ApresentacaoDinamicaPage() {
   const params = useParams();
+  const router = useRouter();
   const slug = typeof params.slug === "string" ? params.slug : "";
 
   const [project, setProject] = useState<PlanningProject | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [isUnauthorized, setIsUnauthorized] = useState(false);
   const [isStrategist, setIsStrategist] = useState(false);
   const [viewMode, setViewMode] = useState<"overview" | "detail">("overview");
   const [activeSlug, setActiveSlug] = useState("resumo-estrategico");
@@ -573,16 +576,30 @@ export default function ApresentacaoDinamicaPage() {
     async function load() {
       setIsLoading(true);
 
+      // 1. Require authentication
       const { data: userData } = await supabase.auth.getUser();
-      if (userData.user) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("role")
-          .eq("id", userData.user.id)
-          .single();
-        if (profile?.role === "strategist") setIsStrategist(true);
+      if (!userData.user) {
+        router.push("/");
+        return;
       }
 
+      // 2. Fetch profile with client_id
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role, client_id")
+        .eq("id", userData.user.id)
+        .single();
+
+      if (!profile) {
+        await supabase.auth.signOut();
+        router.push("/");
+        return;
+      }
+
+      const isStrat = profile.role === "strategist";
+      setIsStrategist(isStrat);
+
+      // 3. Load project
       const { data, error } = await supabase
         .from("planning_projects")
         .select(
@@ -597,12 +614,29 @@ export default function ApresentacaoDinamicaPage() {
         return;
       }
 
+      // 4. If client, verify ownership
+      if (!isStrat && profile.role === "client") {
+        const projectClient = Array.isArray(data.clients)
+          ? data.clients[0]
+          : data.clients;
+        if (!projectClient || projectClient.id !== profile.client_id) {
+          setIsUnauthorized(true);
+          setIsLoading(false);
+          return;
+        }
+      } else if (!isStrat) {
+        // Unknown role
+        await supabase.auth.signOut();
+        router.push("/");
+        return;
+      }
+
       setProject(data as unknown as PlanningProject);
       setIsLoading(false);
     }
 
     load();
-  }, [slug]);
+  }, [slug, router]);
 
   const client = project ? getProjectClient(project) : null;
   const clientName = client?.name ?? project?.title ?? "";
@@ -627,6 +661,30 @@ export default function ApresentacaoDinamicaPage() {
     return (
       <main className="flex min-h-screen items-center justify-center bg-slate-100">
         <p className="text-slate-500">Carregando apresentação...</p>
+      </main>
+    );
+  }
+
+  if (isUnauthorized) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-slate-100">
+        <div className="max-w-md rounded-[2rem] bg-white p-10 text-center shadow-sm ring-1 ring-slate-200">
+          <p className="text-sm font-bold uppercase tracking-[0.18em] text-red-500">
+            Acesso não autorizado
+          </p>
+          <h1 className="mt-4 text-2xl font-bold tracking-[-0.03em]">
+            Você não tem permissão para acessar esta apresentação.
+          </h1>
+          <p className="mt-3 text-sm text-slate-500">
+            Este planejamento não está vinculado à sua conta.
+          </p>
+          <Link
+            href="/cliente"
+            className="mt-6 inline-flex items-center justify-center rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+          >
+            Ir para minha área
+          </Link>
+        </div>
       </main>
     );
   }
