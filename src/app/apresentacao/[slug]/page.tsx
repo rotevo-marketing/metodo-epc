@@ -34,6 +34,10 @@ import LivesPresentation from "@/Components/apresentacao/LivesPresentation";
 import MateriaisEducacionaisPresentation from "@/Components/apresentacao/MateriaisEducacionaisPresentation";
 import EstrategiaSitePresentation from "@/Components/apresentacao/EstrategiaSitePresentation";
 import MapaSitePresentation from "@/Components/apresentacao/MapaSitePresentation";
+import CampanhaCaptacaoLeadPresentation from "@/Components/apresentacao/CampanhaCaptacaoLeadPresentation";
+import CampanhaConversaoVendasPresentation from "@/Components/apresentacao/CampanhaConversaoVendasPresentation";
+import CampanhaDistribuicaoConteudoPresentation from "@/Components/apresentacao/CampanhaDistribuicaoConteudoPresentation";
+import FluxoAutomacaoPresentation from "@/Components/apresentacao/FluxoAutomacaoPresentation";
 import { ModuleIcon } from "@/Components/apresentacao/ModuleIcon";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -518,6 +522,14 @@ function DetailMode({
               <EstrategiaSitePresentation data={moduleContent["estrategia-site"]} />
             ) : activeSection.slug === "mapa-site" ? (
               <MapaSitePresentation data={moduleContent["mapa-site"]} />
+            ) : activeSection.slug === "campanha-captacao-de-lead" ? (
+              <CampanhaCaptacaoLeadPresentation data={moduleContent["campanha-captacao-de-lead"]} />
+            ) : activeSection.slug === "campanha-conversao-de-vendas" ? (
+              <CampanhaConversaoVendasPresentation data={moduleContent["campanha-conversao-de-vendas"]} />
+            ) : activeSection.slug === "campanha-distribuicao-de-conteudo" ? (
+              <CampanhaDistribuicaoConteudoPresentation data={moduleContent["campanha-distribuicao-de-conteudo"]} />
+            ) : activeSection.slug === "fluxo-de-automacao" ? (
+              <FluxoAutomacaoPresentation data={moduleContent["fluxo-de-automacao"]} />
             ) : (
               <ModulePlaceholder section={activeSection} />
             )}
