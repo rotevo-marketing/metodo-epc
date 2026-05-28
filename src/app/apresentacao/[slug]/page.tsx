@@ -251,6 +251,7 @@ function InProducaoMode({
 function OverviewMode({
   sections,
   clientName,
+  projectTitle,
   coverImageUrl,
   isStrategist,
   projectSlug,
@@ -258,6 +259,7 @@ function OverviewMode({
 }: {
   sections: PresentationSection[];
   clientName: string;
+  projectTitle: string;
   coverImageUrl: string | null;
   isStrategist: boolean;
   projectSlug: string;
@@ -299,6 +301,15 @@ function OverviewMode({
                 </a>
               )}
 
+              {!isStrategist && (
+                <a
+                  href="/cliente"
+                  className="rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white hover:text-slate-950"
+                >
+                  Voltar para minha área
+                </a>
+              )}
+
               <a
                 href="#modulos"
                 className="rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white hover:text-slate-950"
@@ -328,6 +339,9 @@ function OverviewMode({
           <h2 className="mt-3 text-5xl font-light tracking-[-0.05em] text-slate-950">
             {clientName}
           </h2>
+          {projectTitle && projectTitle !== clientName && (
+            <p className="mt-2 text-base font-medium text-slate-500">{projectTitle}</p>
+          )}
           <p className="mt-5 max-w-3xl text-lg leading-9 text-slate-600">
             Selecione abaixo o módulo que deseja visualizar. Cada área abre a
             apresentação estratégica correspondente.
@@ -458,6 +472,7 @@ function DetailMode({
   clientName,
   coverImageUrl,
   moduleContent,
+  isStrategist,
   onChangeSlug,
   onBackToOverview,
 }: {
@@ -466,6 +481,7 @@ function DetailMode({
   clientName: string;
   coverImageUrl: string | null;
   moduleContent: Record<string, unknown>;
+  isStrategist: boolean;
   onChangeSlug: (slug: string) => void;
   onBackToOverview: () => void;
 }) {
@@ -499,13 +515,24 @@ function DetailMode({
         <div className="absolute left-6 right-6 top-6 z-20 flex flex-wrap items-center justify-between gap-4">
           <MetodoLogo href="/" size="sm" className="brightness-0 invert" />
 
-          <button
-            type="button"
-            onClick={onBackToOverview}
-            className="inline-flex cursor-pointer items-center rounded-full border border-white/20 bg-white/10 px-5 py-3 text-sm font-medium text-white backdrop-blur transition hover:bg-white hover:text-slate-950"
-          >
-            Ver módulos
-          </button>
+          <div className="flex flex-wrap items-center gap-3">
+            {!isStrategist && (
+              <a
+                href="/cliente"
+                className="inline-flex cursor-pointer items-center rounded-full border border-white/20 bg-white/10 px-5 py-3 text-sm font-medium text-white backdrop-blur transition hover:bg-white hover:text-slate-950"
+              >
+                Voltar para minha área
+              </a>
+            )}
+
+            <button
+              type="button"
+              onClick={onBackToOverview}
+              className="inline-flex cursor-pointer items-center rounded-full border border-white/20 bg-white/10 px-5 py-3 text-sm font-medium text-white backdrop-blur transition hover:bg-white hover:text-slate-950"
+            >
+              Ver módulos
+            </button>
+          </div>
         </div>
 
         <div className="relative z-10 flex min-h-[580px] items-center justify-center px-6 py-16 text-center">
@@ -857,6 +884,7 @@ export default function ApresentacaoDinamicaPage() {
       <OverviewMode
         sections={sections}
         clientName={clientName}
+        projectTitle={project.title}
         coverImageUrl={coverImageUrl}
         isStrategist={isStrategist}
         projectSlug={project.slug}
@@ -875,6 +903,7 @@ export default function ApresentacaoDinamicaPage() {
       clientName={clientName}
       coverImageUrl={coverImageUrl}
       moduleContent={moduleContent}
+      isStrategist={isStrategist}
       onChangeSlug={setActiveSlug}
       onBackToOverview={() => setViewMode("overview")}
     />
