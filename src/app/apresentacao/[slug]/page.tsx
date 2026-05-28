@@ -19,6 +19,21 @@ import PalavrasChavePresentation from "@/Components/apresentacao/PalavrasChavePr
 import PersonasPresentation from "@/Components/apresentacao/PersonasPresentation";
 import JornadaCompraPresentation from "@/Components/apresentacao/JornadaCompraPresentation";
 import CanaisDigitaisPresentation from "@/Components/apresentacao/CanaisDigitaisPresentation";
+import FunilConteudoPresentation from "@/Components/apresentacao/FunilConteudoPresentation";
+import LinhasEditoriaisPresentation from "@/Components/apresentacao/LinhasEditoriaisPresentation";
+import InstagramPresentation from "@/Components/apresentacao/InstagramPresentation";
+import TiktokPresentation from "@/Components/apresentacao/TiktokPresentation";
+import YoutubePresentation from "@/Components/apresentacao/YoutubePresentation";
+import FacebookPresentation from "@/Components/apresentacao/FacebookPresentation";
+import LinkedinPresentation from "@/Components/apresentacao/LinkedinPresentation";
+import WhatsappPresentation from "@/Components/apresentacao/WhatsappPresentation";
+import BlogPresentation from "@/Components/apresentacao/BlogPresentation";
+import PinterestPresentation from "@/Components/apresentacao/PinterestPresentation";
+import PodcastsPresentation from "@/Components/apresentacao/PodcastsPresentation";
+import LivesPresentation from "@/Components/apresentacao/LivesPresentation";
+import MateriaisEducacionaisPresentation from "@/Components/apresentacao/MateriaisEducacionaisPresentation";
+import EstrategiaSitePresentation from "@/Components/apresentacao/EstrategiaSitePresentation";
+import MapaSitePresentation from "@/Components/apresentacao/MapaSitePresentation";
 import { ModuleIcon } from "@/Components/apresentacao/ModuleIcon";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -473,6 +488,36 @@ function DetailMode({
               <JornadaCompraPresentation data={moduleContent["jornada-de-compra"]} />
             ) : activeSection.slug === "canais-digitais-atuais" ? (
               <CanaisDigitaisPresentation data={moduleContent["canais-digitais-atuais"]} />
+            ) : activeSection.slug === "funil-de-conteudo" ? (
+              <FunilConteudoPresentation data={moduleContent["funil-de-conteudo"]} />
+            ) : activeSection.slug === "linhas-editoriais" ? (
+              <LinhasEditoriaisPresentation data={moduleContent["linhas-editoriais"]} />
+            ) : activeSection.slug === "instagram" ? (
+              <InstagramPresentation data={moduleContent["instagram"]} />
+            ) : activeSection.slug === "tiktok" ? (
+              <TiktokPresentation data={moduleContent["tiktok"]} />
+            ) : activeSection.slug === "youtube" ? (
+              <YoutubePresentation data={moduleContent["youtube"]} />
+            ) : activeSection.slug === "facebook" ? (
+              <FacebookPresentation data={moduleContent["facebook"]} />
+            ) : activeSection.slug === "linkedin" ? (
+              <LinkedinPresentation data={moduleContent["linkedin"]} />
+            ) : activeSection.slug === "whatsapp" ? (
+              <WhatsappPresentation data={moduleContent["whatsapp"]} />
+            ) : activeSection.slug === "blog" ? (
+              <BlogPresentation data={moduleContent["blog"]} />
+            ) : activeSection.slug === "pinterest" ? (
+              <PinterestPresentation data={moduleContent["pinterest"]} />
+            ) : activeSection.slug === "podcasts" ? (
+              <PodcastsPresentation data={moduleContent["podcasts"]} />
+            ) : activeSection.slug === "lives" ? (
+              <LivesPresentation data={moduleContent["lives"]} />
+            ) : activeSection.slug === "materiais-educacionais" ? (
+              <MateriaisEducacionaisPresentation data={moduleContent["materiais-educacionais"]} />
+            ) : activeSection.slug === "estrategia-site" ? (
+              <EstrategiaSitePresentation data={moduleContent["estrategia-site"]} />
+            ) : activeSection.slug === "mapa-site" ? (
+              <MapaSitePresentation data={moduleContent["mapa-site"]} />
             ) : (
               <ModulePlaceholder section={activeSection} />
             )}
