@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { moduleCategories, planningModules } from "@/data/modules";
@@ -850,7 +850,7 @@ export default function CampanhaConversaoDeVendasPage() {
               <button
                 type="button"
                 onClick={addDestination}
-                className="mt-5 cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-950 hover:text-white"
+                className="mt-5 cursor-pointer rounded-full border border-[#c79e40]/20 bg-[#c79e40]/10 px-5 py-3 text-sm font-semibold text-[#c79e40] transition-colors hover:bg-[#c79e40] hover:border-[#c79e40] hover:text-black"
               >
                 + Novo destino
               </button>
@@ -1078,7 +1078,7 @@ export default function CampanhaConversaoDeVendasPage() {
               <button
                 type="button"
                 onClick={addReference}
-                className="mt-5 cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-950 hover:text-white"
+                className="mt-5 cursor-pointer rounded-full border border-[#c79e40]/20 bg-[#c79e40]/10 px-5 py-3 text-sm font-semibold text-[#c79e40] transition-colors hover:bg-[#c79e40] hover:border-[#c79e40] hover:text-black"
               >
                 + Nova referência
               </button>

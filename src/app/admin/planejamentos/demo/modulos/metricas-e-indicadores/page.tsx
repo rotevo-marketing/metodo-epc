@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState, type ReactNode } from "react";
 import { moduleCategories, planningModules } from "@/data/modules";
@@ -837,7 +837,7 @@ export default function MetricasEIndicadoresPage() {
               <button
                 type="button"
                 onClick={addIndicator}
-                className="mt-5 cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-950 hover:text-white"
+                className="mt-5 cursor-pointer rounded-full border border-[#c79e40]/20 bg-[#c79e40]/10 px-5 py-3 text-sm font-semibold text-[#c79e40] transition-colors hover:bg-[#c79e40] hover:border-[#c79e40] hover:text-black"
               >
                 + Novo indicador
               </button>
@@ -908,7 +908,7 @@ export default function MetricasEIndicadoresPage() {
               <button
                 type="button"
                 onClick={addJourneyMetric}
-                className="mt-5 cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-950 hover:text-white"
+                className="mt-5 cursor-pointer rounded-full border border-[#c79e40]/20 bg-[#c79e40]/10 px-5 py-3 text-sm font-semibold text-[#c79e40] transition-colors hover:bg-[#c79e40] hover:border-[#c79e40] hover:text-black"
               >
                 + Nova etapa
               </button>
@@ -979,7 +979,7 @@ export default function MetricasEIndicadoresPage() {
               <button
                 type="button"
                 onClick={addChannelMetric}
-                className="mt-5 cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-950 hover:text-white"
+                className="mt-5 cursor-pointer rounded-full border border-[#c79e40]/20 bg-[#c79e40]/10 px-5 py-3 text-sm font-semibold text-[#c79e40] transition-colors hover:bg-[#c79e40] hover:border-[#c79e40] hover:text-black"
               >
                 + Novo canal
               </button>
@@ -1031,7 +1031,7 @@ export default function MetricasEIndicadoresPage() {
               <button
                 type="button"
                 onClick={addTool}
-                className="mt-5 cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-950 hover:text-white"
+                className="mt-5 cursor-pointer rounded-full border border-[#c79e40]/20 bg-[#c79e40]/10 px-5 py-3 text-sm font-semibold text-[#c79e40] transition-colors hover:bg-[#c79e40] hover:border-[#c79e40] hover:text-black"
               >
                 + Nova ferramenta
               </button>
@@ -1154,7 +1154,7 @@ export default function MetricasEIndicadoresPage() {
               <button
                 type="button"
                 onClick={addReference}
-                className="mt-5 cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-950 hover:text-white"
+                className="mt-5 cursor-pointer rounded-full border border-[#c79e40]/20 bg-[#c79e40]/10 px-5 py-3 text-sm font-semibold text-[#c79e40] transition-colors hover:bg-[#c79e40] hover:border-[#c79e40] hover:text-black"
               >
                 + Nova referência
               </button>

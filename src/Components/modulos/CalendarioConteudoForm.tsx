@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { type ReactNode } from "react";
 import Link from "next/link";
@@ -540,7 +540,7 @@ export default function CalendarioConteudoForm({
           type="button"
           onClick={addApprovalStep}
           disabled={isDisabled}
-          className="mt-5 cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-950 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+          className="mt-5 cursor-pointer rounded-full border border-[#c79e40]/20 bg-[#c79e40]/10 px-5 py-3 text-sm font-semibold text-[#c79e40] hover:bg-[#c79e40] hover:border-[#c79e40] hover:text-black disabled:cursor-not-allowed disabled:opacity-50"
         >
           + Nova etapa
         </button>
@@ -646,7 +646,7 @@ export default function CalendarioConteudoForm({
           type="button"
           onClick={addDriveFolder}
           disabled={isDisabled}
-          className="mt-5 cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-950 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+          className="mt-5 cursor-pointer rounded-full border border-[#c79e40]/20 bg-[#c79e40]/10 px-5 py-3 text-sm font-semibold text-[#c79e40] hover:bg-[#c79e40] hover:border-[#c79e40] hover:text-black disabled:cursor-not-allowed disabled:opacity-50"
         >
           + Nova pasta
         </button>
@@ -709,7 +709,7 @@ export default function CalendarioConteudoForm({
           type="button"
           onClick={addReference}
           disabled={isDisabled}
-          className="mt-5 cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-950 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+          className="mt-5 cursor-pointer rounded-full border border-[#c79e40]/20 bg-[#c79e40]/10 px-5 py-3 text-sm font-semibold text-[#c79e40] hover:bg-[#c79e40] hover:border-[#c79e40] hover:text-black disabled:cursor-not-allowed disabled:opacity-50"
         >
           + Nova referência
         </button>
