@@ -518,10 +518,10 @@ function DetailMode({
               <LivesPresentation data={moduleContent["lives"]} />
             ) : activeSection.slug === "materiais-educacionais" ? (
               <MateriaisEducacionaisPresentation data={moduleContent["materiais-educacionais"]} />
-            ) : activeSection.slug === "estrategia-site" ? (
-              <EstrategiaSitePresentation data={moduleContent["estrategia-site"]} />
-            ) : activeSection.slug === "mapa-site" ? (
-              <MapaSitePresentation data={moduleContent["mapa-site"]} />
+            ) : activeSection.slug === "estrategia-do-site" ? (
+              <EstrategiaSitePresentation data={moduleContent["estrategia-do-site"]} />
+            ) : activeSection.slug === "mapa-do-site" ? (
+              <MapaSitePresentation data={moduleContent["mapa-do-site"]} />
             ) : activeSection.slug === "campanha-captacao-de-lead" ? (
               <CampanhaCaptacaoLeadPresentation data={moduleContent["campanha-captacao-de-lead"]} />
             ) : activeSection.slug === "campanha-conversao-de-vendas" ? (
