@@ -349,9 +349,10 @@ export default function AdminPage() {
                   key={project.id}
                   className="rounded-[1.5rem] bg-white p-6 shadow-sm ring-1 ring-slate-200"
                 >
-                  <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-                    <div className="flex items-start gap-4">
-                      <div className="h-16 w-16 shrink-0 overflow-hidden rounded-full bg-slate-100 ring-1 ring-slate-200">
+                  <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
+                    {/* Info area — expands freely */}
+                    <div className="flex min-w-0 flex-1 items-start gap-4">
+                      <div className="h-14 w-14 shrink-0 overflow-hidden rounded-full bg-slate-100 ring-1 ring-slate-200">
                         {coverImageUrl ? (
                           <img
                             src={coverImageUrl}
@@ -365,9 +366,9 @@ export default function AdminPage() {
                         )}
                       </div>
 
-                      <div>
-                        <div className="flex flex-wrap items-center gap-3">
-                          <h3 className="text-2xl font-bold tracking-[-0.03em]">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h3 className="text-xl font-bold tracking-[-0.03em]">
                             {clientName}
                           </h3>
 
@@ -380,74 +381,81 @@ export default function AdminPage() {
                           </span>
                         </div>
 
-                        <p className="mt-3 text-base text-slate-600">
+                        <p className="mt-2 text-sm text-slate-600">
                           {project.title}
                         </p>
 
                         {project.description ? (
-                          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+                          <p className="mt-1.5 text-sm leading-6 text-slate-500">
                             {project.description}
                           </p>
                         ) : null}
 
-                        <p className="mt-4 text-sm text-slate-400">
+                        <p className="mt-3 text-xs text-slate-400">
                           Atualizado em {formatDate(project.updated_at)}
                         </p>
                       </div>
                     </div>
 
-                    <div className="flex flex-col gap-3 sm:flex-row lg:shrink-0">
-                      <Link
-                        href={`/admin/planejamentos/${clientSlug}`}
-                        className="inline-flex items-center justify-center rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
-                      >
-                        Editar planejamento
-                      </Link>
+                    {/* Actions area — fixed column, two rows */}
+                    <div className="flex shrink-0 flex-col gap-2 lg:items-end">
+                      {/* Row 1: navigation actions */}
+                      <div className="flex flex-wrap gap-2">
+                        <Link
+                          href={`/admin/planejamentos/${clientSlug}`}
+                          className="inline-flex items-center justify-center rounded-full bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800"
+                        >
+                          Editar planejamento
+                        </Link>
 
-                      <Link
-                        href={`/admin/planejamentos/${clientSlug}/acesso`}
-                        className="inline-flex items-center justify-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-slate-50"
-                      >
-                        Configurar acesso
-                      </Link>
+                        <Link
+                          href={`/admin/planejamentos/${clientSlug}/acesso`}
+                          className="inline-flex items-center justify-center rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-slate-50"
+                        >
+                          Configurar acesso
+                        </Link>
 
-                      <Link
-                        href={`/apresentacao/${project.slug}`}
-                        className="inline-flex items-center justify-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-slate-50"
-                      >
-                        Ver apresentação
-                      </Link>
+                        <Link
+                          href={`/apresentacao/${project.slug}`}
+                          className="inline-flex items-center justify-center rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-slate-50"
+                        >
+                          Ver apresentação
+                        </Link>
+                      </div>
 
-                      {project.status === "draft" && (
+                      {/* Row 2: publish status + delete */}
+                      <div className="flex flex-wrap gap-2">
+                        {project.status === "draft" && (
+                          <button
+                            type="button"
+                            onClick={() => handlePublishProject(project, "published")}
+                            disabled={isPublishingId === project.id || isDeleting}
+                            className="inline-flex cursor-pointer items-center justify-center rounded-full bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-40"
+                          >
+                            {isPublishingId === project.id ? "Publicando..." : "Publicar"}
+                          </button>
+                        )}
+
+                        {project.status === "published" && (
+                          <button
+                            type="button"
+                            onClick={() => handlePublishProject(project, "draft")}
+                            disabled={isPublishingId === project.id || isDeleting}
+                            className="inline-flex cursor-pointer items-center justify-center rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-slate-600 ring-1 ring-slate-200 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                          >
+                            {isPublishingId === project.id ? "Atualizando..." : "Voltar para rascunho"}
+                          </button>
+                        )}
+
                         <button
                           type="button"
-                          onClick={() => handlePublishProject(project, "published")}
-                          disabled={isPublishingId === project.id || isDeleting}
-                          className="inline-flex cursor-pointer items-center justify-center rounded-full bg-emerald-600 px-7 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-40"
+                          onClick={() => handleDeleteProject(project)}
+                          disabled={isDeleting || isDemoProject}
+                          className="inline-flex cursor-pointer items-center justify-center rounded-full bg-red-50 px-5 py-2.5 text-sm font-semibold text-red-700 ring-1 ring-red-100 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-40"
                         >
-                          {isPublishingId === project.id ? "Publicando..." : "Publicar"}
+                          {isDeleting ? "Excluindo..." : isDemoProject ? "Modelo" : "Excluir"}
                         </button>
-                      )}
-
-                      {project.status === "published" && (
-                        <button
-                          type="button"
-                          onClick={() => handlePublishProject(project, "draft")}
-                          disabled={isPublishingId === project.id || isDeleting}
-                          className="inline-flex cursor-pointer items-center justify-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-slate-600 ring-1 ring-slate-200 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
-                        >
-                          {isPublishingId === project.id ? "Atualizando..." : "Voltar para rascunho"}
-                        </button>
-                      )}
-
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteProject(project)}
-                        disabled={isDeleting || isDemoProject}
-                        className="inline-flex cursor-pointer items-center justify-center rounded-full bg-red-50 px-7 py-3 text-sm font-semibold text-red-700 ring-1 ring-red-100 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-40"
-                      >
-                        {isDeleting ? "Excluindo..." : isDemoProject ? "Modelo" : "Excluir"}
-                      </button>
+                      </div>
                     </div>
                   </div>
                 </article>
