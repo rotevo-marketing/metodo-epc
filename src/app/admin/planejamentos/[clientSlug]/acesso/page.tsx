@@ -34,7 +34,7 @@ function getStatusLabel(status: PlanningProject["status"]) {
 
 function getStatusClass(status: PlanningProject["status"]) {
   if (status === "published") return "bg-emerald-100 text-emerald-700";
-  if (status === "in_progress") return "bg-amber-100 text-amber-700";
+  if (status === "in_progress") return "bg-[#c79e40]/10 text-[#7a5c0a]";
   if (status === "archived") return "bg-slate-200 text-slate-500";
   return "bg-slate-100 text-slate-600";
 }
@@ -303,7 +303,7 @@ export default function AcessoClientePage() {
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="email@cliente.com"
                       disabled={createSuccess}
-                      className="flex-1 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 placeholder-slate-400 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200 disabled:opacity-60"
+                      className="flex-1 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 placeholder-slate-400 focus:border-[#c79e40]/60 focus:outline-none focus:ring-2 focus:ring-[#c79e40]/10 disabled:opacity-60"
                     />
                     {email && <CopyButton value={email} label="Copiar e-mail" />}
                   </div>
@@ -319,7 +319,7 @@ export default function AcessoClientePage() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       disabled={createSuccess}
-                      className="flex-1 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-mono text-sm text-slate-950 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200 disabled:opacity-60"
+                      className="flex-1 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-mono text-sm text-slate-950 focus:border-[#c79e40]/60 focus:outline-none focus:ring-2 focus:ring-[#c79e40]/10 disabled:opacity-60"
                     />
                     <CopyButton value={password} label="Copiar senha" />
                   </div>
@@ -500,7 +500,7 @@ export default function AcessoClientePage() {
                           value={uid}
                           onChange={(e) => setUid(e.target.value)}
                           placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-                          className="flex-1 rounded-2xl border border-slate-200 bg-white px-4 py-3 font-mono text-sm text-slate-950 placeholder-slate-400 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
+                          className="flex-1 rounded-2xl border border-slate-200 bg-white px-4 py-3 font-mono text-sm text-slate-950 placeholder-slate-400 focus:border-[#c79e40]/60 focus:outline-none focus:ring-2 focus:ring-[#c79e40]/10"
                         />
                         {uid.trim() && <CopyButton value={uid.trim()} label="Copiar UID" />}
                       </div>

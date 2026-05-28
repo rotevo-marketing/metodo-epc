@@ -52,7 +52,7 @@ function getStatusClass(status: PlanningProject["status"]) {
   }
 
   if (status === "in_progress") {
-    return "bg-amber-100 text-amber-700";
+    return "bg-[#c79e40]/10 text-[#7a5c0a]";
   }
 
   if (status === "archived") {
@@ -347,7 +347,7 @@ export default function AdminPage() {
               return (
                 <article
                   key={project.id}
-                  className="rounded-[1.5rem] bg-white p-6 shadow-sm ring-1 ring-slate-200"
+                  className="rounded-[1.5rem] bg-white p-6 shadow-sm ring-1 ring-slate-200 transition hover:shadow-md hover:ring-slate-300"
                 >
                   <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
                     {/* Info area — expands freely */}

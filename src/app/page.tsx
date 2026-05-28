@@ -177,7 +177,7 @@ export default function HomePage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Email"
-                    className="h-14 w-full rounded-2xl border border-slate-200 bg-white px-5 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-400"
+                    className="h-14 w-full rounded-2xl border border-slate-200 bg-white px-5 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#c79e40]/60 focus:ring-2 focus:ring-[#c79e40]/10"
                   />
 
                   <div className="relative">
@@ -186,7 +186,7 @@ export default function HomePage() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Senha"
-                      className="h-14 w-full rounded-2xl border border-slate-200 bg-white px-5 pr-12 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-400"
+                      className="h-14 w-full rounded-2xl border border-slate-200 bg-white px-5 pr-12 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#c79e40]/60 focus:ring-2 focus:ring-[#c79e40]/10"
                     />
 
                     <button

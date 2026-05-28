@@ -182,7 +182,7 @@ function InProducaoMode({
 
       <section className="mx-auto max-w-4xl px-6 py-12 lg:px-10">
         <div className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-10">
-          <span className="inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-700">
+          <span className="inline-block rounded-full bg-[#c79e40]/10 px-3 py-1 text-xs font-bold text-[#7a5c0a]">
             Em produção
           </span>
 

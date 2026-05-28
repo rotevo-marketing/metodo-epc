@@ -126,7 +126,7 @@ export default function EstrategistaLoginPage() {
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
                   placeholder="Email"
-                  className="h-14 w-full rounded-2xl border border-slate-200 px-5 text-base outline-none transition placeholder:text-slate-400 focus:border-slate-950"
+                  className="h-14 w-full rounded-2xl border border-slate-200 px-5 text-base outline-none transition placeholder:text-slate-400 focus:border-[#c79e40]/60 focus:ring-2 focus:ring-[#c79e40]/10"
                 />
 
                 <div className="relative">
@@ -135,7 +135,7 @@ export default function EstrategistaLoginPage() {
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
                     placeholder="Senha"
-                    className="h-14 w-full rounded-2xl border border-slate-200 px-5 pr-14 text-base outline-none transition placeholder:text-slate-400 focus:border-slate-950"
+                    className="h-14 w-full rounded-2xl border border-slate-200 px-5 pr-14 text-base outline-none transition placeholder:text-slate-400 focus:border-[#c79e40]/60 focus:ring-2 focus:ring-[#c79e40]/10"
                   />
 
                   <button

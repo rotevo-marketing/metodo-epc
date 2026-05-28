@@ -62,7 +62,7 @@ function getStatusClass(status: PlanningProject["status"]) {
   }
 
   if (status === "in_progress") {
-    return "bg-amber-100 text-amber-700";
+    return "bg-[#c79e40]/10 text-[#7a5c0a]";
   }
 
   if (status === "archived") {

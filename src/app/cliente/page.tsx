@@ -44,7 +44,7 @@ function getStatusLabel(status: string) {
 
 function getStatusClass(status: string) {
   if (status === "published") return "bg-emerald-100 text-emerald-700";
-  if (status === "in_progress") return "bg-amber-100 text-amber-700";
+  if (status === "in_progress") return "bg-[#c79e40]/10 text-[#7a5c0a]";
   if (status === "archived") return "bg-slate-200 text-slate-500";
   return "bg-slate-100 text-slate-600";
 }
@@ -188,7 +188,7 @@ export default function ClientAreaPage() {
                 return (
                   <article
                     key={project.id}
-                    className="rounded-[1.5rem] bg-white p-6 shadow-sm ring-1 ring-slate-200"
+                    className="rounded-[1.5rem] bg-white p-6 shadow-sm ring-1 ring-slate-200 transition hover:shadow-md hover:ring-slate-300"
                   >
                     <div className="flex items-start gap-4">
                       <div className="h-14 w-14 shrink-0 overflow-hidden rounded-full bg-slate-100 ring-1 ring-slate-200">
@@ -210,7 +210,7 @@ export default function ClientAreaPage() {
                           <h3 className="text-xl font-bold tracking-[-0.03em]">
                             {clientName || project.title}
                           </h3>
-                          <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-700">
+                          <span className="rounded-full bg-[#c79e40]/10 px-3 py-1 text-xs font-bold text-[#7a5c0a]">
                             Em produção
                           </span>
                         </div>
@@ -270,7 +270,7 @@ export default function ClientAreaPage() {
               return (
                 <article
                   key={project.id}
-                  className="rounded-[1.5rem] bg-white p-6 shadow-sm ring-1 ring-slate-200"
+                  className="rounded-[1.5rem] bg-white p-6 shadow-sm ring-1 ring-slate-200 transition hover:shadow-md hover:ring-slate-300"
                 >
                   <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-start gap-4">

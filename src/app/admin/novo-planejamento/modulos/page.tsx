@@ -436,7 +436,7 @@ export default function SelecionarModulosPage() {
                         type="date"
                         value={deliverySchedule[key]}
                         onChange={(e) => updateScheduleDate(key, e.target.value)}
-                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-slate-400"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-[#c79e40]/60 focus:ring-2 focus:ring-[#c79e40]/10"
                       />
                     </div>
                   ))}

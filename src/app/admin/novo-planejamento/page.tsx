@@ -252,7 +252,7 @@ export default function NovoPlanejamentoPage() {
                 value={clientName}
                 onChange={(e) => setClientName(e.target.value)}
                 placeholder="Ex: Cliente Demo"
-                className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-slate-400"
+                className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-[#c79e40]/60 focus:ring-2 focus:ring-[#c79e40]/10"
               />
               {clientSlug && (
                 <p className="mt-2 text-xs text-slate-400">
@@ -271,7 +271,7 @@ export default function NovoPlanejamentoPage() {
                 value={projectTitle}
                 onChange={(e) => setProjectTitle(e.target.value)}
                 placeholder="Ex: Planejamento Estratégico 2026"
-                className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-slate-400"
+                className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-[#c79e40]/60 focus:ring-2 focus:ring-[#c79e40]/10"
               />
               {projectSlug && (
                 <p className="mt-2 text-xs text-slate-400">
@@ -374,7 +374,7 @@ export default function NovoPlanejamentoPage() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Ex: Planejamento estratégico inicial do cliente."
-                className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-slate-400"
+                className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-[#c79e40]/60 focus:ring-2 focus:ring-[#c79e40]/10"
               />
             </div>
 
