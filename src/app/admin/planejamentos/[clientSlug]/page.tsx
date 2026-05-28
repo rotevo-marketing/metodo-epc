@@ -295,7 +295,7 @@ export default function PlanejamentoClientePage() {
   return (
     <main className="min-h-screen bg-slate-100 text-slate-950">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-8 lg:px-10">
-        <MetodoLogo />
+        <MetodoLogo variant="dark" />
 
         <div className="flex items-center gap-3">
           <Link

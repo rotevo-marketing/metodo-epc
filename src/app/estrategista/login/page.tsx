@@ -75,7 +75,7 @@ export default function EstrategistaLoginPage() {
 
         <header className="relative z-10 flex items-center justify-between">
           <a href="/" className="flex items-center gap-4">
-            <MetodoLogo href="/" size="md" className="brightness-0 invert" />
+            <MetodoLogo href="/" size="md" variant="light" />
           </a>
 
           <a

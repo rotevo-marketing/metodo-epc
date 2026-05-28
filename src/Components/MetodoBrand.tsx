@@ -5,6 +5,7 @@ type MetodoLogoProps = {
   href?: string;
   className?: string;
   size?: "sm" | "md" | "lg";
+  variant?: "dark" | "light";
 };
 
 type MetodoFooterProps = {
@@ -12,14 +13,8 @@ type MetodoFooterProps = {
 };
 
 function getLogoSize(size: MetodoLogoProps["size"] = "md") {
-  if (size === "sm") {
-    return "h-10 w-auto";
-  }
-
-  if (size === "lg") {
-    return "h-16 w-auto";
-  }
-
+  if (size === "sm") return "h-10 w-auto";
+  if (size === "lg") return "h-16 w-auto";
   return "h-12 w-auto";
 }
 
@@ -27,10 +22,14 @@ export function MetodoLogo({
   href = "/",
   className = "",
   size = "md",
+  variant = "dark",
 }: MetodoLogoProps) {
+  const src =
+    variant === "light" ? "/brand/logo-light.svg" : "/brand/logo-dark.svg";
+
   const logo = (
     <Image
-      src="/icons/logo-metodo.svg"
+      src={src}
       alt="Método EPC"
       width={220}
       height={60}
@@ -57,7 +56,7 @@ export function MetodoFooter({
     <footer className="mt-20 border-t border-slate-200 px-6 py-10 lg:px-10">
       <div className="mx-auto flex max-w-6xl flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
         <div className="space-y-4">
-          <MetodoLogo href="/" size="md" />
+          <MetodoLogo href="/" size="md" variant="dark" />
           <p className="max-w-xl text-sm leading-7 text-slate-600">
             {description}
           </p>

@@ -217,7 +217,7 @@ export default function AcessoClientePage() {
   return (
     <main className="min-h-screen bg-slate-100 text-slate-950">
       <header className="mx-auto flex max-w-5xl items-center justify-between px-6 py-8 lg:px-10">
-        <MetodoLogo />
+        <MetodoLogo variant="dark" />
 
         <Link
           href={`/admin/planejamentos/${clientSlug}`}

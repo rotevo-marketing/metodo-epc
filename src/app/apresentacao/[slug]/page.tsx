@@ -166,7 +166,7 @@ function InProducaoMode({
 
         <div className="relative z-10 flex min-h-[420px] flex-col justify-between px-6 py-8 lg:px-16">
           <div>
-            <MetodoLogo href="/cliente" size="sm" className="brightness-0 invert" />
+            <MetodoLogo href="/cliente" size="sm" variant="light" />
           </div>
 
           <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col items-center justify-center text-center">
@@ -289,7 +289,7 @@ function OverviewMode({
 
         <div className="relative z-10 flex min-h-[520px] flex-col justify-between px-6 py-8 lg:px-16">
           <div className="flex flex-wrap items-center justify-between gap-4">
-            <MetodoLogo href="/" size="sm" className="brightness-0 invert" />
+            <MetodoLogo href="/" size="sm" variant="light" />
 
             <div className="flex flex-wrap items-center justify-end gap-3">
               {isStrategist && (
@@ -513,7 +513,7 @@ function DetailMode({
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/25 to-transparent" />
 
         <div className="absolute left-6 right-6 top-6 z-20 flex flex-wrap items-center justify-between gap-4">
-          <MetodoLogo href="/" size="sm" className="brightness-0 invert" />
+          <MetodoLogo href="/" size="sm" variant="light" />
 
           <div className="flex flex-wrap items-center gap-3">
             {!isStrategist && (

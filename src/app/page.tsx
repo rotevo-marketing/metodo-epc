@@ -122,7 +122,7 @@ export default function HomePage() {
 
       <div className="relative z-10 flex min-h-screen flex-col px-6 py-6 sm:px-8 lg:px-14">
         <header className="flex items-start justify-between gap-6">
-          <MetodoLogo href="/" size="md" className="brightness-0 invert" />
+          <MetodoLogo href="/" size="md" variant="light" />
 
           <Link
             href="/estrategista/login"

@@ -364,11 +364,7 @@ export default function PlanejamentoDemoPage() {
 
   <div className="relative z-10 flex min-h-[520px] flex-col justify-between px-6 py-8 lg:px-16">
     <div className="flex flex-wrap items-center justify-between gap-4">
-  <MetodoLogo
-    href="/admin"
-    size="sm"
-    className="brightness-0 invert"
-  />
+  <MetodoLogo href="/admin" size="sm" variant="light" />
 
   <div className="flex flex-wrap items-center justify-end gap-3">
     <Link
