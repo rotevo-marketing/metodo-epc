@@ -146,9 +146,6 @@ export default function SelecionarModulosPage() {
         {
           name: draft.clientName,
           slug: draft.clientSlug,
-          data: {
-            coverImageUrl: draft.coverImageUrl || null,
-          },
         },
         {
           onConflict: "slug",
