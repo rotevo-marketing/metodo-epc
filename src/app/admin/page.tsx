@@ -405,6 +405,13 @@ export default function AdminPage() {
                       </Link>
 
                       <Link
+                        href={`/admin/planejamentos/${clientSlug}/acesso`}
+                        className="inline-flex items-center justify-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-slate-50"
+                      >
+                        Configurar acesso
+                      </Link>
+
+                      <Link
                         href={`/apresentacao/${project.slug}`}
                         className="inline-flex items-center justify-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-slate-50"
                       >

@@ -307,6 +307,15 @@ export default function PlanejamentoClientePage() {
 
           {project ? (
             <Link
+              href={`/admin/planejamentos/${clientSlug}/acesso`}
+              className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-50"
+            >
+              Configurar acesso
+            </Link>
+          ) : null}
+
+          {project ? (
+            <Link
               href={`/apresentacao/${project.slug}`}
               className="rounded-full bg-slate-950 px-8 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
             >
