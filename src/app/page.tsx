@@ -216,7 +216,7 @@ export default function HomePage() {
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className="inline-flex h-12 cursor-pointer items-center justify-center rounded-2xl bg-[#020617] px-7 text-sm font-semibold text-white transition hover:bg-slate-900 hover:ring-2 hover:ring-[#c79e40]/40 disabled:cursor-not-allowed disabled:opacity-60"
+                      className="inline-flex h-12 cursor-pointer items-center justify-center rounded-2xl bg-[#020617] px-7 text-sm font-semibold text-white transition hover:bg-[#f4f1ea] hover:text-black hover:ring-1 hover:ring-[#c79e40]/30 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {isLoading ? "Entrando..." : "Login"}
                     </button>

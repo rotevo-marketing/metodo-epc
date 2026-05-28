@@ -456,7 +456,7 @@ export default function SelecionarModulosPage() {
               <button
                 type="submit"
                 disabled={isSaving}
-                className="inline-flex cursor-pointer items-center justify-center rounded-full bg-slate-950 px-8 py-3 text-sm font-semibold text-white transition hover:bg-slate-900 hover:ring-2 hover:ring-[#c79e40]/40 disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex cursor-pointer items-center justify-center rounded-full bg-slate-950 px-8 py-3 text-sm font-semibold text-white transition hover:bg-[#f4f1ea] hover:text-black hover:ring-1 hover:ring-[#c79e40]/30 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isSaving ? "Criando..." : "Criar planejamento"}
               </button>
