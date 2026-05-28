@@ -50,7 +50,7 @@ function formatDate(date: string) {
 }
 
 function getStatusLabel(status: PlanningProject["status"]) {
-  if (status === "draft") return "Rascunho";
+  if (status === "draft") return "Em produção";
   if (status === "in_progress") return "Em andamento";
   if (status === "published") return "Publicado";
   return "Arquivado";
@@ -59,6 +59,10 @@ function getStatusLabel(status: PlanningProject["status"]) {
 function getStatusClass(status: PlanningProject["status"]) {
   if (status === "published") {
     return "bg-emerald-100 text-emerald-700";
+  }
+
+  if (status === "draft") {
+    return "bg-[#c79e40]/10 text-[#7a5c0a]";
   }
 
   if (status === "in_progress") {
@@ -353,125 +357,131 @@ export default function PlanejamentoClientePage() {
 
         {!isLoading && project ? (
           <>
-            <div className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-10">
-              <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
-                <div>
-                  <p className="text-sm font-bold uppercase tracking-[0.18em] text-slate-500">
-                    Configuração do planejamento
-                  </p>
+            <div className="overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
+              <div className="h-1 bg-[#c79e40]/20" />
+              <div className="p-8 lg:p-10">
+                <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
+                  <div>
+                    <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[#c79e40]">
+                      Configuração do planejamento
+                    </p>
 
-                  <div className="mt-5 flex items-center gap-4">
-                    <div className="h-20 w-20 overflow-hidden rounded-full bg-slate-200 ring-1 ring-slate-300">
-                      {coverImageUrl ? (
-                        <img
-                          src={coverImageUrl}
-                          alt={client?.name ?? "Cliente"}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center text-2xl font-bold text-slate-500">
-                          {(client?.name ?? "C").charAt(0).toUpperCase()}
-                        </div>
-                      )}
+                    <div className="mt-5 flex items-center gap-4">
+                      <div className="h-20 w-20 overflow-hidden rounded-full bg-slate-100 ring-1 ring-slate-200">
+                        {coverImageUrl ? (
+                          <img
+                            src={coverImageUrl}
+                            alt={client?.name ?? "Cliente"}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center text-2xl font-bold text-slate-400">
+                            {(client?.name ?? "C").charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                      </div>
+
+                      <div>
+                        <h1 className="text-4xl font-bold tracking-[-0.04em] text-slate-950">
+                          {client?.name ?? "Cliente"}
+                        </h1>
+
+                        <p className="mt-1.5 text-base font-medium text-slate-500">
+                          {project.title}
+                        </p>
+                      </div>
                     </div>
 
-                    <div>
-                      <h1 className="text-4xl font-bold tracking-[-0.04em] text-slate-950">
-                        {client?.name ?? "Cliente"}
-                      </h1>
-
-                      <p className="mt-2 text-base text-slate-600">
-                        {project.title}
+                    {project.description ? (
+                      <p className="mt-6 max-w-3xl text-base leading-7 text-slate-500">
+                        {project.description}
                       </p>
+                    ) : null}
+                  </div>
+
+                  <div className="overflow-hidden rounded-2xl bg-slate-50 ring-1 ring-slate-200 lg:min-w-72">
+                    <div className="h-0.5 bg-[#c79e40]/30" />
+                    <div className="p-5">
+                      <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">
+                        Status
+                      </p>
+
+                      <span
+                        className={`mt-2 inline-flex rounded-full px-3 py-1 text-xs font-bold ${getStatusClass(
+                          project.status
+                        )}`}
+                      >
+                        {getStatusLabel(project.status)}
+                      </span>
+
+                      <div className="mt-4">
+                        {project.status === "draft" && (
+                          <button
+                            type="button"
+                            onClick={() => handlePublish("published")}
+                            disabled={isPublishing}
+                            className="w-full cursor-pointer rounded-2xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            {isPublishing ? "Publicando..." : "Publicar apresentação"}
+                          </button>
+                        )}
+
+                        {project.status === "published" && (
+                          <button
+                            type="button"
+                            onClick={() => handlePublish("draft")}
+                            disabled={isPublishing}
+                            className="w-full cursor-pointer rounded-2xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40 disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            {isPublishing ? "Atualizando..." : "Voltar para rascunho"}
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="mt-5 border-t border-slate-200 pt-5">
+                        <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">
+                          Atualizado em
+                        </p>
+                        <strong className="mt-2 block text-xl font-bold tracking-[-0.03em]">
+                          {formatDate(project.updated_at)}
+                        </strong>
+                      </div>
+
+                      <div className="mt-5 border-t border-slate-200 pt-5">
+                        <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">
+                          Módulos selecionados
+                        </p>
+                        <strong className="mt-2 block text-xl font-bold tracking-[-0.03em]">
+                          {selectedModules.length}
+                        </strong>
+                      </div>
                     </div>
-                  </div>
-
-                  {project.description ? (
-                    <p className="mt-6 max-w-3xl text-base leading-7 text-slate-600">
-                      {project.description}
-                    </p>
-                  ) : null}
-                </div>
-
-                <div className="rounded-2xl bg-slate-50 p-5 ring-1 ring-slate-200 lg:min-w-72">
-                  <p className="text-sm font-semibold text-slate-500">
-                    Status
-                  </p>
-
-                  <span
-                    className={`mt-2 inline-flex rounded-full px-3 py-1 text-xs font-bold ${getStatusClass(
-                      project.status
-                    )}`}
-                  >
-                    {getStatusLabel(project.status)}
-                  </span>
-
-                  <div className="mt-4">
-                    {project.status === "draft" && (
-                      <button
-                        type="button"
-                        onClick={() => handlePublish("published")}
-                        disabled={isPublishing}
-                        className="w-full cursor-pointer rounded-2xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
-                      >
-                        {isPublishing ? "Publicando..." : "Publicar apresentação"}
-                      </button>
-                    )}
-
-                    {project.status === "published" && (
-                      <button
-                        type="button"
-                        onClick={() => handlePublish("draft")}
-                        disabled={isPublishing}
-                        className="w-full cursor-pointer rounded-2xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40 disabled:cursor-not-allowed disabled:opacity-60"
-                      >
-                        {isPublishing ? "Atualizando..." : "Voltar para rascunho"}
-                      </button>
-                    )}
-                  </div>
-
-                  <div className="mt-5 border-t border-slate-200 pt-5">
-                    <p className="text-sm font-semibold text-slate-500">
-                      Atualizado em
-                    </p>
-                    <strong className="mt-1 block text-lg">
-                      {formatDate(project.updated_at)}
-                    </strong>
-                  </div>
-
-                  <div className="mt-5 border-t border-slate-200 pt-5">
-                    <p className="text-sm font-semibold text-slate-500">
-                      Módulos selecionados
-                    </p>
-                    <strong className="mt-1 block text-lg">
-                      {selectedModules.length}
-                    </strong>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="sticky top-0 z-10 mt-8 rounded-3xl bg-white/95 p-5 shadow-sm ring-1 ring-slate-200 backdrop-blur">
+            <div className="sticky top-0 z-10 mt-8 rounded-3xl bg-white/95 p-5 shadow-sm ring-1 ring-slate-200 backdrop-blur lg:p-6">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div>
-                  <p className="text-sm font-bold uppercase tracking-[0.18em] text-slate-500">
+                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#c79e40]">
                     Seleção de módulos
                   </p>
 
-                  <h2 className="mt-1 text-2xl font-bold tracking-[-0.03em]">
+                  <h2 className="mt-1.5 text-2xl font-bold tracking-[-0.03em]">
                     Escolha o que entra neste planejamento
                   </h2>
 
-                  <p className="mt-2 text-sm text-slate-500">
+                  <p className="mt-1.5 text-sm text-slate-500">
                     Apenas os módulos selecionados devem ser preenchidos e aparecer no planejamento final.
                   </p>
                 </div>
 
-                <div className="flex flex-col gap-3 sm:flex-row">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                   <button
                     type="button"
                     onClick={selectAllModules}
-                    className="cursor-pointer rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40"
+                    className="cursor-pointer rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40"
                   >
                     Selecionar todos
                   </button>
@@ -479,7 +489,7 @@ export default function PlanejamentoClientePage() {
                   <button
                     type="button"
                     onClick={clearModules}
-                    className="cursor-pointer rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40"
+                    className="cursor-pointer rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40"
                   >
                     Limpar
                   </button>
@@ -488,7 +498,7 @@ export default function PlanejamentoClientePage() {
                     type="button"
                     onClick={saveModuleSelection}
                     disabled={isSaving}
-                    className="cursor-pointer rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#f4f1ea] hover:text-black hover:ring-1 hover:ring-[#c79e40]/30 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="cursor-pointer rounded-full bg-slate-950 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-[#f4f1ea] hover:text-black hover:ring-1 hover:ring-[#c79e40]/30 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {isSaving ? "Salvando..." : "Salvar seleção"}
                   </button>
@@ -520,7 +530,7 @@ export default function PlanejamentoClientePage() {
 
                 return (
                   <section key={category}>
-                    <h3 className="text-xl font-bold tracking-[-0.03em]">
+                    <h3 className="border-l-2 border-[#c79e40]/50 pl-3 text-xl font-bold tracking-[-0.03em]">
                       {category}
                     </h3>
 
@@ -535,8 +545,8 @@ export default function PlanejamentoClientePage() {
                             key={module.slug}
                             className={`rounded-3xl bg-white p-6 shadow-sm ring-1 transition ${
                               isSelected
-                                ? "ring-slate-950"
-                                : "opacity-60 ring-slate-200"
+                                ? "ring-slate-950 hover:shadow-md"
+                                : "opacity-60 ring-slate-200 hover:opacity-80"
                             }`}
                           >
                             <label className="flex cursor-pointer items-start gap-4">
@@ -549,7 +559,7 @@ export default function PlanejamentoClientePage() {
 
                               <div className="flex-1">
                                 <div className="flex flex-wrap items-center gap-3">
-                                  <p className="text-sm font-semibold text-slate-400">
+                                  <p className="text-xs font-bold uppercase tracking-[0.15em] text-slate-400">
                                     Módulo
                                   </p>
 
@@ -558,17 +568,17 @@ export default function PlanejamentoClientePage() {
                                       Selecionado
                                     </span>
                                   ) : (
-                                    <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">
+                                    <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-400">
                                       Fora do planejamento
                                     </span>
                                   )}
                                 </div>
 
-                                <h4 className="mt-2 text-xl font-bold">
+                                <h4 className="mt-2 text-lg font-bold tracking-[-0.02em]">
                                   {module.title}
                                 </h4>
 
-                                <p className="mt-3 text-sm leading-6 text-slate-600">
+                                <p className="mt-2 text-sm leading-6 text-slate-500">
                                   {module.description}
                                 </p>
                               </div>
