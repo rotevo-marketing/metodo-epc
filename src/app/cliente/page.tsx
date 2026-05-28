@@ -208,12 +208,16 @@ export default function ClientAreaPage() {
                       <div className="flex-1">
                         <div className="flex flex-wrap items-center gap-3">
                           <h3 className="text-xl font-bold tracking-[-0.03em]">
-                            {project.title}
+                            {clientName || project.title}
                           </h3>
                           <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-700">
                             Em produção
                           </span>
                         </div>
+
+                        <p className="mt-1 text-sm font-medium text-slate-500">
+                          {project.title}
+                        </p>
 
                         <p className="mt-3 max-w-xl text-sm leading-6 text-slate-500">
                           Seu planejamento estratégico está em produção. Em breve, os módulos serão liberados para visualização.

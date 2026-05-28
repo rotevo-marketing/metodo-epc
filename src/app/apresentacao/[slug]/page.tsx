@@ -690,6 +690,7 @@ export default function ApresentacaoDinamicaPage() {
   const [notFound, setNotFound] = useState(false);
   const [isUnauthorized, setIsUnauthorized] = useState(false);
   const [isStrategist, setIsStrategist] = useState(false);
+  const [fetchedClientName, setFetchedClientName] = useState("");
   const [viewMode, setViewMode] = useState<"overview" | "detail">("overview");
   const [activeSlug, setActiveSlug] = useState("resumo-estrategico");
 
@@ -744,6 +745,13 @@ export default function ApresentacaoDinamicaPage() {
           setIsLoading(false);
           return;
         }
+        // Fetch client name directly — the join is blocked by RLS for client role
+        const { data: clientRow } = await supabase
+          .from("clients")
+          .select("name")
+          .eq("id", profile.client_id)
+          .single();
+        setFetchedClientName(clientRow?.name ?? "");
       } else if (!isStrat) {
         // Unknown role
         await supabase.auth.signOut();
@@ -759,7 +767,7 @@ export default function ApresentacaoDinamicaPage() {
   }, [slug, router]);
 
   const client = project ? getProjectClient(project) : null;
-  const clientName = client?.name ?? project?.title ?? "";
+  const clientName = fetchedClientName || client?.name || project?.title || "";
   const selectedModuleSlugs = project?.data?.selectedModules ?? [];
   const coverImageUrl = project?.data?.coverImageUrl ?? null;
   const moduleContent = project?.data?.moduleContent ?? {};
