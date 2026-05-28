@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 
 type MetodoLogoProps = {
@@ -28,13 +27,10 @@ export function MetodoLogo({
     variant === "light" ? "/brand/logo-light.svg" : "/brand/logo-dark.svg";
 
   const logo = (
-    <Image
+    <img
       src={src}
       alt="Método EPC"
-      width={220}
-      height={60}
-      priority
-      className={`${getLogoSize(size)} ${className}`}
+      className={`${getLogoSize(size)} object-contain ${className}`}
     />
   );
 
