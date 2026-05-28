@@ -40,7 +40,7 @@ function formatDate(date: string) {
 }
 
 function getStatusLabel(status: PlanningProject["status"]) {
-  if (status === "draft") return "Rascunho";
+  if (status === "draft") return "Em produção";
   if (status === "in_progress") return "Em andamento";
   if (status === "published") return "Publicado";
   return "Arquivado";
@@ -49,6 +49,10 @@ function getStatusLabel(status: PlanningProject["status"]) {
 function getStatusClass(status: PlanningProject["status"]) {
   if (status === "published") {
     return "bg-emerald-100 text-emerald-700";
+  }
+
+  if (status === "draft") {
+    return "bg-[#c79e40]/10 text-[#7a5c0a]";
   }
 
   if (status === "in_progress") {
@@ -83,7 +87,7 @@ export default function AdminPage() {
   const totalProjects = projects.length;
 
   const inProgressProjects = useMemo(() => {
-    return projects.filter((project) => project.status === "in_progress").length;
+    return projects.filter((project) => project.status === "draft").length;
   }, [projects]);
 
   const publishedProjects = useMemo(() => {
@@ -272,7 +276,7 @@ export default function AdminPage() {
             </div>
 
             <div className="rounded-2xl border border-slate-200 p-6">
-              <p className="text-sm text-slate-500">Em andamento</p>
+              <p className="text-sm text-slate-500">Em produção</p>
               <strong className="mt-3 block text-4xl text-slate-950">
                 {isLoading ? "..." : inProgressProjects}
               </strong>
