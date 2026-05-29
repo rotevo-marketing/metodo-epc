@@ -39,9 +39,9 @@ export function TextList({ items, label }: { items: TextItem[]; label: string })
   if (!filled.length) return null;
   return (
     <div>
-      <h4 className="mb-3 text-base font-semibold tracking-tight text-slate-950 md:text-lg">
+      <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
         {label}
-      </h4>
+      </p>
       <ul className="space-y-2">
         {filled.map((item, i) => (
           <li key={i} className="flex items-start gap-3 text-sm leading-7 text-slate-700">
@@ -77,9 +77,9 @@ export function ExternalRefList({ refs, label = "Referências" }: { refs: ExtRef
   if (!filled.length) return null;
   return (
     <div>
-      <h4 className="mb-3 text-base font-semibold tracking-tight text-slate-950 md:text-lg">
+      <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
         {label}
-      </h4>
+      </p>
       <ul className="space-y-3">
         {filled.map((ref, i) => (
           <li key={i} className="flex items-start gap-3">
@@ -108,7 +108,7 @@ export function FieldBlock({ label, value }: { label: string; value: string }) {
   if (!value?.trim()) return null;
   return (
     <div>
-      <p className="mb-6 mt-12 text-base font-semibold uppercase tracking-[0.26em] text-[#6f7f99]">
+      <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
         {label}
       </p>
       <p className="whitespace-pre-wrap text-sm leading-7 text-slate-700">{value}</p>
@@ -119,8 +119,8 @@ export function FieldBlock({ label, value }: { label: string; value: string }) {
 export function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
-      <h3 className="mb-7 text-3xl font-light tracking-[-0.04em] text-slate-950">{title}</h3>
-      <div className="space-y-7">{children}</div>
+      <h3 className="mb-6 text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl">{title}</h3>
+      <div className="space-y-6">{children}</div>
     </section>
   );
 }

@@ -70,14 +70,14 @@ export default function DnaConteudoPresentation({ data }: { data: unknown }) {
       {/* Fundamentos do DNA */}
       {otherFields.length > 0 && (
         <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
-          <h3 className="mb-8 text-xl font-semibold tracking-tight text-slate-950 md:text-2xl">
+          <h3 className="mb-6 text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl">
             Fundamentos do DNA
           </h3>
 
-          <div className="space-y-10">
+          <div className="space-y-6">
             {otherFields.map(([key, label, helper]) => (
               <div key={key}>
-                <p className="mb-2 text-sm font-semibold uppercase tracking-[0.18em] text-[#6f7f99]">
+                <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
                   {label}
                 </p>
                 {helper && (
@@ -94,11 +94,11 @@ export default function DnaConteudoPresentation({ data }: { data: unknown }) {
 
       {/* Big Idea — after Fundamentos, before Ideias secundárias */}
       {bigIdea && (
-        <section className="rounded-[2rem] border border-[#c79e40]/20 bg-[#c79e40]/10 p-8 shadow-sm lg:p-12">
-          <p className="mb-6 text-base font-semibold uppercase tracking-[0.26em] text-[#6f7f99]">
+        <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
+          <p className="mb-3 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
             Big Idea do Conteúdo
           </p>
-          <p className="text-lg leading-relaxed text-slate-900 md:text-xl">
+          <p className="whitespace-pre-wrap text-base leading-7 text-slate-800 md:text-lg">
             {bigIdea}
           </p>
         </section>
@@ -107,7 +107,7 @@ export default function DnaConteudoPresentation({ data }: { data: unknown }) {
       {/* Ideias secundárias */}
       {secondaryIdeas.length > 0 && (
         <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
-          <h3 className="mb-8 text-xl font-semibold tracking-tight text-slate-950 md:text-2xl">
+          <h3 className="mb-6 text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl">
             Ideias secundárias
           </h3>
           <ul className="space-y-3">

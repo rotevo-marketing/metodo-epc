@@ -27,7 +27,7 @@ function Field({ label, value }: { label: string; value: string }) {
   if (!value?.trim()) return null;
   return (
     <div>
-      <p className="mb-6 mt-12 text-base font-semibold uppercase tracking-[0.26em] text-[#6f7f99]">
+      <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
         {label}
       </p>
       <p className="whitespace-pre-wrap text-base leading-8 text-slate-700">{value}</p>
@@ -82,10 +82,10 @@ export default function EmpresaPresentation({ data }: { data: unknown }) {
       {/* Primary fields */}
       {primaryFields.length > 0 && (
         <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
-          <h3 className="mb-8 text-3xl font-light tracking-[-0.04em] text-slate-950">
+          <h3 className="mb-6 text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl">
             Sobre a empresa
           </h3>
-          <div className="space-y-8">
+          <div className="space-y-6">
             {primaryFields.map(([key, label]) => (
               <Field key={key} label={label} value={fields[key] ?? ""} />
             ))}
@@ -96,10 +96,10 @@ export default function EmpresaPresentation({ data }: { data: unknown }) {
       {/* Strategic fields */}
       {stratFields.length > 0 && (
         <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
-          <h3 className="mb-8 text-3xl font-light tracking-[-0.04em] text-slate-950">
+          <h3 className="mb-6 text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl">
             Fundamentos estratégicos
           </h3>
-          <div className="space-y-8">
+          <div className="space-y-6">
             {stratFields.map(([key, label]) => (
               <Field key={key} label={label} value={fields[key] ?? ""} />
             ))}

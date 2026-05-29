@@ -65,14 +65,18 @@ function ToneBar({
 
       <div className="flex flex-1 items-center justify-between gap-1">
         {[0, 1, 2, 3, 4, 5, 6].map((i) => {
-          const isSelected =
-            (isLeft && i === 0) || (isRight && i === 6);
+          const isSelected = (isLeft && i === 0) || (isRight && i === 6);
+          const isEndPoint = i === 0 || i === 6;
           return (
             <div
               key={i}
-              className={`rounded-full transition ${
-                i === 0 || i === 6
-                  ? `h-4 w-4 ${isSelected ? "bg-slate-950" : "bg-slate-200"}`
+              className={`rounded-full transition-all ${
+                isEndPoint
+                  ? `h-4 w-4 ${
+                      isSelected
+                        ? "bg-[#c79e40] ring-4 ring-[#c79e40]/20"
+                        : "bg-slate-200"
+                    }`
                   : `h-2 w-2 ${hasValue ? "bg-slate-200" : "bg-slate-200"}`
               }`}
             />
@@ -85,6 +89,28 @@ function ToneBar({
       >
         {right}
       </span>
+    </div>
+  );
+}
+
+function VocabChips({ text }: { text: string }) {
+  const items = text
+    .split(/[,\n]/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  if (!items.length) return null;
+
+  return (
+    <div className="flex flex-wrap gap-2">
+      {items.map((item, i) => (
+        <span
+          key={i}
+          className="rounded-full border border-slate-200 bg-white px-3 py-1 text-sm text-slate-700"
+        >
+          {item}
+        </span>
+      ))}
     </div>
   );
 }
@@ -132,10 +158,10 @@ export default function TomDeVozPresentation({ data }: { data: unknown }) {
       {/* Characteristics */}
       {characteristics.length > 0 && (
         <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
-          <h3 className="mb-8 text-3xl font-light tracking-[-0.04em] text-slate-950">
+          <h3 className="mb-6 text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl">
             Características do tom
           </h3>
-          <div className="space-y-6">
+          <div className="space-y-4">
             {characteristics.map((c, i) => (
               <div
                 key={i}
@@ -158,7 +184,7 @@ export default function TomDeVozPresentation({ data }: { data: unknown }) {
       {/* Tone choices */}
       {filledTones.length > 0 && (
         <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
-          <h3 className="mb-8 text-3xl font-light tracking-[-0.04em] text-slate-950">
+          <h3 className="mb-6 text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl">
             Posicionamento de tom
           </h3>
           <div className="space-y-5">
@@ -181,7 +207,7 @@ export default function TomDeVozPresentation({ data }: { data: unknown }) {
       {/* Emotions */}
       {emotions.length > 0 && (
         <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
-          <h3 className="mb-6 text-3xl font-light tracking-[-0.04em] text-slate-950">
+          <h3 className="mb-6 text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl">
             Emoções transmitidas
           </h3>
           <div className="flex flex-wrap gap-2">
@@ -200,18 +226,19 @@ export default function TomDeVozPresentation({ data }: { data: unknown }) {
       {/* Vocabulary */}
       {filledVocabulary.length > 0 && (
         <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
-          <h3 className="mb-8 text-3xl font-light tracking-[-0.04em] text-slate-950">
+          <h3 className="mb-6 text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl">
             Vocabulário da marca
           </h3>
-          <div className="space-y-8">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-6">
             {filledVocabulary.map(([key, label]) => (
-              <div key={key}>
-                <p className="mb-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+              <div
+                key={key}
+                className="rounded-2xl border border-slate-200 bg-slate-50/60 p-5 md:p-6"
+              >
+                <p className="mb-4 text-sm font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
                   {label}
                 </p>
-                <p className="whitespace-pre-wrap text-base leading-8 text-slate-700">
-                  {vocabulary[key]}
-                </p>
+                <VocabChips text={vocabulary[key]} />
               </div>
             ))}
           </div>
@@ -221,10 +248,10 @@ export default function TomDeVozPresentation({ data }: { data: unknown }) {
       {/* Observations */}
       {observations && (
         <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
-          <h3 className="mb-5 text-3xl font-light tracking-[-0.04em] text-slate-950">
+          <h3 className="mb-5 text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl">
             Observações
           </h3>
-          <p className="whitespace-pre-wrap text-base leading-8 text-slate-700">
+          <p className="whitespace-pre-wrap text-base leading-7 text-slate-700">
             {observations}
           </p>
         </section>
@@ -233,7 +260,7 @@ export default function TomDeVozPresentation({ data }: { data: unknown }) {
       {/* References */}
       {references.length > 0 && (
         <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
-          <h3 className="mb-8 text-3xl font-light tracking-[-0.04em] text-slate-950">
+          <h3 className="mb-6 text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl">
             Referências de tom
           </h3>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
