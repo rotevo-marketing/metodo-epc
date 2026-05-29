@@ -108,7 +108,7 @@ export function FieldBlock({ label, value }: { label: string; value: string }) {
   if (!value?.trim()) return null;
   return (
     <div>
-      <p className="mb-3 text-base font-semibold uppercase tracking-[0.22em] text-slate-400">
+      <p className="mb-6 mt-12 text-base font-semibold uppercase tracking-[0.26em] text-[#6f7f99]">
         {label}
       </p>
       <p className="whitespace-pre-wrap text-sm leading-7 text-slate-700">{value}</p>
