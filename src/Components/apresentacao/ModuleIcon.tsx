@@ -44,15 +44,21 @@ export function ModuleIcon({
   size = "sm",
   inverted = false,
   hoverInvert = false,
+  hoverDarken = false,
 }: {
   slug: string;
   size?: "sm" | "lg";
   inverted?: boolean;
   hoverInvert?: boolean;
+  hoverDarken?: boolean;
 }) {
   const sizeClass = size === "lg" ? "h-10 w-10" : "h-5 w-5";
   const invertedClass = inverted ? "brightness-0 invert" : "";
-  const hoverClass = hoverInvert ? "group-hover:brightness-0 group-hover:invert" : "";
+  const hoverClass = hoverInvert
+    ? "group-hover:brightness-0 group-hover:invert"
+    : hoverDarken
+    ? "group-hover:brightness-0"
+    : "";
 
   return (
     <img

@@ -378,8 +378,8 @@ function OverviewMode({
                       className="group min-h-[150px] cursor-pointer rounded-[1.5rem] bg-white p-6 text-left shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-950/5 hover:ring-slate-300"
                     >
                       <div className="flex gap-5">
-                        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-slate-100 ring-1 ring-slate-200 transition group-hover:bg-slate-950">
-                          <ModuleIcon slug={section.slug} hoverInvert />
+                        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-[#c79e40]/20 bg-[#c79e40]/10 transition-colors group-hover:border-[#c79e40] group-hover:bg-[#c79e40]">
+                          <ModuleIcon slug={section.slug} hoverDarken />
                         </div>
 
                         <div className="flex-1">
