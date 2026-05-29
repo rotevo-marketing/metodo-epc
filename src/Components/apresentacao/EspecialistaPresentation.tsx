@@ -1,4 +1,5 @@
 import { ModuleIcon } from "./ModuleIcon";
+import { sanitizeHtml, isHtmlContent } from "@/lib/renderHtml";
 
 type SpecialistCharacteristic = { title: string; description: string };
 
@@ -26,12 +27,23 @@ const fieldLabels: [string, string][] = [
 
 function Field({ label, value }: { label: string; value: string }) {
   if (!value?.trim()) return null;
+  const isHtml = isHtmlContent(value);
+
   return (
-    <div>
-      <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+    <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-6 md:p-7">
+      <p className="mb-4 text-sm font-bold uppercase tracking-[0.18em] text-[#5f6f8a]">
         {label}
       </p>
-      <p className="whitespace-pre-wrap text-base leading-8 text-slate-700">{value}</p>
+      {isHtml ? (
+        <div
+          className="text-base leading-7 text-slate-800 [&_a]:text-[#c79e40] [&_a]:underline [&_em]:italic [&_li]:my-1 [&_mark]:bg-yellow-100 [&_mark]:px-0.5 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:my-2 [&_s]:line-through [&_strong]:font-semibold [&_u]:underline [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-5"
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(value) }}
+        />
+      ) : (
+        <p className="whitespace-pre-wrap text-base leading-7 text-slate-800">
+          {value}
+        </p>
+      )}
     </div>
   );
 }
@@ -60,9 +72,9 @@ export default function EspecialistaPresentation({ data }: { data: unknown }) {
   const filledFields = fieldLabels.filter(([k]) => fields[k]?.trim());
 
   return (
-    <article className="space-y-6">
-      {/* Header */}
-      <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
+    <article className="space-y-4">
+      {/* Header — integrated, no card border */}
+      <div className="p-6 lg:p-8">
         <div className="flex items-center gap-5">
           <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-slate-950">
             <ModuleIcon slug="dna-do-especialista" size="lg" inverted />
@@ -76,12 +88,7 @@ export default function EspecialistaPresentation({ data }: { data: unknown }) {
             </h2>
           </div>
         </div>
-
-        <p className="mt-6 max-w-2xl text-base leading-8 text-slate-600">
-          O DNA do especialista que sustenta a comunicação: quem é, o que faz,
-          sua trajetória, valores, propósito e como deseja ser percebido.
-        </p>
-      </section>
+      </div>
 
       {/* Photo standalone — only when no characteristics */}
       {photo && characteristics.length === 0 && (
@@ -97,13 +104,13 @@ export default function EspecialistaPresentation({ data }: { data: unknown }) {
         </section>
       )}
 
-      {/* Fields */}
+      {/* Fields — each in its own card */}
       {filledFields.length > 0 && (
         <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
           <h3 className="mb-6 text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl">
             Sobre o especialista
           </h3>
-          <div className="space-y-6">
+          <div className="space-y-4">
             {filledFields.map(([key, label]) => (
               <Field key={key} label={label} value={fields[key] ?? ""} />
             ))}
@@ -114,19 +121,15 @@ export default function EspecialistaPresentation({ data }: { data: unknown }) {
       {/* Personalidade do especialista — grid layout */}
       {characteristics.length > 0 && (
         <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
-          {/* Section header */}
           <p className="mb-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
             Personalidade do especialista
           </p>
 
           {/* Desktop: cross grid */}
           <div className="hidden md:grid md:grid-cols-3 md:items-center md:gap-8">
-            {/* Row 1 */}
             <div />
             <div>{characteristics[0] && <CharCard c={characteristics[0]} />}</div>
             <div />
-
-            {/* Row 2 */}
             <div>
               {characteristics[1] ? <CharCard c={characteristics[1]} /> : <div />}
             </div>
@@ -144,8 +147,6 @@ export default function EspecialistaPresentation({ data }: { data: unknown }) {
             <div>
               {characteristics[2] ? <CharCard c={characteristics[2]} /> : <div />}
             </div>
-
-            {/* Row 3 */}
             <div />
             <div>{characteristics[3] ? <CharCard c={characteristics[3]} /> : <div />}</div>
             <div />
@@ -169,7 +170,6 @@ export default function EspecialistaPresentation({ data }: { data: unknown }) {
             </div>
           </div>
 
-          {/* Extra characteristics beyond 4 */}
           {characteristics.length > 4 && (
             <div className="mt-8 grid gap-4 sm:grid-cols-2">
               {characteristics.slice(4).map((c, i) => (

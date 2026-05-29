@@ -1,4 +1,5 @@
 import { ModuleIcon } from "./ModuleIcon";
+import { sanitizeHtml, isHtmlContent } from "@/lib/renderHtml";
 
 type ContentDnaData = {
   fields: Record<string, string>;
@@ -9,28 +10,34 @@ function isContentDnaData(v: unknown): v is ContentDnaData {
   return typeof v === "object" && v !== null && "fields" in v;
 }
 
-const fieldLabels: [string, string, string][] = [
-  [
-    "posicionamentoUnico",
-    "Posicionamento único",
-    "É a forma como o seu cliente quer ser visto pelo mercado.",
-  ],
-  [
-    "propostaUnicaValor",
-    "Proposta única de valor",
-    "É o valor mais peculiar do negócio que está emitindo o conteúdo.",
-  ],
-  [
-    "maiorTransformacao",
-    "Maior transformação que o conteúdo entrega",
-    "É a grande diferença do conteúdo, o que ele torna único e inigualável na mente dos consumidores.",
-  ],
-  [
-    "bigIdea",
-    "A Big Idea do conteúdo",
-    "É a ideia genial, a ideia master, que vai nortear todas as produções desse conteúdo.",
-  ],
+const fieldLabels: [string, string][] = [
+  ["posicionamentoUnico", "Posicionamento único"],
+  ["propostaUnicaValor", "Proposta única de valor"],
+  ["maiorTransformacao", "Maior transformação que o conteúdo entrega"],
 ];
+
+function Field({ label, value }: { label: string; value: string }) {
+  if (!value?.trim()) return null;
+  const isHtml = isHtmlContent(value);
+
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-6 md:p-7">
+      <p className="mb-4 text-sm font-bold uppercase tracking-[0.18em] text-[#5f6f8a]">
+        {label}
+      </p>
+      {isHtml ? (
+        <div
+          className="text-base leading-7 text-slate-800 [&_a]:text-[#c79e40] [&_a]:underline [&_em]:italic [&_li]:my-1 [&_mark]:bg-yellow-100 [&_mark]:px-0.5 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:my-2 [&_s]:line-through [&_strong]:font-semibold [&_u]:underline [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-5"
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(value) }}
+        />
+      ) : (
+        <p className="whitespace-pre-wrap text-base leading-7 text-slate-800">
+          {value}
+        </p>
+      )}
+    </div>
+  );
+}
 
 export default function DnaConteudoPresentation({ data }: { data: unknown }) {
   const d = isContentDnaData(data) ? data : null;
@@ -38,14 +45,12 @@ export default function DnaConteudoPresentation({ data }: { data: unknown }) {
   const secondaryIdeas = (d?.secondaryIdeas ?? []).filter((s) => s?.trim());
 
   const bigIdea = fields["bigIdea"]?.trim();
-  const otherFields = fieldLabels.filter(
-    ([k]) => k !== "bigIdea" && fields[k]?.trim()
-  );
+  const otherFields = fieldLabels.filter(([k]) => fields[k]?.trim());
 
   return (
-    <article className="space-y-6">
-      {/* Header */}
-      <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
+    <article className="space-y-4">
+      {/* Header — integrated, no card border */}
+      <div className="p-6 lg:p-8">
         <div className="flex items-center gap-5">
           <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-slate-950">
             <ModuleIcon slug="dna-de-conteudo" size="lg" inverted />
@@ -59,48 +64,26 @@ export default function DnaConteudoPresentation({ data }: { data: unknown }) {
             </h2>
           </div>
         </div>
+      </div>
 
-        <p className="mt-6 max-w-2xl text-base leading-8 text-slate-600">
-          O núcleo que orienta toda a produção de conteúdo: posicionamento,
-          proposta de valor, transformação entregue e a Big Idea que norteia
-          a comunicação.
-        </p>
-      </section>
-
-      {/* Fundamentos do DNA */}
+      {/* Fundamentos */}
       {otherFields.length > 0 && (
         <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
           <h3 className="mb-6 text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl">
             Fundamentos do DNA
           </h3>
-
-          <div className="space-y-6">
-            {otherFields.map(([key, label, helper]) => (
-              <div key={key}>
-                <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
-                  {label}
-                </p>
-                {helper && (
-                  <p className="mb-3 text-sm text-slate-500">{helper}</p>
-                )}
-                <p className="whitespace-pre-wrap text-base leading-8 text-slate-700 md:text-lg">
-                  {fields[key]}
-                </p>
-              </div>
+          <div className="space-y-4">
+            {otherFields.map(([key, label]) => (
+              <Field key={key} label={label} value={fields[key] ?? ""} />
             ))}
           </div>
         </section>
       )}
 
-      {/* Big Idea — after Fundamentos, before Ideias secundárias */}
+      {/* Big Idea */}
       {bigIdea && (
         <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
-          <p className="mb-3 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
-            Big Idea do Conteúdo
-          </p>
-          <p className="whitespace-pre-wrap text-base leading-7 text-slate-800 md:text-lg">
-            {bigIdea}
-          </p>
+          <Field label="Big Idea do Conteúdo" value={bigIdea} />
         </section>
       )}
 

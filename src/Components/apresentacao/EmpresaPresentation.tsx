@@ -1,4 +1,5 @@
 import { ModuleIcon } from "./ModuleIcon";
+import { sanitizeHtml, isHtmlContent } from "@/lib/renderHtml";
 
 type CompanyData = { fields: Record<string, string> };
 
@@ -23,18 +24,6 @@ const fieldLabels: [string, string][] = [
   ["percepcaoDesejada", "Percepção desejada"],
 ];
 
-function Field({ label, value }: { label: string; value: string }) {
-  if (!value?.trim()) return null;
-  return (
-    <div>
-      <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
-        {label}
-      </p>
-      <p className="whitespace-pre-wrap text-base leading-8 text-slate-700">{value}</p>
-    </div>
-  );
-}
-
 const strategicKeys = [
   "missao",
   "visao",
@@ -43,6 +32,29 @@ const strategicKeys = [
   "propostaDeValor",
   "percepcaoDesejada",
 ];
+
+function Field({ label, value }: { label: string; value: string }) {
+  if (!value?.trim()) return null;
+  const isHtml = isHtmlContent(value);
+
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-6 md:p-7">
+      <p className="mb-4 text-sm font-bold uppercase tracking-[0.18em] text-[#5f6f8a]">
+        {label}
+      </p>
+      {isHtml ? (
+        <div
+          className="text-base leading-7 text-slate-800 [&_a]:text-[#c79e40] [&_a]:underline [&_em]:italic [&_li]:my-1 [&_mark]:bg-yellow-100 [&_mark]:px-0.5 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:my-2 [&_s]:line-through [&_strong]:font-semibold [&_u]:underline [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-5"
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(value) }}
+        />
+      ) : (
+        <p className="whitespace-pre-wrap text-base leading-7 text-slate-800">
+          {value}
+        </p>
+      )}
+    </div>
+  );
+}
 
 export default function EmpresaPresentation({ data }: { data: unknown }) {
   const d = isCompanyData(data) ? data : null;
@@ -56,9 +68,9 @@ export default function EmpresaPresentation({ data }: { data: unknown }) {
   );
 
   return (
-    <article className="space-y-6">
-      {/* Header */}
-      <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
+    <article className="space-y-4">
+      {/* Header — integrated, no card border */}
+      <div className="p-6 lg:p-8">
         <div className="flex items-center gap-5">
           <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-slate-950">
             <ModuleIcon slug="dna-da-empresa" size="lg" inverted />
@@ -72,20 +84,14 @@ export default function EmpresaPresentation({ data }: { data: unknown }) {
             </h2>
           </div>
         </div>
+      </div>
 
-        <p className="mt-6 max-w-2xl text-base leading-8 text-slate-600">
-          A identidade profunda da empresa: o que é, o que entrega, para quem
-          serve, como se posiciona e qual transformação promove.
-        </p>
-      </section>
-
-      {/* Primary fields */}
       {primaryFields.length > 0 && (
         <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
           <h3 className="mb-6 text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl">
             Sobre a empresa
           </h3>
-          <div className="space-y-6">
+          <div className="space-y-4">
             {primaryFields.map(([key, label]) => (
               <Field key={key} label={label} value={fields[key] ?? ""} />
             ))}
@@ -93,13 +99,12 @@ export default function EmpresaPresentation({ data }: { data: unknown }) {
         </section>
       )}
 
-      {/* Strategic fields */}
       {stratFields.length > 0 && (
         <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
           <h3 className="mb-6 text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl">
             Fundamentos estratégicos
           </h3>
-          <div className="space-y-6">
+          <div className="space-y-4">
             {stratFields.map(([key, label]) => (
               <Field key={key} label={label} value={fields[key] ?? ""} />
             ))}

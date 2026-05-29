@@ -55,10 +55,6 @@ export default function CanaisDigitaisPresentation({ data }: { data: unknown }) 
             </h2>
           </div>
         </div>
-        <p className="mt-6 max-w-2xl text-base leading-8 text-slate-600">
-          Mapeamento dos canais digitais em uso, sua função atual no projeto e
-          o papel estratégico de cada plataforma.
-        </p>
       </section>
 
       {/* Channels */}

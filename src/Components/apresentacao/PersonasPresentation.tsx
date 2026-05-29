@@ -92,10 +92,6 @@ export default function PersonasPresentation({ data }: { data: unknown }) {
             </h2>
           </div>
         </div>
-        <p className="mt-6 max-w-2xl text-base leading-8 text-slate-600">
-          Perfis estratégicos do público: quem são, o que buscam, quais desafios
-          enfrentam e como chegam até a solução.
-        </p>
       </section>
 
       {/* Personas */}

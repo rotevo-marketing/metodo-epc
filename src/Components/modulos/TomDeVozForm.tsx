@@ -132,6 +132,73 @@ const emotionOptions = [
   "Tranquilidade",
 ];
 
+function VocabularyListField({
+  label,
+  value,
+  onChange,
+  addLabel = "+ Novo item",
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  addLabel?: string;
+}) {
+  const items = value
+    ? value.split("\n").filter((s) => s.trim())
+    : [];
+  const displayItems = items.length > 0 ? items : [""];
+
+  function updateItem(index: number, newVal: string) {
+    const next = [...displayItems];
+    next[index] = newVal;
+    onChange(next.join("\n"));
+  }
+
+  function addItem() {
+    onChange([...displayItems.filter(Boolean), ""].join("\n"));
+  }
+
+  function removeItem(index: number) {
+    const next = displayItems.filter((_, i) => i !== index);
+    onChange((next.length ? next : [""]).join("\n"));
+  }
+
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-5">
+      <p className="mb-3 text-sm font-semibold text-slate-800">{label}</p>
+      <div className="space-y-2">
+        {displayItems.map((item, i) => (
+          <div key={i} className="flex items-center gap-2">
+            <input
+              type="text"
+              value={item}
+              onChange={(e) => updateItem(i, e.target.value)}
+              placeholder={i === 0 ? "Adicionar item..." : "Mais um item..."}
+              className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm leading-6 outline-none transition placeholder:text-slate-400 focus:border-[#c79e40]/60 focus:ring-2 focus:ring-[#c79e40]/10"
+            />
+            {displayItems.length > 1 && (
+              <button
+                type="button"
+                onClick={() => removeItem(i)}
+                className="shrink-0 text-sm text-red-400 transition hover:text-red-600"
+              >
+                Remover
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+      <button
+        type="button"
+        onClick={addItem}
+        className="mt-3 cursor-pointer rounded-full border border-[#c79e40]/20 bg-[#c79e40]/10 px-4 py-1.5 text-sm font-semibold text-[#c79e40] transition-colors hover:border-[#c79e40] hover:bg-[#c79e40] hover:text-black"
+      >
+        {addLabel}
+      </button>
+    </div>
+  );
+}
+
 function SectionCard({
   title,
   description,
@@ -462,21 +529,13 @@ export default function TomDeVozForm({
       >
         <div className="grid gap-4 md:grid-cols-2">
           {vocabularyFields.map((field) => (
-            <div key={field.key}>
-              <label className="mb-2 block text-sm font-semibold text-slate-600">
-                {field.label}
-              </label>
-
-              <textarea
-                rows={5}
-                value={data.vocabulary[field.key] || ""}
-                onChange={(event) =>
-                  updateVocabulary(field.key, event.target.value)
-                }
-                placeholder={field.placeholder}
-                className="w-full resize-none rounded-2xl border border-slate-200 px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
-              />
-            </div>
+            <VocabularyListField
+              key={field.key}
+              label={field.label}
+              value={data.vocabulary[field.key] || ""}
+              onChange={(value) => updateVocabulary(field.key, value)}
+              addLabel={`+ Novo item`}
+            />
           ))}
         </div>
       </SectionCard>

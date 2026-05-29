@@ -33,10 +33,6 @@ export default function PalavrasChavePresentation({ data }: { data: unknown }) {
             </h2>
           </div>
         </div>
-        <p className="mt-6 max-w-2xl text-base leading-8 text-slate-600">
-          Termos estratégicos que orientam o SEO, a produção de conteúdo e a
-          busca orgânica do projeto.
-        </p>
       </section>
 
       {/* Keywords table */}

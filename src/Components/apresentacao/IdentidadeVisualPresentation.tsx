@@ -66,11 +66,6 @@ export default function IdentidadeVisualPresentation({ data }: { data: unknown }
             </h2>
           </div>
         </div>
-
-        <p className="mt-6 max-w-2xl text-base leading-8 text-slate-600">
-          A direção estética da marca: paleta de cores, tipografia, elementos
-          visuais e referências que constroem a percepção desejada.
-        </p>
       </section>
 
       {/* Colors */}

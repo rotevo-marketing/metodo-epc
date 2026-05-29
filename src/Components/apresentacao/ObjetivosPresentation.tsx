@@ -88,10 +88,6 @@ export default function ObjetivosPresentation({ data }: { data: unknown }) {
             </h2>
           </div>
         </div>
-        <p className="mt-6 max-w-2xl text-base leading-8 text-slate-600">
-          As metas centrais do projeto, prioridades estratégicas, indicadores de
-          sucesso, resultados esperados e fases de execução.
-        </p>
       </section>
 
       {/* Main objective */}

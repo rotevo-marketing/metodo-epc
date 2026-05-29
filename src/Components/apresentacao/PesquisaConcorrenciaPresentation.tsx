@@ -58,10 +58,6 @@ export default function PesquisaConcorrenciaPresentation({
             </h2>
           </div>
         </div>
-        <p className="mt-6 max-w-2xl text-base leading-8 text-slate-600">
-          Análise detalhada dos concorrentes: posicionamento, público, canais,
-          conteúdo, pontos fortes e lacunas que o projeto pode ocupar.
-        </p>
       </section>
 
       {/* Competitors */}

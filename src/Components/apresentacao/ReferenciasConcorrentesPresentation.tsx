@@ -59,10 +59,6 @@ export default function ReferenciasConcorrentesPresentation({
             </h2>
           </div>
         </div>
-        <p className="mt-6 max-w-2xl text-base leading-8 text-slate-600">
-          Referências estratégicas e concorrentes mapeados: presença nos canais,
-          posicionamento e análises que orientam as decisões do projeto.
-        </p>
       </section>
 
       {/* Items */}

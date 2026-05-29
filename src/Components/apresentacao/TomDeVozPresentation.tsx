@@ -51,8 +51,8 @@ function ToneBar({
   right: string;
   value: string | undefined;
 }) {
-  const isLeft = value === "left";
-  const isRight = value === "right";
+  const isLeft = value === left;
+  const isRight = value === right;
   const hasValue = isLeft || isRight;
 
   return (
@@ -148,11 +148,6 @@ export default function TomDeVozPresentation({ data }: { data: unknown }) {
             </h2>
           </div>
         </div>
-
-        <p className="mt-6 max-w-2xl text-base leading-8 text-slate-600">
-          A personalidade sonora da marca: como ela fala, quais emoções transmite,
-          que vocabulário usa e como se posiciona no espectro de cada característica.
-        </p>
       </section>
 
       {/* Characteristics */}

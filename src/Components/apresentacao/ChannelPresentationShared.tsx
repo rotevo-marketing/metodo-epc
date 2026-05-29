@@ -179,7 +179,6 @@ export function ModuleHeader({
           <h2 className="mt-2 text-5xl font-light tracking-[-0.05em] text-slate-950">{title}</h2>
         </div>
       </div>
-      <p className="mt-6 max-w-2xl text-base leading-8 text-slate-600">{description}</p>
     </section>
   );
 }

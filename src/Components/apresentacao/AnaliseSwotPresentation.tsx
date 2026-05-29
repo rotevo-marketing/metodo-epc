@@ -60,10 +60,6 @@ export default function AnaliseSwotPresentation({ data }: { data: unknown }) {
             </h2>
           </div>
         </div>
-        <p className="mt-6 max-w-2xl text-base leading-8 text-slate-600">
-          Diagnóstico estratégico do projeto: forças, fraquezas, oportunidades
-          e ameaças que orientam as decisões de posicionamento e execução.
-        </p>
       </section>
 
       {/* SWOT grid */}

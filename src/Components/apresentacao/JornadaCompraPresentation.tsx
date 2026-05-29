@@ -109,11 +109,6 @@ export default function JornadaCompraPresentation({ data }: { data: unknown }) {
             </h2>
           </div>
         </div>
-        <p className="mt-6 max-w-2xl text-base leading-8 text-slate-600">
-          O caminho percorrido pelo público desde o primeiro contato até a
-          decisão de compra, com conteúdo, canais e pontos de virada para cada
-          etapa.
-        </p>
       </section>
 
       {/* Overview */}

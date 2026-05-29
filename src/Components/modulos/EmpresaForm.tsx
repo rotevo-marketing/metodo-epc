@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { Dispatch, SetStateAction } from "react";
+import RichTextEditor from "@/Components/RichTextEditor";
 
 export type CompanyData = {
   fields: Record<string, string>;
@@ -103,25 +104,18 @@ function TextAreaCard({
   placeholder,
   value,
   onChange,
-  rows = 5,
 }: {
   label: string;
   placeholder: string;
   value: string;
   onChange: (value: string) => void;
-  rows?: number;
 }) {
   return (
     <section className="rounded-[1.5rem] bg-white p-6 shadow-sm ring-1 ring-slate-200">
       <label className="text-sm font-semibold text-slate-950">{label}</label>
-
-      <textarea
-        rows={rows}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        placeholder={placeholder}
-        className="mt-4 w-full resize-none rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm leading-7 text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
-      />
+      <div className="mt-4">
+        <RichTextEditor value={value} onChange={onChange} placeholder={placeholder} />
+      </div>
     </section>
   );
 }
