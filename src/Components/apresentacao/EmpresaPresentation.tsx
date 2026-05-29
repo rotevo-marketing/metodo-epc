@@ -27,9 +27,9 @@ function Field({ label, value }: { label: string; value: string }) {
   if (!value?.trim()) return null;
   return (
     <div>
-      <h4 className="mb-2 text-base font-semibold tracking-tight text-slate-950 md:text-lg">
+      <p className="mb-3 text-base font-semibold uppercase tracking-[0.22em] text-slate-400">
         {label}
-      </h4>
+      </p>
       <p className="whitespace-pre-wrap text-base leading-8 text-slate-700">{value}</p>
     </div>
   );

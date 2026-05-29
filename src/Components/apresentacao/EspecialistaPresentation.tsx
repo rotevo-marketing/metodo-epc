@@ -28,9 +28,9 @@ function Field({ label, value }: { label: string; value: string }) {
   if (!value?.trim()) return null;
   return (
     <div>
-      <h4 className="mb-2 text-base font-semibold tracking-tight text-slate-950 md:text-lg">
+      <p className="mb-3 text-base font-semibold uppercase tracking-[0.22em] text-slate-400">
         {label}
-      </h4>
+      </p>
       <p className="whitespace-pre-wrap text-base leading-8 text-slate-700">{value}</p>
     </div>
   );
@@ -115,14 +115,9 @@ export default function EspecialistaPresentation({ data }: { data: unknown }) {
       {characteristics.length > 0 && (
         <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
           {/* Section header */}
-          <div className="mb-10 flex items-center gap-4">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#9f4542]">
-              <ModuleIcon slug="dna-do-especialista" size="lg" inverted />
-            </div>
-            <h3 className="text-2xl font-semibold uppercase tracking-wide text-[#9f4542] md:text-3xl">
-              Personalidade do especialista
-            </h3>
-          </div>
+          <p className="mb-10 text-base font-semibold uppercase tracking-[0.22em] text-slate-400">
+            Personalidade do especialista
+          </p>
 
           {/* Desktop: cross grid */}
           <div className="hidden md:grid md:grid-cols-3 md:items-center md:gap-8">

@@ -379,7 +379,7 @@ function OverviewMode({
                     >
                       <div className="flex gap-5">
                         <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-[#c79e40]/20 bg-[#c79e40]/10 transition-colors group-hover:border-[#c79e40] group-hover:bg-[#c79e40]">
-                          <ModuleIcon slug={section.slug} hoverDarken />
+                          <ModuleIcon slug={section.slug} hoverInvert />
                         </div>
 
                         <div className="flex-1">
