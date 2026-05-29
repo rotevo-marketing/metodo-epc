@@ -28,10 +28,23 @@ function Field({ label, value }: { label: string; value: string }) {
   if (!value?.trim()) return null;
   return (
     <div>
-      <p className="mb-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+      <h4 className="mb-2 text-base font-semibold tracking-tight text-slate-950 md:text-lg">
         {label}
-      </p>
+      </h4>
       <p className="whitespace-pre-wrap text-base leading-8 text-slate-700">{value}</p>
+    </div>
+  );
+}
+
+function CharCard({ c }: { c: SpecialistCharacteristic }) {
+  return (
+    <div className="rounded-2xl border border-slate-100 bg-slate-50 p-5 text-center">
+      {c.title && (
+        <p className="text-base font-semibold text-slate-950">{c.title}</p>
+      )}
+      {c.description && (
+        <p className="mt-2 text-sm leading-relaxed text-slate-700">{c.description}</p>
+      )}
     </div>
   );
 }
@@ -70,8 +83,8 @@ export default function EspecialistaPresentation({ data }: { data: unknown }) {
         </p>
       </section>
 
-      {/* Photo */}
-      {photo && (
+      {/* Photo standalone — only when no characteristics */}
+      {photo && characteristics.length === 0 && (
         <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
           <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
             Foto do especialista
@@ -98,29 +111,77 @@ export default function EspecialistaPresentation({ data }: { data: unknown }) {
         </section>
       )}
 
-      {/* Characteristics */}
+      {/* Personalidade do especialista — grid layout */}
       {characteristics.length > 0 && (
         <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
-          <h3 className="mb-8 text-3xl font-light tracking-[-0.04em] text-slate-950">
-            Características marcantes
-          </h3>
-          <div className="space-y-6">
-            {characteristics.map((c, i) => (
-              <div
-                key={i}
-                className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200"
-              >
-                {c.title && (
-                  <p className="mb-2 text-sm font-semibold text-slate-950">
-                    {c.title}
-                  </p>
-                )}
-                {c.description && (
-                  <p className="text-sm leading-7 text-slate-600">{c.description}</p>
-                )}
-              </div>
-            ))}
+          {/* Section header */}
+          <div className="mb-10 flex items-center gap-4">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#9f4542]">
+              <ModuleIcon slug="dna-do-especialista" size="lg" inverted />
+            </div>
+            <h3 className="text-2xl font-semibold uppercase tracking-wide text-[#9f4542] md:text-3xl">
+              Personalidade do especialista
+            </h3>
           </div>
+
+          {/* Desktop: cross grid */}
+          <div className="hidden md:grid md:grid-cols-3 md:items-center md:gap-8">
+            {/* Row 1 */}
+            <div />
+            <div>{characteristics[0] && <CharCard c={characteristics[0]} />}</div>
+            <div />
+
+            {/* Row 2 */}
+            <div>
+              {characteristics[1] ? <CharCard c={characteristics[1]} /> : <div />}
+            </div>
+            <div className="flex justify-center">
+              {photo ? (
+                <img
+                  src={photo}
+                  alt="Especialista"
+                  className="h-40 w-40 rounded-full border-4 border-white object-cover shadow-md"
+                />
+              ) : (
+                <div className="h-40 w-40 rounded-full border-2 border-slate-200 bg-slate-100" />
+              )}
+            </div>
+            <div>
+              {characteristics[2] ? <CharCard c={characteristics[2]} /> : <div />}
+            </div>
+
+            {/* Row 3 */}
+            <div />
+            <div>{characteristics[3] ? <CharCard c={characteristics[3]} /> : <div />}</div>
+            <div />
+          </div>
+
+          {/* Mobile: stacked */}
+          <div className="md:hidden">
+            {photo && (
+              <div className="mb-8 flex justify-center">
+                <img
+                  src={photo}
+                  alt="Especialista"
+                  className="h-32 w-32 rounded-full border-4 border-white object-cover shadow-md"
+                />
+              </div>
+            )}
+            <div className="space-y-4">
+              {characteristics.slice(0, 4).map((c, i) => (
+                <CharCard key={i} c={c} />
+              ))}
+            </div>
+          </div>
+
+          {/* Extra characteristics beyond 4 */}
+          {characteristics.length > 4 && (
+            <div className="mt-8 grid gap-4 sm:grid-cols-2">
+              {characteristics.slice(4).map((c, i) => (
+                <CharCard key={i} c={c} />
+              ))}
+            </div>
+          )}
         </section>
       )}
 

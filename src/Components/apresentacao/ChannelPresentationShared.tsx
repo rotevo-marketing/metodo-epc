@@ -39,9 +39,9 @@ export function TextList({ items, label }: { items: TextItem[]; label: string })
   if (!filled.length) return null;
   return (
     <div>
-      <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+      <h4 className="mb-3 text-base font-semibold tracking-tight text-slate-950 md:text-lg">
         {label}
-      </p>
+      </h4>
       <ul className="space-y-2">
         {filled.map((item, i) => (
           <li key={i} className="flex items-start gap-3 text-sm leading-7 text-slate-700">
@@ -77,9 +77,9 @@ export function ExternalRefList({ refs, label = "Referências" }: { refs: ExtRef
   if (!filled.length) return null;
   return (
     <div>
-      <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+      <h4 className="mb-3 text-base font-semibold tracking-tight text-slate-950 md:text-lg">
         {label}
-      </p>
+      </h4>
       <ul className="space-y-3">
         {filled.map((ref, i) => (
           <li key={i} className="flex items-start gap-3">
@@ -108,9 +108,9 @@ export function FieldBlock({ label, value }: { label: string; value: string }) {
   if (!value?.trim()) return null;
   return (
     <div>
-      <p className="mb-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+      <h4 className="mb-2 text-base font-semibold tracking-tight text-slate-950 md:text-lg">
         {label}
-      </p>
+      </h4>
       <p className="whitespace-pre-wrap text-sm leading-7 text-slate-700">{value}</p>
     </div>
   );
