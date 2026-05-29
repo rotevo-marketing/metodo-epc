@@ -53,18 +53,27 @@ export function ModuleIcon({
   hoverDarken?: boolean;
 }) {
   const sizeClass = size === "lg" ? "h-10 w-10" : "h-5 w-5";
-  const invertedClass = inverted ? "brightness-0 invert" : "";
-  const hoverClass = hoverInvert
-    ? "group-hover:brightness-0 group-hover:invert"
+  const textClass = inverted ? "text-white" : "";
+  const hoverTextClass = hoverInvert
+    ? "group-hover:text-white"
     : hoverDarken
-    ? "group-hover:brightness-0"
+    ? "group-hover:text-black"
     : "";
+  const iconPath = getIconPath(slug);
 
   return (
-    <img
-      src={getIconPath(slug)}
-      alt=""
-      className={`object-contain transition ${sizeClass} ${invertedClass} ${hoverClass}`.trim()}
+    <div
+      style={{
+        maskImage: `url(${iconPath})`,
+        WebkitMaskImage: `url(${iconPath})`,
+        maskSize: "contain",
+        WebkitMaskSize: "contain",
+        maskRepeat: "no-repeat",
+        WebkitMaskRepeat: "no-repeat",
+        maskPosition: "center",
+        WebkitMaskPosition: "center",
+      }}
+      className={`bg-current transition-colors ${sizeClass} ${textClass} ${hoverTextClass}`.trim()}
     />
   );
 }
