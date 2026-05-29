@@ -67,35 +67,23 @@ export default function DnaConteudoPresentation({ data }: { data: unknown }) {
         </p>
       </section>
 
-      {/* Big Idea destaque */}
-      {bigIdea && (
-        <section className="rounded-[2rem] bg-slate-950 p-8 shadow-sm lg:p-12">
-          <p className="text-xs font-semibold uppercase tracking-[0.32em] text-white/50">
-            A Big Idea do conteúdo
-          </p>
-          <blockquote className="mt-6 text-3xl font-light leading-[1.4] tracking-[-0.03em] text-white lg:text-4xl">
-            &ldquo;{bigIdea}&rdquo;
-          </blockquote>
-        </section>
-      )}
-
-      {/* Other fields */}
+      {/* Fundamentos do DNA */}
       {otherFields.length > 0 && (
         <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
-          <h3 className="mb-8 text-3xl font-light tracking-[-0.04em] text-slate-950">
+          <h3 className="mb-8 text-xl font-semibold tracking-tight text-slate-950 md:text-2xl">
             Fundamentos do DNA
           </h3>
 
-          <div className="space-y-8">
+          <div className="space-y-10">
             {otherFields.map(([key, label, helper]) => (
               <div key={key}>
-                <p className="mb-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                <p className="mb-2 text-sm font-semibold uppercase tracking-[0.18em] text-[#6f7f99]">
                   {label}
                 </p>
                 {helper && (
-                  <p className="mb-2 text-sm text-slate-400">{helper}</p>
+                  <p className="mb-3 text-sm text-slate-500">{helper}</p>
                 )}
-                <p className="whitespace-pre-wrap text-base leading-8 text-slate-700">
+                <p className="whitespace-pre-wrap text-base leading-8 text-slate-700 md:text-lg">
                   {fields[key]}
                 </p>
               </div>
@@ -104,10 +92,22 @@ export default function DnaConteudoPresentation({ data }: { data: unknown }) {
         </section>
       )}
 
-      {/* Secondary ideas */}
+      {/* Big Idea — after Fundamentos, before Ideias secundárias */}
+      {bigIdea && (
+        <section className="rounded-[2rem] border border-[#c79e40]/20 bg-[#c79e40]/10 p-8 shadow-sm lg:p-12">
+          <p className="mb-6 text-base font-semibold uppercase tracking-[0.26em] text-[#6f7f99]">
+            Big Idea do Conteúdo
+          </p>
+          <p className="text-lg leading-relaxed text-slate-900 md:text-xl">
+            {bigIdea}
+          </p>
+        </section>
+      )}
+
+      {/* Ideias secundárias */}
       {secondaryIdeas.length > 0 && (
         <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
-          <h3 className="mb-8 text-3xl font-light tracking-[-0.04em] text-slate-950">
+          <h3 className="mb-8 text-xl font-semibold tracking-tight text-slate-950 md:text-2xl">
             Ideias secundárias
           </h3>
           <ul className="space-y-3">
@@ -116,7 +116,7 @@ export default function DnaConteudoPresentation({ data }: { data: unknown }) {
                 key={i}
                 className="flex items-start gap-3 text-base leading-7 text-slate-700"
               >
-                <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-slate-300" />
+                <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-[#c79e40]/50" />
                 {idea}
               </li>
             ))}
