@@ -6,6 +6,7 @@ import {
   EmptyState,
   ExtRef,
 } from "./ChannelPresentationShared";
+import { RichText } from "./RichText";
 
 type SiteMapPageItem = {
   title: string;
@@ -75,9 +76,7 @@ export default function MapaSitePresentation({ data }: { data: unknown }) {
                     <span className="font-medium text-slate-700">Objetivo:</span> {page.objective}
                   </p>
                 )}
-                {page.description && (
-                  <p className="mt-1 text-sm text-slate-600">{page.description}</p>
-                )}
+                <RichText content={page.description} className="mt-1 text-sm text-slate-600" />
                 {page.requiredSections && (
                   <p className="mt-1.5 text-xs text-slate-500">
                     <span className="font-medium text-slate-700">Seções obrigatórias:</span> {page.requiredSections}

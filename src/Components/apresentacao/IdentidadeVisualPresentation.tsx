@@ -1,4 +1,5 @@
 import { ModuleIcon } from "./ModuleIcon";
+import { RichText } from "./RichText";
 
 type ColorItem = { name: string; color: string; code: string };
 type VisualReference = { image: string };
@@ -110,9 +111,7 @@ export default function IdentidadeVisualPresentation({ data }: { data: unknown }
                 {helper && (
                   <p className="mb-2 text-sm text-slate-400">{helper}</p>
                 )}
-                <p className="whitespace-pre-wrap text-base leading-8 text-slate-700">
-                  {fields[key]}
-                </p>
+                <RichText content={fields[key]} className="text-base leading-8 text-slate-700" />
               </div>
             ))}
           </div>

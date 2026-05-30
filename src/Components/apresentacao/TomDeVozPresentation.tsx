@@ -1,4 +1,5 @@
 import { ModuleIcon } from "./ModuleIcon";
+import { RichText } from "./RichText";
 
 type CharacteristicItem = { title: string; description: string };
 type ReferenceItem = { image: string; title: string; link: string };
@@ -167,9 +168,7 @@ export default function TomDeVozPresentation({ data }: { data: unknown }) {
                     {c.title}
                   </p>
                 )}
-                {c.description && (
-                  <p className="text-sm leading-7 text-slate-600">{c.description}</p>
-                )}
+                <RichText content={c.description} className="text-sm leading-7 text-slate-600" />
               </div>
             ))}
           </div>
@@ -246,9 +245,7 @@ export default function TomDeVozPresentation({ data }: { data: unknown }) {
           <h3 className="mb-5 text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl">
             Observações
           </h3>
-          <p className="whitespace-pre-wrap text-base leading-7 text-slate-700">
-            {observations}
-          </p>
+          <RichText content={observations} className="text-base leading-7 text-slate-700" />
         </section>
       )}
 

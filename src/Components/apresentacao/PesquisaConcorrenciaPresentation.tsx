@@ -1,4 +1,5 @@
 import { ModuleIcon } from "./ModuleIcon";
+import { RichText } from "./RichText";
 
 type CompetitorAnalysisItem = {
   image: string;
@@ -114,9 +115,7 @@ export default function PesquisaConcorrenciaPresentation({
                     <p className="mb-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
                       {f.title}
                     </p>
-                    <p className="whitespace-pre-wrap text-sm leading-7 text-slate-700">
-                      {comp[f.key]}
-                    </p>
+                    <RichText content={comp[f.key] as string} className="text-sm leading-7 text-slate-700" />
                   </div>
                 ))}
               </div>

@@ -5,6 +5,7 @@ import {
   ModuleHeader,
   EmptyState,
 } from "./ChannelPresentationShared";
+import { RichText } from "./RichText";
 
 type AutomationTag = { name: string; description: string };
 type ChannelPriority = { flow: string; dominantChannel: string; supportChannel: string };
@@ -210,9 +211,7 @@ export default function FluxoAutomacaoPresentation({ data }: { data: unknown }) 
                     )}
                   </div>
 
-                  {flow.objective && (
-                    <p className="mt-3 text-sm leading-7 text-slate-600">{flow.objective}</p>
-                  )}
+                  <RichText content={flow.objective} className="mt-3 text-sm leading-7 text-slate-600" />
 
                   {(flow.entryTrigger || flow.advanceTrigger || flow.exitCondition) && (
                     <div className="mt-3 grid gap-3 md:grid-cols-3">

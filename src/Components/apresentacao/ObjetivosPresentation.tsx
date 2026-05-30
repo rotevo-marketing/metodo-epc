@@ -1,4 +1,5 @@
 import { ModuleIcon } from "./ModuleIcon";
+import { RichText } from "./RichText";
 
 type SimpleItem = { title: string; description: string };
 type PhaseItem = { title: string; period: string; description: string };
@@ -33,9 +34,7 @@ function ItemCard({ item, index }: { item: SimpleItem; index?: number }) {
       {item.title && (
         <p className="text-sm font-semibold text-slate-950">{item.title}</p>
       )}
-      {item.description && (
-        <p className="mt-1.5 text-sm leading-7 text-slate-600">{item.description}</p>
-      )}
+      <RichText content={item.description} className="mt-1.5 text-sm leading-7 text-slate-600" />
     </div>
   );
 }
@@ -101,11 +100,7 @@ export default function ObjetivosPresentation({ data }: { data: unknown }) {
               {mainObjective!.title}
             </h3>
           )}
-          {mainObjective!.description && (
-            <p className="mt-4 text-base leading-8 text-slate-700">
-              {mainObjective!.description}
-            </p>
-          )}
+          <RichText content={mainObjective!.description} className="mt-4 text-base leading-8 text-slate-700" />
         </section>
       )}
 
@@ -183,11 +178,7 @@ export default function ObjetivosPresentation({ data }: { data: unknown }) {
                     {phase.title}
                   </p>
                 )}
-                {phase.description && (
-                  <p className="mt-1.5 text-sm leading-7 text-slate-600">
-                    {phase.description}
-                  </p>
-                )}
+                <RichText content={phase.description} className="mt-1.5 text-sm leading-7 text-slate-600" />
               </div>
             ))}
           </div>
@@ -200,9 +191,7 @@ export default function ObjetivosPresentation({ data }: { data: unknown }) {
           <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
             Observação estratégica
           </p>
-          <p className="whitespace-pre-wrap text-base leading-8 text-slate-700">
-            {strategicObservation}
-          </p>
+          <RichText content={strategicObservation} className="text-base leading-8 text-slate-700" />
         </section>
       )}
 

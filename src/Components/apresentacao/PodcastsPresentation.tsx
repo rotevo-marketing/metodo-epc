@@ -12,6 +12,7 @@ import {
   VisualRef,
   ExtRef,
 } from "./ChannelPresentationShared";
+import { RichText } from "./RichText";
 
 type PodcastsContentItem = {
   title: string;
@@ -95,9 +96,7 @@ export default function PodcastsPresentation({ data }: { data: unknown }) {
                     <p className="text-xs text-slate-400">Convidado/Responsável: {item.guestOrResponsible}</p>
                   )}
                 </div>
-                {item.observation && (
-                  <p className="mt-1.5 text-sm text-slate-600">{item.observation}</p>
-                )}
+                <RichText content={item.observation} className="mt-1.5 text-sm text-slate-600" />
               </div>
             ))}
           </div>

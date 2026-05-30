@@ -1,10 +1,22 @@
 import {
   ExternalRefList,
-  FieldBlock,
   ModuleHeader,
   EmptyState,
   SectionCard,
 } from "./ChannelPresentationShared";
+import { RichText } from "./RichText";
+
+function FieldBlock({ label, value }: { label: string; value: string }) {
+  if (!value?.trim()) return null;
+  return (
+    <div>
+      <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+        {label}
+      </p>
+      <RichText content={value} className="text-sm leading-7 text-slate-700" />
+    </div>
+  );
+}
 
 type ContentFunnelStageData = {
   strategy: string;
@@ -126,7 +138,7 @@ export default function FunilConteudoPresentation({ data }: { data: unknown }) {
                 {distItems.map((item, i) => (
                   <div key={i} className="rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200">
                     <p className="mb-1 text-xs font-bold text-slate-500">{item.label}</p>
-                    <p className="text-sm text-slate-700">{item.value}</p>
+                    <RichText content={item.value} className="text-sm text-slate-700" />
                   </div>
                 ))}
               </div>
@@ -141,7 +153,7 @@ export default function FunilConteudoPresentation({ data }: { data: unknown }) {
                 {metricsItems.map((item, i) => (
                   <div key={i} className="rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200">
                     <p className="mb-1 text-xs font-bold text-slate-500">{item.label}</p>
-                    <p className="text-sm text-slate-700">{item.value}</p>
+                    <RichText content={item.value} className="text-sm text-slate-700" />
                   </div>
                 ))}
               </div>

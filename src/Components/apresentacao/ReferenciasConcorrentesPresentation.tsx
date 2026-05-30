@@ -1,4 +1,5 @@
 import { ModuleIcon } from "./ModuleIcon";
+import { RichText } from "./RichText";
 
 type ChannelKey =
   | "site" | "instagram" | "tiktok" | "youtube" | "facebook"
@@ -118,9 +119,7 @@ export default function ReferenciasConcorrentesPresentation({
                         <span className="text-xs font-semibold text-slate-500">
                           {ch.label}
                         </span>
-                        <p className="text-sm leading-6 text-slate-700">
-                          {item.channels[ch.key]}
-                        </p>
+                        <RichText content={item.channels[ch.key]} className="text-sm leading-6 text-slate-700" />
                       </div>
                     </div>
                   ))}
@@ -145,11 +144,7 @@ export default function ReferenciasConcorrentesPresentation({
                           {a.title}
                         </p>
                       )}
-                      {a.description && (
-                        <p className="mt-1.5 text-sm leading-7 text-slate-600">
-                          {a.description}
-                        </p>
-                      )}
+                      <RichText content={a.description} className="mt-1.5 text-sm leading-7 text-slate-600" />
                     </div>
                   ))}
                 </div>

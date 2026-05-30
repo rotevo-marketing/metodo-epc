@@ -1,5 +1,5 @@
 import { ModuleIcon } from "./ModuleIcon";
-import { sanitizeHtml, isHtmlContent } from "@/lib/renderHtml";
+import { RichText } from "./RichText";
 
 type ContentDnaData = {
   fields: Record<string, string>;
@@ -18,23 +18,13 @@ const fieldLabels: [string, string][] = [
 
 function Field({ label, value }: { label: string; value: string }) {
   if (!value?.trim()) return null;
-  const isHtml = isHtmlContent(value);
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-6 md:p-7">
       <p className="mb-4 text-sm font-bold uppercase tracking-[0.18em] text-[#5f6f8a]">
         {label}
       </p>
-      {isHtml ? (
-        <div
-          className="text-base leading-7 text-slate-800 [&_a]:text-[#c79e40] [&_a]:underline [&_em]:italic [&_li]:my-1 [&_mark]:bg-yellow-100 [&_mark]:px-0.5 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:my-2 [&_s]:line-through [&_strong]:font-semibold [&_u]:underline [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-5"
-          dangerouslySetInnerHTML={{ __html: sanitizeHtml(value) }}
-        />
-      ) : (
-        <p className="whitespace-pre-wrap text-base leading-7 text-slate-800">
-          {value}
-        </p>
-      )}
+      <RichText content={value} className="text-base leading-7 text-slate-800" />
     </div>
   );
 }

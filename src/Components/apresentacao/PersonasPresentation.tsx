@@ -1,4 +1,5 @@
 import { ModuleIcon } from "./ModuleIcon";
+import { RichText } from "./RichText";
 
 type BehaviorKey =
   | "redesSociais" | "blogs" | "anunciosMidiaTradicional"
@@ -175,9 +176,7 @@ export default function PersonasPresentation({ data }: { data: unknown }) {
                     <p className="mb-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
                       {f.label}
                     </p>
-                    <p className="whitespace-pre-wrap text-sm leading-7 text-slate-700">
-                      {persona[f.key] as string}
-                    </p>
+                    <RichText content={persona[f.key] as string} className="text-sm leading-7 text-slate-700" />
                   </div>
                 ))}
               </div>
@@ -191,9 +190,7 @@ export default function PersonasPresentation({ data }: { data: unknown }) {
                     <p className="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
                       {f.label}
                     </p>
-                    <p className="text-sm leading-6 text-slate-700">
-                      {persona[f.key] as string}
-                    </p>
+                    <RichText content={persona[f.key] as string} className="text-sm leading-6 text-slate-700" />
                   </div>
                 ))}
               </div>

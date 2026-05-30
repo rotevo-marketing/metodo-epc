@@ -6,6 +6,7 @@ import {
   EmptyState,
   ExtRef,
 } from "./ChannelPresentationShared";
+import { RichText } from "./RichText";
 
 type EducationalMaterial = {
   title: string;
@@ -65,9 +66,7 @@ export default function MateriaisEducacionaisPresentation({ data }: { data: unkn
                     <span className="font-medium text-slate-700">Objetivo:</span> {item.objective}
                   </p>
                 )}
-                {item.content && (
-                  <p className="mt-1 text-sm text-slate-600">{item.content}</p>
-                )}
+                <RichText content={item.content} className="mt-1 text-sm text-slate-600" />
                 {item.distribution && (
                   <p className="mt-1.5 text-xs text-slate-500">
                     <span className="font-medium text-slate-700">Distribuição:</span> {item.distribution}

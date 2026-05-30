@@ -5,6 +5,7 @@ import {
   ModuleHeader,
   EmptyState,
 } from "./ChannelPresentationShared";
+import { RichText } from "./RichText";
 
 type TimelineSprint = {
   title: string;
@@ -78,19 +79,19 @@ export default function LinhaTempoPresentation({ data }: { data: unknown }) {
             {d?.firstMilestone && (
               <div className="rounded-xl bg-indigo-50 p-4 ring-1 ring-indigo-200">
                 <p className="text-xs font-semibold uppercase tracking-wider text-indigo-400">1º Marco</p>
-                <p className="mt-1 text-sm text-slate-700">{d.firstMilestone}</p>
+                <RichText content={d.firstMilestone} className="mt-1 text-sm text-slate-700" />
               </div>
             )}
             {d?.secondMilestone && (
               <div className="rounded-xl bg-indigo-50 p-4 ring-1 ring-indigo-200">
                 <p className="text-xs font-semibold uppercase tracking-wider text-indigo-400">2º Marco</p>
-                <p className="mt-1 text-sm text-slate-700">{d.secondMilestone}</p>
+                <RichText content={d.secondMilestone} className="mt-1 text-sm text-slate-700" />
               </div>
             )}
             {d?.thirdMilestone && (
               <div className="rounded-xl bg-indigo-50 p-4 ring-1 ring-indigo-200">
                 <p className="text-xs font-semibold uppercase tracking-wider text-indigo-400">3º Marco</p>
-                <p className="mt-1 text-sm text-slate-700">{d.thirdMilestone}</p>
+                <RichText content={d.thirdMilestone} className="mt-1 text-sm text-slate-700" />
               </div>
             )}
           </div>
@@ -134,9 +135,7 @@ export default function LinhaTempoPresentation({ data }: { data: unknown }) {
                     )}
                   </div>
 
-                  {event.description && (
-                    <p className="mt-2 text-sm leading-7 text-slate-600">{event.description}</p>
-                  )}
+                  <RichText content={event.description} className="mt-2 text-sm leading-7 text-slate-600" />
 
                   {(event.responsible || event.dependency) && (
                     <div className="mt-3 grid gap-3 md:grid-cols-2">

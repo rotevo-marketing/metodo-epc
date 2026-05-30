@@ -1,4 +1,5 @@
 import { ModuleIcon } from "./ModuleIcon";
+import { RichText } from "./RichText";
 
 type SwotData = { fields: Record<string, string>; synthesis: string };
 
@@ -78,9 +79,7 @@ export default function AnaliseSwotPresentation({ data }: { data: unknown }) {
                   {q.label}
                 </p>
                 <p className="mt-0.5 text-xs text-slate-400">{q.description}</p>
-                <p className="mt-4 whitespace-pre-wrap text-sm leading-7 text-slate-700">
-                  {fields[q.key]}
-                </p>
+                <RichText content={fields[q.key]} className="mt-4 text-sm leading-7 text-slate-700" />
               </div>
             ))}
           </div>
@@ -93,9 +92,7 @@ export default function AnaliseSwotPresentation({ data }: { data: unknown }) {
           <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
             Síntese estratégica
           </p>
-          <p className="whitespace-pre-wrap text-base leading-8 text-slate-700">
-            {synthesis}
-          </p>
+          <RichText content={synthesis} className="text-base leading-8 text-slate-700" />
         </section>
       )}
 

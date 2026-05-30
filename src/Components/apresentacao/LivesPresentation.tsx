@@ -12,6 +12,7 @@ import {
   VisualRef,
   ExtRef,
 } from "./ChannelPresentationShared";
+import { RichText } from "./RichText";
 
 type NetworkFrequencyItem = { channel: string; frequency: string };
 
@@ -112,9 +113,7 @@ export default function LivesPresentation({ data }: { data: unknown }) {
                     <p className="text-xs text-slate-400">Objetivo: {item.objective}</p>
                   )}
                 </div>
-                {item.observation && (
-                  <p className="mt-1.5 text-sm text-slate-600">{item.observation}</p>
-                )}
+                <RichText content={item.observation} className="mt-1.5 text-sm text-slate-600" />
               </div>
             ))}
           </div>

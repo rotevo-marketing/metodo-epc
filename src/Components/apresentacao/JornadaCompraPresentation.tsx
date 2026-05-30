@@ -1,4 +1,5 @@
 import { ModuleIcon } from "./ModuleIcon";
+import { RichText } from "./RichText";
 
 type JourneyStageData = {
   awarenessLevel: string;
@@ -55,9 +56,7 @@ function Field({ label, value }: { label: string; value: string }) {
       <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
         {label}
       </p>
-      <p className="whitespace-pre-wrap text-sm leading-7 text-slate-700">
-        {value}
-      </p>
+      <RichText content={value} className="text-sm leading-7 text-slate-700" />
     </div>
   );
 }
@@ -117,9 +116,7 @@ export default function JornadaCompraPresentation({ data }: { data: unknown }) {
           <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
             Visão geral
           </p>
-          <p className="whitespace-pre-wrap text-base leading-8 text-slate-700">
-            {overview}
-          </p>
+          <RichText content={overview} className="text-base leading-8 text-slate-700" />
         </section>
       )}
 
@@ -164,7 +161,7 @@ export default function JornadaCompraPresentation({ data }: { data: unknown }) {
                 <p className="mb-1.5 text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
                   {tp.label}
                 </p>
-                <p className="text-sm leading-7 text-slate-700">{tp.value}</p>
+                <RichText content={tp.value} className="text-sm leading-7 text-slate-700" />
               </div>
             ))}
           </div>
@@ -183,7 +180,7 @@ export default function JornadaCompraPresentation({ data }: { data: unknown }) {
                 <p className="mb-1.5 text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
                   {o.label}
                 </p>
-                <p className="text-sm leading-7 text-slate-700">{o.value}</p>
+                <RichText content={o.value} className="text-sm leading-7 text-slate-700" />
               </div>
             ))}
           </div>

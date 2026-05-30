@@ -1,4 +1,5 @@
 import { ModuleIcon } from "./ModuleIcon";
+import { RichText } from "./RichText";
 
 type KeywordItem = { keyword: string; volume: string; observation: string };
 type KeywordsData = {
@@ -78,9 +79,7 @@ export default function PalavrasChavePresentation({ data }: { data: unknown }) {
           <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
             Observação estratégica
           </p>
-          <p className="whitespace-pre-wrap text-base leading-8 text-slate-700">
-            {strategicObservation}
-          </p>
+          <RichText content={strategicObservation} className="text-base leading-8 text-slate-700" />
         </section>
       )}
 

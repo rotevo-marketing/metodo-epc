@@ -1,4 +1,5 @@
 import { ModuleIcon } from "./ModuleIcon";
+import { RichText } from "./RichText";
 
 type ChannelItem = { nome: string; descricao: string; link: string };
 type ChannelReference = { title: string; link: string };
@@ -94,11 +95,7 @@ export default function CanaisDigitaisPresentation({ data }: { data: unknown }) 
                       </a>
                     )}
                   </div>
-                  {channel.descricao && (
-                    <p className="mt-1.5 text-sm leading-7 text-slate-600">
-                      {channel.descricao}
-                    </p>
-                  )}
+                  <RichText content={channel.descricao} className="mt-1.5 text-sm leading-7 text-slate-600" />
                 </div>
               </div>
             ))}
@@ -112,9 +109,7 @@ export default function CanaisDigitaisPresentation({ data }: { data: unknown }) 
           <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
             Observação estratégica
           </p>
-          <p className="whitespace-pre-wrap text-base leading-8 text-slate-700">
-            {observation}
-          </p>
+          <RichText content={observation} className="text-base leading-8 text-slate-700" />
         </section>
       )}
 

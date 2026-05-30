@@ -12,6 +12,7 @@ import {
   VisualRef,
   ExtRef,
 } from "./ChannelPresentationShared";
+import { RichText } from "./RichText";
 
 type BlogContentItem = { title: string; suggestedDate: string; observation: string };
 
@@ -78,9 +79,7 @@ export default function BlogPresentation({ data }: { data: unknown }) {
                 {item.suggestedDate && (
                   <p className="mt-1 text-xs text-slate-400">Data sugerida: {item.suggestedDate}</p>
                 )}
-                {item.observation && (
-                  <p className="mt-1.5 text-sm text-slate-600">{item.observation}</p>
-                )}
+                <RichText content={item.observation} className="mt-1.5 text-sm text-slate-600" />
               </div>
             ))}
           </div>

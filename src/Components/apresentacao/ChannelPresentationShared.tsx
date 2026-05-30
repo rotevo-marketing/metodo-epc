@@ -1,4 +1,5 @@
 // Shared helpers used by all channel/editorial presentation components
+import { RichText } from "./RichText";
 
 export type FreqItem = { format: string; quantity: string; period: string; observation: string };
 export type TextItem = { value: string };
@@ -111,7 +112,7 @@ export function FieldBlock({ label, value }: { label: string; value: string }) {
       <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
         {label}
       </p>
-      <p className="whitespace-pre-wrap text-sm leading-7 text-slate-700">{value}</p>
+      <RichText content={value} className="text-sm leading-7 text-slate-700" />
     </div>
   );
 }
