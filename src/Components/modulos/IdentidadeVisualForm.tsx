@@ -3,6 +3,7 @@
 import { ChangeEvent } from "react";
 import Link from "next/link";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
+import RichTextEditor from "@/Components/RichTextEditor";
 
 export type ColorItem = {
   name: string;
@@ -334,12 +335,10 @@ export default function IdentidadeVisualForm({
         title="Direção visual"
         description="Explique a direção estética do projeto, incluindo sensação desejada, estilo, atmosfera, aparência geral e percepção visual que a marca precisa transmitir."
       >
-        <textarea
-          rows={6}
+        <RichTextEditor
           value={data.fields.direcaoVisual || ""}
-          onChange={(event) => updateField("direcaoVisual", event.target.value)}
+          onChange={(value) => updateField("direcaoVisual", value)}
           placeholder="Ex: Uma identidade visual limpa, sofisticada e estratégica, com estética minimalista, forte presença de espaços em branco, composição editorial e sensação de autoridade tranquila."
-          className="w-full resize-none rounded-2xl border border-slate-200 px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
         />
       </SectionCard>
 
@@ -425,12 +424,10 @@ export default function IdentidadeVisualForm({
           title={field.title}
           description={field.description}
         >
-          <textarea
-            rows={6}
+          <RichTextEditor
             value={data.fields[field.key] || ""}
-            onChange={(event) => updateField(field.key, event.target.value)}
+            onChange={(value) => updateField(field.key, value)}
             placeholder={field.placeholder}
-            className="w-full resize-none rounded-2xl border border-slate-200 px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
           />
         </SectionCard>
       ))}

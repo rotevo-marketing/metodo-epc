@@ -3,6 +3,7 @@
 import { ChangeEvent } from "react";
 import Link from "next/link";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
+import RichTextEditor from "@/Components/RichTextEditor";
 
 export type CompetitorAnalysisItem = {
   image: string;
@@ -321,18 +322,12 @@ export default function PesquisaConcorrenciaForm({
                           {field.title}
                         </label>
 
-                        <textarea
-                          rows={5}
+                        <RichTextEditor
                           value={competitor[field.key]}
-                          onChange={(event) =>
-                            updateCompetitor(
-                              index,
-                              field.key,
-                              event.target.value
-                            )
+                          onChange={(value) =>
+                            updateCompetitor(index, field.key, value)
                           }
                           placeholder={field.placeholder}
-                          className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
                         />
                       </div>
                     ))}

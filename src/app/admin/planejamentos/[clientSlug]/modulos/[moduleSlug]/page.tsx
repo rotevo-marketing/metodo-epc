@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
+import RichTextEditor from "@/Components/RichTextEditor";
 import { planningModules } from "@/data/modules";
 import { MetodoFooter, MetodoLogo } from "@/Components/MetodoBrand";
 import EspecialistaForm, {
@@ -2811,17 +2812,15 @@ function isProjectObjectivesData(
                       Conteúdo principal do módulo
                     </label>
 
-                    <textarea
-                      rows={10}
+                    <RichTextEditor
                       value={genericData.mainText || ""}
-                      onChange={(event) =>
+                      onChange={(value) =>
                         setGenericData((current) => ({
                           ...current,
-                          mainText: event.target.value,
+                          mainText: value,
                         }))
                       }
                       placeholder="Preencha aqui as informações estratégicas deste módulo."
-                      className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm leading-6 outline-none transition focus:border-slate-400"
                     />
                   </div>
 
@@ -2830,17 +2829,15 @@ function isProjectObjectivesData(
                       Observações internas
                     </label>
 
-                    <textarea
-                      rows={5}
+                    <RichTextEditor
                       value={genericData.notes || ""}
-                      onChange={(event) =>
+                      onChange={(value) =>
                         setGenericData((current) => ({
                           ...current,
-                          notes: event.target.value,
+                          notes: value,
                         }))
                       }
                       placeholder="Anote observações, decisões, pendências ou contexto para este cliente."
-                      className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm leading-6 outline-none transition focus:border-slate-400"
                     />
                   </div>
 
@@ -2849,17 +2846,15 @@ function isProjectObjectivesData(
                       Referências e links
                     </label>
 
-                    <textarea
-                      rows={4}
+                    <RichTextEditor
                       value={genericData.references || ""}
-                      onChange={(event) =>
+                      onChange={(value) =>
                         setGenericData((current) => ({
                           ...current,
-                          references: event.target.value,
+                          references: value,
                         }))
                       }
                       placeholder="Cole referências, links, exemplos ou materiais usados neste módulo."
-                      className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm leading-6 outline-none transition focus:border-slate-400"
                     />
                   </div>
 

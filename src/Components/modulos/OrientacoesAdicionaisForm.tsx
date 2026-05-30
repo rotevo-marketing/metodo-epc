@@ -2,6 +2,7 @@
 
 import { type ReactNode } from "react";
 import Link from "next/link";
+import RichTextEditor from "@/Components/RichTextEditor";
 
 export type PendingItem = {
   title: string;
@@ -153,7 +154,7 @@ function TextAreaField({
   value,
   onChange,
   placeholder,
-  rows = 6,
+  rows: _rows,
 }: {
   value: string;
   onChange: (value: string) => void;
@@ -161,13 +162,7 @@ function TextAreaField({
   rows?: number;
 }) {
   return (
-    <textarea
-      rows={rows}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      placeholder={placeholder}
-      className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
-    />
+    <RichTextEditor value={value} onChange={onChange} placeholder={placeholder} />
   );
 }
 

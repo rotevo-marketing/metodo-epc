@@ -3,6 +3,7 @@
 import { ChangeEvent } from "react";
 import Link from "next/link";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
+import RichTextEditor from "@/Components/RichTextEditor";
 
 export type InstagramFrequencyItem = {
   format: string;
@@ -524,17 +525,12 @@ export default function InstagramForm({
                 Conteúdo da bio
               </label>
 
-              <textarea
-                rows={5}
+              <RichTextEditor
                 value={data.bioText}
-                onChange={(event) =>
-                  setData((current) => ({
-                    ...current,
-                    bioText: event.target.value,
-                  }))
+                onChange={(value) =>
+                  setData((current) => ({ ...current, bioText: value }))
                 }
                 placeholder="Escreva uma sugestão de bio para o Instagram."
-                className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
               />
             </div>
 
@@ -738,17 +734,12 @@ export default function InstagramForm({
             Estratégia visual
           </label>
 
-          <textarea
-            rows={6}
+          <RichTextEditor
             value={data.visualStrategy}
-            onChange={(event) =>
-              setData((current) => ({
-                ...current,
-                visualStrategy: event.target.value,
-              }))
+            onChange={(value) =>
+              setData((current) => ({ ...current, visualStrategy: value }))
             }
             placeholder="Explique a direção visual do Instagram: estilo dos posts, cores, fundos, fotos, vídeos, ritmo, estética e referências."
-            className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
           />
         </div>
 

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
+import RichTextEditor from "@/Components/RichTextEditor";
 
 export type JourneyStageData = {
   awarenessLevel: string;
@@ -216,7 +217,7 @@ function TextAreaInput({
   label,
   value,
   placeholder,
-  rows = 5,
+  rows: _rows,
   onChange,
 }: {
   label: string;
@@ -230,14 +231,7 @@ function TextAreaInput({
       <label className="mb-2 block text-sm font-semibold text-slate-600">
         {label}
       </label>
-
-      <textarea
-        rows={rows}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        placeholder={placeholder}
-        className="w-full resize-none rounded-2xl border border-slate-200 px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
-      />
+      <RichTextEditor value={value} onChange={onChange} placeholder={placeholder} />
     </div>
   );
 }
@@ -381,12 +375,10 @@ export default function JornadaCompraForm({
         title="Visão geral da jornada"
         description="Explique como o público geralmente evolui até se tornar cliente. Este campo ajuda a resumir a lógica da jornada antes de detalhar cada etapa."
       >
-        <textarea
-          rows={6}
+        <RichTextEditor
           value={data.overview}
-          onChange={(event) => updateOverview(event.target.value)}
+          onChange={updateOverview}
           placeholder="Ex: O público começa sentindo dificuldade para gerar demanda, depois entende que falta estratégia, busca soluções, compara métodos e finalmente decide contratar quando percebe clareza, prova e segurança."
-          className="w-full resize-none rounded-2xl border border-slate-200 px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
         />
       </SectionCard>
 
@@ -567,17 +559,12 @@ export default function JornadaCompraForm({
         title="Gatilhos de avanço"
         description="Defina quais mensagens, conteúdos, provas ou ações ajudam o público a avançar de uma etapa para outra."
       >
-        <textarea
-          rows={6}
+        <RichTextEditor
           value={data.advancementTriggers}
-          onChange={(event) =>
-            setData((current) => ({
-              ...current,
-              advancementTriggers: event.target.value,
-            }))
+          onChange={(value) =>
+            setData((current) => ({ ...current, advancementTriggers: value }))
           }
           placeholder="Ex: Mostrar sintomas do problema, apresentar consequências, oferecer um diagnóstico, entregar prova social, mostrar bastidores da solução, quebrar objeções, criar urgência e direcionar para conversa comercial."
-          className="w-full resize-none rounded-2xl border border-slate-200 px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
         />
       </SectionCard>
 
@@ -606,17 +593,12 @@ export default function JornadaCompraForm({
         title="Relação com funil de conteúdo, campanhas e automações"
         description="Explique como esta jornada deve orientar o funil de conteúdo, as campanhas de tráfego e os fluxos de automação."
       >
-        <textarea
-          rows={7}
+        <RichTextEditor
           value={data.funnelCampaignsAutomation}
-          onChange={(event) =>
-            setData((current) => ({
-              ...current,
-              funnelCampaignsAutomation: event.target.value,
-            }))
+          onChange={(value) =>
+            setData((current) => ({ ...current, funnelCampaignsAutomation: value }))
           }
           placeholder="Ex: A etapa de descoberta orienta conteúdos de atração. A etapa de busca por solução orienta materiais educativos e captação de leads. A comparação orienta remarketing e provas sociais. A decisão orienta campanhas de conversão e mensagens comerciais. O pós-compra orienta automações de onboarding e fidelização."
-          className="w-full resize-none rounded-2xl border border-slate-200 px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
         />
       </SectionCard>
 

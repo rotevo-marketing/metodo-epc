@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
+import RichTextEditor from "@/Components/RichTextEditor";
 
 export type ChannelItem = {
   nome: string;
@@ -361,14 +362,10 @@ export default function CanaisDigitaisAtuaisForm({
                     Descrição opcional
                   </label>
 
-                  <textarea
-                    rows={5}
+                  <RichTextEditor
                     value={channel.descricao}
-                    onChange={(event) =>
-                      updateChannel(index, "descricao", event.target.value)
-                    }
+                    onChange={(value) => updateChannel(index, "descricao", value)}
                     placeholder="Registre a função desse canal dentro da presença digital atual do projeto."
-                    className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
                   />
                 </div>
 
@@ -423,17 +420,12 @@ export default function CanaisDigitaisAtuaisForm({
         title="Observações sobre a presença digital atual"
         description="Use este campo para resumir o estado atual dos canais, apontar prioridades, problemas, oportunidades e ajustes necessários."
       >
-        <textarea
-          rows={7}
+        <RichTextEditor
           value={data.observation}
-          onChange={(event) =>
-            setData((current) => ({
-              ...current,
-              observation: event.target.value,
-            }))
+          onChange={(value) =>
+            setData((current) => ({ ...current, observation: value }))
           }
           placeholder="Registre aqui uma síntese da presença digital atual do projeto."
-          className="w-full resize-none rounded-2xl border border-slate-200 px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
         />
       </SectionCard>
 

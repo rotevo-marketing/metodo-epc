@@ -3,6 +3,7 @@
 import { ChangeEvent } from "react";
 import Link from "next/link";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
+import RichTextEditor from "@/Components/RichTextEditor";
 
 export type LinkedInFrequencyItem = {
   format: string;
@@ -537,17 +538,12 @@ export default function LinkedInForm({
                 Sobre do perfil
               </label>
 
-              <textarea
-                rows={6}
+              <RichTextEditor
                 value={data.aboutProfile}
-                onChange={(event) =>
-                  setData((current) => ({
-                    ...current,
-                    aboutProfile: event.target.value,
-                  }))
+                onChange={(value) =>
+                  setData((current) => ({ ...current, aboutProfile: value }))
                 }
                 placeholder="Escreva orientações ou uma sugestão para a seção Sobre do LinkedIn."
-                className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
               />
             </div>
           </div>
@@ -693,17 +689,12 @@ export default function LinkedInForm({
             Estratégia visual
           </label>
 
-          <textarea
-            rows={6}
+          <RichTextEditor
             value={data.visualStrategy}
-            onChange={(event) =>
-              setData((current) => ({
-                ...current,
-                visualStrategy: event.target.value,
-              }))
+            onChange={(value) =>
+              setData((current) => ({ ...current, visualStrategy: value }))
             }
             placeholder="Explique a direção visual do LinkedIn: estilo dos posts, capas, carrosséis, vídeos, fotos profissionais, cores, layout e referências."
-            className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
           />
         </div>
 

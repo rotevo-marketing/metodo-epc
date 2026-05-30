@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { Dispatch, SetStateAction } from "react";
+import RichTextEditor from "@/Components/RichTextEditor";
 
 export type SwotData = {
   fields: Record<string, string>;
@@ -92,13 +93,13 @@ export default function AnaliseSwotForm({
             {campo.description}
           </p>
 
-          <textarea
-            rows={6}
-            value={data.fields[campo.key] || ""}
-            onChange={(event) => updateField(campo.key, event.target.value)}
-            placeholder={campo.placeholder}
-            className="mt-4 w-full resize-none rounded-2xl border border-slate-200 px-4 py-3 leading-7 outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
-          />
+          <div className="mt-4">
+            <RichTextEditor
+              value={data.fields[campo.key] || ""}
+              onChange={(value) => updateField(campo.key, value)}
+              placeholder={campo.placeholder}
+            />
+          </div>
         </div>
       ))}
 
@@ -112,18 +113,15 @@ export default function AnaliseSwotForm({
           para o planejamento.
         </p>
 
-        <textarea
-          rows={6}
-          value={data.synthesis}
-          onChange={(event) =>
-            setData((current) => ({
-              ...current,
-              synthesis: event.target.value,
-            }))
-          }
-          placeholder="Registre as principais conclusões da análise SWOT e como elas devem orientar as decisões do projeto."
-          className="mt-3 w-full resize-none rounded-2xl border border-slate-200 px-4 py-3 leading-7 outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
-        />
+        <div className="mt-3">
+          <RichTextEditor
+            value={data.synthesis}
+            onChange={(value) =>
+              setData((current) => ({ ...current, synthesis: value }))
+            }
+            placeholder="Registre as principais conclusões da análise SWOT e como elas devem orientar as decisões do projeto."
+          />
+        </div>
       </div>
 
       <div className="sticky bottom-0 rounded-[1.5rem] border border-slate-200 bg-white/95 p-5 shadow-sm backdrop-blur">

@@ -3,6 +3,7 @@
 import { ChangeEvent } from "react";
 import Link from "next/link";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
+import RichTextEditor from "@/Components/RichTextEditor";
 
 export type BehaviorKey =
   | "redesSociais"
@@ -231,13 +232,7 @@ function TextAreaField({
 }) {
   return (
     <SectionCard title={title}>
-      <textarea
-        rows={6}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        placeholder={placeholder}
-        className="w-full resize-none rounded-2xl border border-slate-200 px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
-      />
+      <RichTextEditor value={value} onChange={onChange} placeholder={placeholder} />
     </SectionCard>
   );
 }
@@ -568,18 +563,12 @@ export default function PersonasForm({
                   Objetivo principal resumido
                 </label>
 
-                <textarea
-                  rows={4}
+                <RichTextEditor
                   value={persona.summaryObjective}
-                  onChange={(event) =>
-                    updatePersona(
-                      personaIndex,
-                      "summaryObjective",
-                      event.target.value
-                    )
+                  onChange={(value) =>
+                    updatePersona(personaIndex, "summaryObjective", value)
                   }
                   placeholder="Resumo do principal objetivo dessa persona."
-                  className="w-full resize-none rounded-2xl border border-slate-200 px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
                 />
               </div>
 
@@ -588,18 +577,12 @@ export default function PersonasForm({
                   Desafio principal resumido
                 </label>
 
-                <textarea
-                  rows={4}
+                <RichTextEditor
                   value={persona.summaryChallenge}
-                  onChange={(event) =>
-                    updatePersona(
-                      personaIndex,
-                      "summaryChallenge",
-                      event.target.value
-                    )
+                  onChange={(value) =>
+                    updatePersona(personaIndex, "summaryChallenge", value)
                   }
                   placeholder="Resumo do principal desafio dessa persona."
-                  className="w-full resize-none rounded-2xl border border-slate-200 px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
                 />
               </div>
 
@@ -608,18 +591,12 @@ export default function PersonasForm({
                   Objeção principal resumida
                 </label>
 
-                <textarea
-                  rows={4}
+                <RichTextEditor
                   value={persona.summaryObjection}
-                  onChange={(event) =>
-                    updatePersona(
-                      personaIndex,
-                      "summaryObjection",
-                      event.target.value
-                    )
+                  onChange={(value) =>
+                    updatePersona(personaIndex, "summaryObjection", value)
                   }
                   placeholder="Resumo da principal objeção dessa persona."
-                  className="w-full resize-none rounded-2xl border border-slate-200 px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
                 />
               </div>
 
@@ -628,18 +605,12 @@ export default function PersonasForm({
                   Jornada provável resumida
                 </label>
 
-                <textarea
-                  rows={4}
+                <RichTextEditor
                   value={persona.summaryJourney}
-                  onChange={(event) =>
-                    updatePersona(
-                      personaIndex,
-                      "summaryJourney",
-                      event.target.value
-                    )
+                  onChange={(value) =>
+                    updatePersona(personaIndex, "summaryJourney", value)
                   }
                   placeholder="Resumo da jornada de compra dessa persona."
-                  className="w-full resize-none rounded-2xl border border-slate-200 px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
                 />
               </div>
             </div>

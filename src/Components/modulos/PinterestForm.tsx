@@ -3,6 +3,7 @@
 import { ChangeEvent } from "react";
 import Link from "next/link";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
+import RichTextEditor from "@/Components/RichTextEditor";
 
 export type PinterestFrequencyItem = {
   format: string;
@@ -417,17 +418,12 @@ export default function PinterestForm({
             <label className="mb-2 block text-sm font-semibold text-slate-600">
               Pastas principais
             </label>
-            <textarea
-              rows={6}
+            <RichTextEditor
               value={data.mainBoards}
-              onChange={(event) =>
-                setData((current) => ({
-                  ...current,
-                  mainBoards: event.target.value,
-                }))
+              onChange={(value) =>
+                setData((current) => ({ ...current, mainBoards: value }))
               }
               placeholder="Ex: Inspirações, portfólio, projetos, tendências, guias, antes e depois, referências por tema..."
-              className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
             />
           </div>
 
@@ -435,17 +431,12 @@ export default function PinterestForm({
             <label className="mb-2 block text-sm font-semibold text-slate-600">
               Temas visuais prioritários
             </label>
-            <textarea
-              rows={6}
+            <RichTextEditor
               value={data.priorityVisualThemes}
-              onChange={(event) =>
-                setData((current) => ({
-                  ...current,
-                  priorityVisualThemes: event.target.value,
-                }))
+              onChange={(value) =>
+                setData((current) => ({ ...current, priorityVisualThemes: value }))
               }
               placeholder="Ex: Estilo visual, categorias de conteúdo, temas de interesse, referências de estética e tipos de imagem."
-              className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
             />
           </div>
         </div>
@@ -459,17 +450,12 @@ export default function PinterestForm({
           <label className="mb-2 block text-sm font-semibold text-slate-600">
             Estratégia visual
           </label>
-          <textarea
-            rows={6}
+          <RichTextEditor
             value={data.visualStrategy}
-            onChange={(event) =>
-              setData((current) => ({
-                ...current,
-                visualStrategy: event.target.value,
-              }))
+            onChange={(value) =>
+              setData((current) => ({ ...current, visualStrategy: value }))
             }
             placeholder="Explique a direção visual do Pinterest: tipos de imagem, composição, cores, textos sobrepostos, estilo dos pins, estética, portfólio e referências."
-            className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
           />
         </div>
 
@@ -526,17 +512,12 @@ export default function PinterestForm({
             <label className="mb-2 block text-sm font-semibold text-slate-600">
               Palavras-chave dos pins
             </label>
-            <textarea
-              rows={5}
+            <RichTextEditor
               value={data.pinKeywords}
-              onChange={(event) =>
-                setData((current) => ({
-                  ...current,
-                  pinKeywords: event.target.value,
-                }))
+              onChange={(value) =>
+                setData((current) => ({ ...current, pinKeywords: value }))
               }
               placeholder="Liste termos importantes para títulos, descrições e organização dos pins."
-              className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
             />
           </div>
 
@@ -544,17 +525,12 @@ export default function PinterestForm({
             <label className="mb-2 block text-sm font-semibold text-slate-600">
               Links de destino
             </label>
-            <textarea
-              rows={5}
+            <RichTextEditor
               value={data.destinationLinks}
-              onChange={(event) =>
-                setData((current) => ({
-                  ...current,
-                  destinationLinks: event.target.value,
-                }))
+              onChange={(value) =>
+                setData((current) => ({ ...current, destinationLinks: value }))
               }
               placeholder="Informe páginas, posts, produtos, portfólio, site ou landing pages que os pins devem direcionar."
-              className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
             />
           </div>
         </div>
@@ -563,17 +539,12 @@ export default function PinterestForm({
           <label className="mb-2 block text-sm font-semibold text-slate-600">
             Diretrizes de descrição
           </label>
-          <textarea
-            rows={6}
+          <RichTextEditor
             value={data.descriptionGuidelines}
-            onChange={(event) =>
-              setData((current) => ({
-                ...current,
-                descriptionGuidelines: event.target.value,
-              }))
+            onChange={(value) =>
+              setData((current) => ({ ...current, descriptionGuidelines: value }))
             }
             placeholder="Explique como escrever títulos e descrições dos pins, quais termos usar e qual chamada deve aparecer."
-            className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
           />
         </div>
       </SectionCard>

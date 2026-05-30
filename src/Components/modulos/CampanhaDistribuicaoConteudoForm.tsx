@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
+import RichTextEditor from "@/Components/RichTextEditor";
 
 export type DistributionMaterial = {
   title: string;
@@ -138,7 +139,7 @@ function TextAreaField({
   label,
   value,
   placeholder,
-  rows = 5,
+  rows: _rows,
   onChange,
 }: {
   label: string;
@@ -152,14 +153,7 @@ function TextAreaField({
       <label className="mb-2 block text-sm font-semibold text-slate-600">
         {label}
       </label>
-
-      <textarea
-        rows={rows}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        placeholder={placeholder}
-        className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
-      />
+      <RichTextEditor value={value} onChange={onChange} placeholder={placeholder} />
     </div>
   );
 }

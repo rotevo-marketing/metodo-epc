@@ -3,6 +3,7 @@
 import { ChangeEvent } from "react";
 import Link from "next/link";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
+import RichTextEditor from "@/Components/RichTextEditor";
 
 export type YoutubeFrequencyItem = {
   format: string;
@@ -530,17 +531,12 @@ export default function YoutubeForm({
                 Descrição do canal
               </label>
 
-              <textarea
-                rows={6}
+              <RichTextEditor
                 value={data.channelDescription}
-                onChange={(event) =>
-                  setData((current) => ({
-                    ...current,
-                    channelDescription: event.target.value,
-                  }))
+                onChange={(value) =>
+                  setData((current) => ({ ...current, channelDescription: value }))
                 }
                 placeholder="Escreva uma sugestão de descrição para o canal do YouTube."
-                className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
               />
             </div>
 
@@ -697,17 +693,12 @@ export default function YoutubeForm({
             Estratégia de edição
           </label>
 
-          <textarea
-            rows={6}
+          <RichTextEditor
             value={data.editingStyle}
-            onChange={(event) =>
-              setData((current) => ({
-                ...current,
-                editingStyle: event.target.value,
-              }))
+            onChange={(value) =>
+              setData((current) => ({ ...current, editingStyle: value }))
             }
             placeholder="Explique ritmo de edição, cortes, trilhas, legendas, vinhetas, thumbnails, enquadramento e estilo dos vídeos."
-            className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
           />
         </div>
 

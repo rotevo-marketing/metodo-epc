@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import Link from "next/link";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
+import RichTextEditor from "@/Components/RichTextEditor";
 
 export type KeywordItem = {
   keyword: string;
@@ -296,17 +297,12 @@ export default function PalavrasChaveForm({
         title="Observações estratégicas"
         description="Use este campo para resumir padrões, oportunidades, prioridades, intenção de busca e decisões de SEO ou conteúdo."
       >
-        <textarea
-          rows={7}
+        <RichTextEditor
           value={data.strategicObservation}
-          onChange={(event) =>
-            setData((current) => ({
-              ...current,
-              strategicObservation: event.target.value,
-            }))
+          onChange={(value) =>
+            setData((current) => ({ ...current, strategicObservation: value }))
           }
           placeholder="Registre aqui os principais aprendizados da pesquisa de palavras-chave."
-          className="w-full resize-none rounded-2xl border border-slate-200 px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
         />
       </SectionCard>
 

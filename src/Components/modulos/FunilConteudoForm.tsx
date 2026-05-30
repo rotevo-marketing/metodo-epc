@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
+import RichTextEditor from "@/Components/RichTextEditor";
 
 export type ContentFunnelStageData = {
   strategy: string;
@@ -147,7 +148,7 @@ function TextAreaInput({
   label,
   value,
   placeholder,
-  rows = 5,
+  rows: _rows,
   onChange,
 }: {
   label: string;
@@ -161,14 +162,7 @@ function TextAreaInput({
       <label className="mb-2 block text-sm font-semibold text-slate-600">
         {label}
       </label>
-
-      <textarea
-        rows={rows}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        placeholder={placeholder}
-        className="w-full resize-none rounded-2xl border border-slate-200 px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
-      />
+      <RichTextEditor value={value} onChange={onChange} placeholder={placeholder} />
     </div>
   );
 }
@@ -391,17 +385,12 @@ export default function FunilConteudoForm({
         title="Visão geral do funil"
         description="Explique como as quatro etapas se conectam e como o conteúdo deve conduzir o público de uma fase para a próxima."
       >
-        <textarea
-          rows={7}
+        <RichTextEditor
           value={data.overview}
-          onChange={(event) =>
-            setData((current) => ({
-              ...current,
-              overview: event.target.value,
-            }))
+          onChange={(value) =>
+            setData((current) => ({ ...current, overview: value }))
           }
           placeholder="Ex: Primeiro os conteúdos de atração ampliam o alcance. Depois os conteúdos de conexão geram identificação. Em seguida, os conteúdos de vinculação levam o público para uma lista, conversa ou material. Por fim, os conteúdos de venda apresentam prova, oferta e chamada para decisão."
-          className="w-full resize-none rounded-2xl border border-slate-200 px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
         />
       </SectionCard>
 

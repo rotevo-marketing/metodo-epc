@@ -3,6 +3,7 @@
 import { ChangeEvent } from "react";
 import Link from "next/link";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
+import RichTextEditor from "@/Components/RichTextEditor";
 
 export type BlogFrequencyItem = {
   format: string;
@@ -440,17 +441,12 @@ export default function BlogForm({
           <label className="mb-2 block text-sm font-semibold text-slate-600">
             Estratégia visual
           </label>
-          <textarea
-            rows={6}
+          <RichTextEditor
             value={data.visualStrategy}
-            onChange={(event) =>
-              setData((current) => ({
-                ...current,
-                visualStrategy: event.target.value,
-              }))
+            onChange={(value) =>
+              setData((current) => ({ ...current, visualStrategy: value }))
             }
             placeholder="Explique a direção visual do blog: layout da página inicial, página de artigo, imagens, categorias, chamadas, organização e referências."
-            className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
           />
         </div>
 
@@ -507,17 +503,12 @@ export default function BlogForm({
             <label className="mb-2 block text-sm font-semibold text-slate-600">
               Palavras-chave prioritárias
             </label>
-            <textarea
-              rows={5}
+            <RichTextEditor
               value={data.priorityKeywords}
-              onChange={(event) =>
-                setData((current) => ({
-                  ...current,
-                  priorityKeywords: event.target.value,
-                }))
+              onChange={(value) =>
+                setData((current) => ({ ...current, priorityKeywords: value }))
               }
               placeholder="Liste palavras-chave principais para orientar os artigos."
-              className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
             />
           </div>
 
@@ -525,17 +516,12 @@ export default function BlogForm({
             <label className="mb-2 block text-sm font-semibold text-slate-600">
               Categorias do blog
             </label>
-            <textarea
-              rows={5}
+            <RichTextEditor
               value={data.blogCategories}
-              onChange={(event) =>
-                setData((current) => ({
-                  ...current,
-                  blogCategories: event.target.value,
-                }))
+              onChange={(value) =>
+                setData((current) => ({ ...current, blogCategories: value }))
               }
               placeholder="Liste categorias, editorias ou temas centrais do blog."
-              className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
             />
           </div>
         </div>
@@ -544,17 +530,12 @@ export default function BlogForm({
           <label className="mb-2 block text-sm font-semibold text-slate-600">
             Orientações de SEO
           </label>
-          <textarea
-            rows={6}
+          <RichTextEditor
             value={data.seoGuidelines}
-            onChange={(event) =>
-              setData((current) => ({
-                ...current,
-                seoGuidelines: event.target.value,
-              }))
+            onChange={(value) =>
+              setData((current) => ({ ...current, seoGuidelines: value }))
             }
             placeholder="Registre orientações sobre títulos, subtítulos, links internos, CTAs, intenção de busca e estrutura dos artigos."
-            className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
           />
         </div>
       </SectionCard>
@@ -605,14 +586,10 @@ export default function BlogForm({
                 <label className="mb-2 block text-sm font-semibold text-slate-600">
                   Observação
                 </label>
-                <textarea
-                  rows={5}
+                <RichTextEditor
                   value={content.observation}
-                  onChange={(event) =>
-                    updateContent(index, "observation", event.target.value)
-                  }
+                  onChange={(value) => updateContent(index, "observation", value)}
                   placeholder="Registre objetivo do artigo, palavra-chave, abordagem e CTA sugerido."
-                  className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
                 />
               </div>
 

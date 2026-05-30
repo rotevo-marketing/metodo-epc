@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import Link from "next/link";
+import RichTextEditor from "@/Components/RichTextEditor";
 
 type SiteReference = {
   title: string;
@@ -179,12 +180,10 @@ export default function EstrategiaDoSiteForm({
         </p>
 
         <div className="mt-6">
-          <textarea
-            rows={8}
+          <RichTextEditor
             value={data.visualIdentity}
-            onChange={(e) => setData((c) => ({ ...c, visualIdentity: e.target.value }))}
+            onChange={(value) => setData((c) => ({ ...c, visualIdentity: value }))}
             placeholder="Descreva a direção visual do site, incluindo estilo, cores, referências, imagens, tipografia, elementos gráficos e sensação desejada."
-            className={textareaClass}
           />
         </div>
       </section>
@@ -380,12 +379,10 @@ export default function EstrategiaDoSiteForm({
         </p>
 
         <div className="mt-6">
-          <textarea
-            rows={8}
+          <RichTextEditor
             value={data.strategicNotes}
-            onChange={(e) => setData((c) => ({ ...c, strategicNotes: e.target.value }))}
+            onChange={(value) => setData((c) => ({ ...c, strategicNotes: value }))}
             placeholder="Registre observações sobre estrutura, função comercial, experiência do usuário, conversão, conteúdo, SEO e prioridades do site."
-            className={textareaClass}
           />
         </div>
       </section>

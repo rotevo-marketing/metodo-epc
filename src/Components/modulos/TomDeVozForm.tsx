@@ -3,6 +3,7 @@
 import { ChangeEvent } from "react";
 import Link from "next/link";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
+import RichTextEditor from "@/Components/RichTextEditor";
 
 export type CharacteristicItem = {
   title: string;
@@ -143,9 +144,7 @@ function VocabularyListField({
   onChange: (value: string) => void;
   addLabel?: string;
 }) {
-  const items = value
-    ? value.split("\n").filter((s) => s.trim())
-    : [];
+  const items = value ? value.split("\n") : [];
   const displayItems = items.length > 0 ? items : [""];
 
   function updateItem(index: number, newVal: string) {
@@ -155,7 +154,7 @@ function VocabularyListField({
   }
 
   function addItem() {
-    onChange([...displayItems.filter(Boolean), ""].join("\n"));
+    onChange([...displayItems, ""].join("\n"));
   }
 
   function removeItem(index: number) {
@@ -446,18 +445,12 @@ export default function TomDeVozForm({
                     Descrição da característica
                   </label>
 
-                  <textarea
-                    rows={5}
+                  <RichTextEditor
                     value={characteristic.description}
-                    onChange={(event) =>
-                      updateCharacteristic(
-                        index,
-                        "description",
-                        event.target.value
-                      )
+                    onChange={(value) =>
+                      updateCharacteristic(index, "description", value)
                     }
                     placeholder="Explique como essa característica deve aparecer nos conteúdos, nas legendas, nos textos comerciais, nos vídeos, nos e-mails e nas interações com o público."
-                    className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
                   />
                 </div>
               </div>
@@ -574,17 +567,12 @@ export default function TomDeVozForm({
         title="Observações sobre o tom de voz"
         description="Use este espaço para registrar orientações gerais sobre linguagem, narrativa, postura e cuidados de comunicação."
       >
-        <textarea
-          rows={6}
+        <RichTextEditor
           value={data.observations}
-          onChange={(event) =>
-            setData((current) => ({
-              ...current,
-              observations: event.target.value,
-            }))
+          onChange={(value) =>
+            setData((current) => ({ ...current, observations: value }))
           }
           placeholder="Registre observações importantes sobre a forma como a marca deve falar, escrever, conduzir argumentos, lidar com objeções e construir sua narrativa."
-          className="w-full resize-none rounded-2xl border border-slate-200 px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
         />
       </SectionCard>
 

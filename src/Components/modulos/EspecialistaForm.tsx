@@ -322,19 +322,15 @@ export default function EspecialistaForm({
                   className="mt-4 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
                 />
 
-                <textarea
-                  rows={4}
-                  value={characteristic.description}
-                  onChange={(event) =>
-                    updateCharacteristic(
-                      index,
-                      "description",
-                      event.target.value
-                    )
-                  }
-                  placeholder="Explique como essa característica aparece na comunicação, no posicionamento e na percepção pública."
-                  className="mt-3 w-full resize-none rounded-2xl border border-slate-200 px-4 py-3 text-sm leading-7 outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
-                />
+                <div className="mt-3">
+                  <RichTextEditor
+                    value={characteristic.description}
+                    onChange={(value) =>
+                      updateCharacteristic(index, "description", value)
+                    }
+                    placeholder="Explique como essa característica aparece na comunicação, no posicionamento e na percepção pública."
+                  />
+                </div>
               </div>
             ))}
 

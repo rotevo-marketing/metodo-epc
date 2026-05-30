@@ -3,6 +3,7 @@
 import { ChangeEvent } from "react";
 import Link from "next/link";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
+import RichTextEditor from "@/Components/RichTextEditor";
 
 export type TikTokFrequencyItem = {
   format: string;
@@ -508,17 +509,12 @@ export default function TikTokForm({
               Formatos principais
             </label>
 
-            <textarea
-              rows={6}
+            <RichTextEditor
               value={data.mainFormats}
-              onChange={(event) =>
-                setData((current) => ({
-                  ...current,
-                  mainFormats: event.target.value,
-                }))
+              onChange={(value) =>
+                setData((current) => ({ ...current, mainFormats: value }))
               }
               placeholder="Ex: Dicas rápidas, bastidores, reacts, storytelling, perguntas e respostas, cortes, tendências adaptadas..."
-              className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
             />
           </div>
 
@@ -527,17 +523,12 @@ export default function TikTokForm({
               Séries de conteúdo
             </label>
 
-            <textarea
-              rows={6}
+            <RichTextEditor
               value={data.contentSeries}
-              onChange={(event) =>
-                setData((current) => ({
-                  ...current,
-                  contentSeries: event.target.value,
-                }))
+              onChange={(value) =>
+                setData((current) => ({ ...current, contentSeries: value }))
               }
               placeholder="Ex: Série de mitos, erros comuns, passo a passo, análise de casos, rotina, desafios, bastidores..."
-              className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
             />
           </div>
         </div>
@@ -552,17 +543,12 @@ export default function TikTokForm({
             Estratégia visual
           </label>
 
-          <textarea
-            rows={6}
+          <RichTextEditor
             value={data.visualStrategy}
-            onChange={(event) =>
-              setData((current) => ({
-                ...current,
-                visualStrategy: event.target.value,
-              }))
+            onChange={(value) =>
+              setData((current) => ({ ...current, visualStrategy: value }))
             }
             placeholder="Explique a direção visual do TikTok: cenário, luz, enquadramento, legendas, cortes, ritmo, estilo dos vídeos e referências."
-            className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
           />
         </div>
 
@@ -622,17 +608,12 @@ export default function TikTokForm({
               Ganchos de abertura
             </label>
 
-            <textarea
-              rows={5}
+            <RichTextEditor
               value={data.openingHooks}
-              onChange={(event) =>
-                setData((current) => ({
-                  ...current,
-                  openingHooks: event.target.value,
-                }))
+              onChange={(value) =>
+                setData((current) => ({ ...current, openingHooks: value }))
               }
               placeholder="Ex: Você está cometendo esse erro..., Pare de fazer isso..., Ninguém te conta isso sobre..."
-              className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
             />
           </div>
 
@@ -641,17 +622,12 @@ export default function TikTokForm({
               Recursos de retenção
             </label>
 
-            <textarea
-              rows={5}
+            <RichTextEditor
               value={data.retentionResources}
-              onChange={(event) =>
-                setData((current) => ({
-                  ...current,
-                  retentionResources: event.target.value,
-                }))
+              onChange={(value) =>
+                setData((current) => ({ ...current, retentionResources: value }))
               }
               placeholder="Ex: Cortes rápidos, legenda dinâmica, mudança de enquadramento, exemplos práticos, listas e suspense."
-              className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
             />
           </div>
         </div>

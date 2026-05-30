@@ -2,6 +2,7 @@
 
 import { ChangeEvent, useState } from "react";
 import Link from "next/link";
+import RichTextEditor from "@/Components/RichTextEditor";
 
 type FrequencyItem = {
   format: string;
@@ -504,45 +505,37 @@ export default function LivesForm({
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           <div>
             <label className={labelClass}>Abertura</label>
-            <textarea
-              rows={6}
+            <RichTextEditor
               value={data.openingScript}
-              onChange={(e) => setData((c) => ({ ...c, openingScript: e.target.value }))}
+              onChange={(value) => setData((c) => ({ ...c, openingScript: value }))}
               placeholder="Explique como iniciar a live, apresentar o tema, gerar interesse e orientar quem está chegando."
-              className={textareaClass}
             />
           </div>
 
           <div>
             <label className={labelClass}>Conteúdo central</label>
-            <textarea
-              rows={6}
+            <RichTextEditor
               value={data.centralContent}
-              onChange={(e) => setData((c) => ({ ...c, centralContent: e.target.value }))}
+              onChange={(value) => setData((c) => ({ ...c, centralContent: value }))}
               placeholder="Descreva como o conteúdo principal será estruturado, dividido e entregue durante a live."
-              className={textareaClass}
             />
           </div>
 
           <div>
             <label className={labelClass}>Interação com o público</label>
-            <textarea
-              rows={6}
+            <RichTextEditor
               value={data.publicInteraction}
-              onChange={(e) => setData((c) => ({ ...c, publicInteraction: e.target.value }))}
+              onChange={(value) => setData((c) => ({ ...c, publicInteraction: value }))}
               placeholder="Defina perguntas, enquetes, momentos de interação, leitura de comentários e participação da audiência."
-              className={textareaClass}
             />
           </div>
 
           <div>
             <label className={labelClass}>Encerramento e chamada final</label>
-            <textarea
-              rows={6}
+            <RichTextEditor
               value={data.closingAndCall}
-              onChange={(e) => setData((c) => ({ ...c, closingAndCall: e.target.value }))}
+              onChange={(value) => setData((c) => ({ ...c, closingAndCall: value }))}
               placeholder="Explique como finalizar, recapitular, apresentar oferta, direcionar para link, WhatsApp, página ou próximo conteúdo."
-              className={textareaClass}
             />
           </div>
         </div>
@@ -557,12 +550,10 @@ export default function LivesForm({
 
         <div className="mt-6">
           <label className={labelClass}>Estratégia visual</label>
-          <textarea
-            rows={6}
+          <RichTextEditor
             value={data.visualStrategy}
-            onChange={(e) => setData((c) => ({ ...c, visualStrategy: e.target.value }))}
+            onChange={(value) => setData((c) => ({ ...c, visualStrategy: value }))}
             placeholder="Explique a direção visual das lives: capa, thumbnail, cenário, enquadramento, luz, identidade, chamadas e elementos gráficos."
-            className={textareaClass}
           />
         </div>
 
@@ -684,12 +675,10 @@ export default function LivesForm({
 
                   <div className="mt-4">
                     <label className={labelClass}>Observação</label>
-                    <textarea
-                      rows={5}
+                    <RichTextEditor
                       value={content.observation}
-                      onChange={(e) => updateContent(index, "observation", e.target.value)}
+                      onChange={(value) => updateContent(index, "observation", value)}
                       placeholder="Registre pauta, roteiro resumido, chamada final, oferta relacionada, links e observações de produção."
-                      className={textareaClass}
                     />
                   </div>
 
@@ -725,23 +714,19 @@ export default function LivesForm({
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           <div>
             <label className={labelClass}>Divulgação antes da live</label>
-            <textarea
-              rows={6}
+            <RichTextEditor
               value={data.beforeAndAfterPromotion}
-              onChange={(e) => setData((c) => ({ ...c, beforeAndAfterPromotion: e.target.value }))}
+              onChange={(value) => setData((c) => ({ ...c, beforeAndAfterPromotion: value }))}
               placeholder="Ex: Stories, post no feed, lista de transmissão, e-mail, anúncio, contagem regressiva ou convite no WhatsApp."
-              className={textareaClass}
             />
           </div>
 
           <div>
             <label className={labelClass}>Reaproveitamento depois da live</label>
-            <textarea
-              rows={6}
+            <RichTextEditor
               value={data.repurposingStrategy}
-              onChange={(e) => setData((c) => ({ ...c, repurposingStrategy: e.target.value }))}
+              onChange={(value) => setData((c) => ({ ...c, repurposingStrategy: value }))}
               placeholder="Ex: Cortes para Reels, TikTok, Shorts, carrossel, blog, e-mail, WhatsApp ou materiais educacionais."
-              className={textareaClass}
             />
           </div>
         </div>

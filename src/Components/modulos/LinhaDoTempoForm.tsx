@@ -2,6 +2,7 @@
 
 import { type ReactNode } from "react";
 import Link from "next/link";
+import RichTextEditor from "@/Components/RichTextEditor";
 
 export type TimelineSprint = {
   title: string;
@@ -153,28 +154,6 @@ function InputField({
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
       className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
-    />
-  );
-}
-
-function TextAreaField({
-  value,
-  onChange,
-  placeholder,
-  rows = 6,
-}: {
-  value: string;
-  onChange: (value: string) => void;
-  placeholder: string;
-  rows?: number;
-}) {
-  return (
-    <textarea
-      rows={rows}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      placeholder={placeholder}
-      className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
     />
   );
 }
@@ -373,11 +352,10 @@ export default function LinhaDoTempoForm({
 
               <div className="mt-4">
                 <FieldLabel>Descrição da implementação</FieldLabel>
-                <TextAreaField
+                <RichTextEditor
                   value={event.description}
                   onChange={(value) => updateEvent(eventIndex, "description", value)}
                   placeholder="Explique o que será implementado, por que essa etapa é importante e qual resultado ela deve gerar."
-                  rows={5}
                 />
               </div>
 
@@ -508,13 +486,12 @@ export default function LinhaDoTempoForm({
 
                       <div className="mt-4">
                         <FieldLabel>Entregas do sprint</FieldLabel>
-                        <TextAreaField
+                        <RichTextEditor
                           value={sprint.deliverables}
                           onChange={(value) =>
                             updateSprint(eventIndex, sprintIndex, "deliverables", value)
                           }
                           placeholder="Liste as entregas deste sprint. Ex: implementar bio, configurar link, organizar destaques, revisar textos, validar página..."
-                          rows={6}
                         />
                       </div>
                     </div>
@@ -539,11 +516,10 @@ export default function LinhaDoTempoForm({
         title="Visão macro da implementação"
         description="Use este campo para explicar a lógica geral de execução, prioridades, ordem das entregas e cuidados importantes."
       >
-        <TextAreaField
+        <RichTextEditor
           value={data.macroVision}
           onChange={(value) => setData((current) => ({ ...current, macroVision: value }))}
           placeholder="Ex: Primeiro concluir diagnóstico e essência do projeto, depois aprovar identidade visual, em seguida produzir conteúdo base, configurar campanhas e acompanhar métricas semanalmente."
-          rows={7}
         />
       </SectionCard>
 
@@ -589,11 +565,10 @@ export default function LinhaDoTempoForm({
         title="Riscos e pontos de atenção"
         description="Liste situações que podem atrasar ou impactar a execução do planejamento."
       >
-        <TextAreaField
+        <RichTextEditor
           value={data.risks}
           onChange={(value) => setData((current) => ({ ...current, risks: value }))}
           placeholder="Ex: Atraso no envio de materiais, falta de aprovação, dependência de terceiros, ausência de fotos, mudanças de escopo, demora na configuração de ferramentas ou falta de verba."
-          rows={7}
         />
       </SectionCard>
 

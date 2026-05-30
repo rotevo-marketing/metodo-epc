@@ -3,6 +3,7 @@
 import { ChangeEvent } from "react";
 import Link from "next/link";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
+import RichTextEditor from "@/Components/RichTextEditor";
 
 export type WhatsAppFrequencyItem = {
   format: string;
@@ -374,17 +375,12 @@ export default function WhatsAppForm({
               Mensagem inicial sugerida
             </label>
 
-            <textarea
-              rows={5}
+            <RichTextEditor
               value={data.initialMessage}
-              onChange={(event) =>
-                setData((current) => ({
-                  ...current,
-                  initialMessage: event.target.value,
-                }))
+              onChange={(value) =>
+                setData((current) => ({ ...current, initialMessage: value }))
               }
               placeholder="Escreva uma mensagem inicial para quem clicar no link do WhatsApp."
-              className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
             />
           </div>
 
@@ -393,17 +389,12 @@ export default function WhatsAppForm({
               Observações de atendimento
             </label>
 
-            <textarea
-              rows={5}
+            <RichTextEditor
               value={data.serviceNotes}
-              onChange={(event) =>
-                setData((current) => ({
-                  ...current,
-                  serviceNotes: event.target.value,
-                }))
+              onChange={(value) =>
+                setData((current) => ({ ...current, serviceNotes: value }))
               }
               placeholder="Registre horários, responsáveis, tempo ideal de resposta, etiquetas, etapas e cuidados no atendimento."
-              className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
             />
           </div>
         </div>
@@ -541,17 +532,12 @@ export default function WhatsAppForm({
               Primeiro atendimento
             </label>
 
-            <textarea
-              rows={6}
+            <RichTextEditor
               value={data.firstContactFlow}
-              onChange={(event) =>
-                setData((current) => ({
-                  ...current,
-                  firstContactFlow: event.target.value,
-                }))
+              onChange={(value) =>
+                setData((current) => ({ ...current, firstContactFlow: value }))
               }
               placeholder="Descreva como deve ser a primeira resposta, quais perguntas fazer e qual próxima ação conduzir."
-              className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
             />
           </div>
 
@@ -560,17 +546,12 @@ export default function WhatsAppForm({
               Nutrição e relacionamento
             </label>
 
-            <textarea
-              rows={6}
+            <RichTextEditor
               value={data.nurtureFlow}
-              onChange={(event) =>
-                setData((current) => ({
-                  ...current,
-                  nurtureFlow: event.target.value,
-                }))
+              onChange={(value) =>
+                setData((current) => ({ ...current, nurtureFlow: value }))
               }
               placeholder="Descreva como manter contato, enviar conteúdos, gerar valor e preparar a pessoa para uma decisão."
-              className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
             />
           </div>
 
@@ -579,17 +560,12 @@ export default function WhatsAppForm({
               Conversão de vendas
             </label>
 
-            <textarea
-              rows={6}
+            <RichTextEditor
               value={data.salesFlow}
-              onChange={(event) =>
-                setData((current) => ({
-                  ...current,
-                  salesFlow: event.target.value,
-                }))
+              onChange={(value) =>
+                setData((current) => ({ ...current, salesFlow: value }))
               }
               placeholder="Descreva como apresentar oferta, responder objeções, conduzir para pagamento, reunião ou fechamento."
-              className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
             />
           </div>
 
@@ -598,17 +574,12 @@ export default function WhatsAppForm({
               Pós-venda e acompanhamento
             </label>
 
-            <textarea
-              rows={6}
+            <RichTextEditor
               value={data.postSaleFlow}
-              onChange={(event) =>
-                setData((current) => ({
-                  ...current,
-                  postSaleFlow: event.target.value,
-                }))
+              onChange={(value) =>
+                setData((current) => ({ ...current, postSaleFlow: value }))
               }
               placeholder="Descreva como acompanhar o cliente após a compra, pedir feedback, enviar orientações e manter relacionamento."
-              className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
             />
           </div>
         </div>
@@ -623,17 +594,12 @@ export default function WhatsAppForm({
             Estratégia visual
           </label>
 
-          <textarea
-            rows={6}
+          <RichTextEditor
             value={data.visualStrategy}
-            onChange={(event) =>
-              setData((current) => ({
-                ...current,
-                visualStrategy: event.target.value,
-              }))
+            onChange={(value) =>
+              setData((current) => ({ ...current, visualStrategy: value }))
             }
             placeholder="Explique a direção visual dos materiais enviados no WhatsApp: estilo dos cards, PDFs, imagens, convites, capas e materiais de apoio."
-            className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
           />
         </div>
 

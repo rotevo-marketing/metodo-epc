@@ -3,6 +3,7 @@
 import { ChangeEvent } from "react";
 import Link from "next/link";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
+import RichTextEditor from "@/Components/RichTextEditor";
 
 export type ChannelKey =
   | "site"
@@ -475,19 +476,12 @@ export default function ReferenciasConcorrentesForm({
                                 Descrição da análise
                               </label>
 
-                              <textarea
-                                rows={5}
+                              <RichTextEditor
                                 value={analysis.description}
-                                onChange={(event) =>
-                                  updateAnalysis(
-                                    index,
-                                    analysisIndex,
-                                    "description",
-                                    event.target.value
-                                  )
+                                onChange={(value) =>
+                                  updateAnalysis(index, analysisIndex, "description", value)
                                 }
                                 placeholder="Descreva o que deve ser observado nessa referência ou concorrência, incluindo pontos positivos, oportunidades, diferenciais, riscos e aprendizados."
-                                className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
                               />
                             </div>
                           </div>

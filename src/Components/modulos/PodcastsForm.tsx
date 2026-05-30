@@ -3,6 +3,7 @@
 import { ChangeEvent } from "react";
 import Link from "next/link";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
+import RichTextEditor from "@/Components/RichTextEditor";
 
 export type PodcastsFrequencyItem = {
   format: string;
@@ -452,14 +453,10 @@ export default function PodcastsForm({
             <label className="mb-2 block text-sm font-semibold text-slate-600">
               Formato principal
             </label>
-            <textarea
-              rows={6}
+            <RichTextEditor
               value={data.mainFormat}
-              onChange={(event) =>
-                setData((current) => ({ ...current, mainFormat: event.target.value }))
-              }
+              onChange={(value) => setData((current) => ({ ...current, mainFormat: value }))}
               placeholder="Ex: Entrevistas, episódios solo, mesa redonda, comentários, estudos de caso, aulas ou conversas guiadas."
-              className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
             />
           </div>
 
@@ -467,14 +464,10 @@ export default function PodcastsForm({
             <label className="mb-2 block text-sm font-semibold text-slate-600">
               Duração e ritmo
             </label>
-            <textarea
-              rows={6}
+            <RichTextEditor
               value={data.durationAndRhythm}
-              onChange={(event) =>
-                setData((current) => ({ ...current, durationAndRhythm: event.target.value }))
-              }
+              onChange={(value) => setData((current) => ({ ...current, durationAndRhythm: value }))}
               placeholder="Ex: Episódios de 20 a 40 minutos, cortes para redes sociais, ritmo leve, educativo ou conversacional."
-              className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
             />
           </div>
 
@@ -482,14 +475,10 @@ export default function PodcastsForm({
             <label className="mb-2 block text-sm font-semibold text-slate-600">
               Quadros ou séries
             </label>
-            <textarea
-              rows={6}
+            <RichTextEditor
               value={data.seriesOrSegments}
-              onChange={(event) =>
-                setData((current) => ({ ...current, seriesOrSegments: event.target.value }))
-              }
+              onChange={(value) => setData((current) => ({ ...current, seriesOrSegments: value }))}
               placeholder="Ex: Perguntas da audiência, histórias de clientes, bastidores, entrevistas, tendências, erros comuns..."
-              className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
             />
           </div>
 
@@ -497,14 +486,10 @@ export default function PodcastsForm({
             <label className="mb-2 block text-sm font-semibold text-slate-600">
               Convidados ou participantes
             </label>
-            <textarea
-              rows={6}
+            <RichTextEditor
               value={data.guestsAndParticipants}
-              onChange={(event) =>
-                setData((current) => ({ ...current, guestsAndParticipants: event.target.value }))
-              }
+              onChange={(value) => setData((current) => ({ ...current, guestsAndParticipants: value }))}
               placeholder="Liste tipos de convidados, parceiros, especialistas, clientes ou pessoas que podem participar dos episódios."
-              className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
             />
           </div>
         </div>
@@ -518,14 +503,10 @@ export default function PodcastsForm({
           <label className="mb-2 block text-sm font-semibold text-slate-600">
             Estratégia visual
           </label>
-          <textarea
-            rows={6}
+          <RichTextEditor
             value={data.visualStrategy}
-            onChange={(event) =>
-              setData((current) => ({ ...current, visualStrategy: event.target.value }))
-            }
+            onChange={(value) => setData((current) => ({ ...current, visualStrategy: value }))}
             placeholder="Explique a direção visual do podcast: capa, thumbnail dos episódios, fotos, cores, títulos, elementos gráficos e referências."
-            className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
           />
         </div>
 
@@ -651,14 +632,10 @@ export default function PodcastsForm({
                 <label className="mb-2 block text-sm font-semibold text-slate-600">
                   Observação
                 </label>
-                <textarea
-                  rows={5}
+                <RichTextEditor
                   value={content.observation}
-                  onChange={(event) =>
-                    updateContent(index, "observation", event.target.value)
-                  }
+                  onChange={(value) => updateContent(index, "observation", value)}
                   placeholder="Registre objetivo do episódio, pontos principais, chamada final, links citados e observações de produção."
-                  className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
                 />
               </div>
 
@@ -691,14 +668,10 @@ export default function PodcastsForm({
             <label className="mb-2 block text-sm font-semibold text-slate-600">
               Plataformas de publicação
             </label>
-            <textarea
-              rows={6}
+            <RichTextEditor
               value={data.publishingPlatforms}
-              onChange={(event) =>
-                setData((current) => ({ ...current, publishingPlatforms: event.target.value }))
-              }
+              onChange={(value) => setData((current) => ({ ...current, publishingPlatforms: value }))}
               placeholder="Ex: Spotify, YouTube, Apple Podcasts, Deezer, site, blog ou agregadores."
-              className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
             />
           </div>
 
@@ -706,14 +679,10 @@ export default function PodcastsForm({
             <label className="mb-2 block text-sm font-semibold text-slate-600">
               Reaproveitamento de conteúdo
             </label>
-            <textarea
-              rows={6}
+            <RichTextEditor
               value={data.repurposingStrategy}
-              onChange={(event) =>
-                setData((current) => ({ ...current, repurposingStrategy: event.target.value }))
-              }
+              onChange={(value) => setData((current) => ({ ...current, repurposingStrategy: value }))}
               placeholder="Ex: Cortes para Instagram, TikTok, YouTube Shorts, carrosséis, newsletter, blog e WhatsApp."
-              className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
             />
           </div>
         </div>

@@ -2,6 +2,7 @@
 
 import { ChangeEvent, useState } from "react";
 import Link from "next/link";
+import RichTextEditor from "@/Components/RichTextEditor";
 
 export type EducationalMaterial = {
   title: string;
@@ -225,35 +226,29 @@ export default function MateriaisEducacionaisForm({
 
                   <div className="mt-4">
                     <label className={labelClass}>Conteúdo</label>
-                    <textarea
-                      rows={7}
+                    <RichTextEditor
                       value={material.content}
-                      onChange={(e) => updateMaterial(index, "content", e.target.value)}
+                      onChange={(value) => updateMaterial(index, "content", value)}
                       placeholder="Descreva o conteúdo do material, os temas abordados, a promessa, a estrutura e como ele será usado na estratégia."
-                      className={textareaClass}
                     />
                   </div>
 
                   <div className="mt-4 grid gap-4 md:grid-cols-2">
                     <div>
                       <label className={labelClass}>Objetivo do material</label>
-                      <textarea
-                        rows={5}
+                      <RichTextEditor
                         value={material.objective}
-                        onChange={(e) => updateMaterial(index, "objective", e.target.value)}
+                        onChange={(value) => updateMaterial(index, "objective", value)}
                         placeholder="Ex: Captar leads, educar o público, preparar para venda, reforçar autoridade ou entregar valor."
-                        className={textareaClass}
                       />
                     </div>
 
                     <div>
                       <label className={labelClass}>Como será distribuído</label>
-                      <textarea
-                        rows={5}
+                      <RichTextEditor
                         value={material.distribution}
-                        onChange={(e) => updateMaterial(index, "distribution", e.target.value)}
+                        onChange={(value) => updateMaterial(index, "distribution", value)}
                         placeholder="Ex: Landing page, Instagram, WhatsApp, e-mail, anúncio, blog ou campanha de captação."
-                        className={textareaClass}
                       />
                     </div>
                   </div>
@@ -331,12 +326,10 @@ export default function MateriaisEducacionaisForm({
         </p>
 
         <div className="mt-6">
-          <textarea
-            rows={8}
+          <RichTextEditor
             value={data.strategy}
-            onChange={(e) => setData((c) => ({ ...c, strategy: e.target.value }))}
+            onChange={(value) => setData((c) => ({ ...c, strategy: value }))}
             placeholder="Explique como os materiais serão usados na estratégia, quais etapas da jornada eles atendem, quais públicos receberão cada material e quais resultados devem gerar."
-            className={textareaClass}
           />
         </div>
       </section>

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
+import RichTextEditor from "@/Components/RichTextEditor";
 
 export type SimpleItem = {
   title: string;
@@ -152,14 +153,10 @@ function SimpleItemEditor({
             Descrição
           </label>
 
-          <textarea
-            rows={5}
+          <RichTextEditor
             value={item.description}
-            onChange={(event) =>
-              onChange(index, "description", event.target.value)
-            }
+            onChange={(value) => onChange(index, "description", value)}
             placeholder={descriptionPlaceholder}
-            className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
           />
         </div>
       </div>
@@ -527,14 +524,10 @@ export default function ObjetivosProjetoForm({
                   Descrição da fase
                 </label>
 
-                <textarea
-                  rows={5}
+                <RichTextEditor
                   value={phase.description}
-                  onChange={(event) =>
-                    updatePhase(index, "description", event.target.value)
-                  }
+                  onChange={(value) => updatePhase(index, "description", value)}
                   placeholder="Explique o que acontece nesta fase e qual avanço ela deve gerar."
-                  className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
                 />
               </div>
             </div>
@@ -554,17 +547,12 @@ export default function ObjetivosProjetoForm({
         title="Observação estratégica"
         description="Registre uma orientação final sobre como os objetivos devem ser interpretados e usados durante a execução."
       >
-        <textarea
-          rows={6}
+        <RichTextEditor
           value={data.strategicObservation}
-          onChange={(event) =>
-            setData((current) => ({
-              ...current,
-              strategicObservation: event.target.value,
-            }))
+          onChange={(value) =>
+            setData((current) => ({ ...current, strategicObservation: value }))
           }
           placeholder="Ex: Os objetivos não devem ser tratados como tarefas isoladas, mas como critérios para tomada de decisão, priorização de conteúdo, construção de campanhas e avaliação de evolução."
-          className="w-full resize-none rounded-2xl border border-slate-200 px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
         />
       </SectionCard>
 

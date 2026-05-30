@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import RichTextEditor from "@/Components/RichTextEditor";
 
 export type SiteMapPageItem = {
   title: string;
@@ -258,35 +259,29 @@ export default function MapaDoSiteForm({
 
                   <div className="mt-4">
                     <label className={labelClass}>Descrição</label>
-                    <textarea
-                      rows={6}
+                    <RichTextEditor
                       value={page.description}
-                      onChange={(e) => updatePage(index, "description", e.target.value)}
+                      onChange={(value) => updatePage(index, "description", value)}
                       placeholder="Descreva o que essa página deve conter, qual será sua função, qual mensagem ela precisa transmitir e qual ação o visitante deve realizar."
-                      className={textareaClass}
                     />
                   </div>
 
                   <div className="mt-4 grid gap-4 md:grid-cols-2">
                     <div>
                       <label className={labelClass}>Seções obrigatórias</label>
-                      <textarea
-                        rows={5}
+                      <RichTextEditor
                         value={page.requiredSections}
-                        onChange={(e) => updatePage(index, "requiredSections", e.target.value)}
+                        onChange={(value) => updatePage(index, "requiredSections", value)}
                         placeholder="Ex: Hero, prova social, benefícios, serviços, depoimentos, FAQ, formulário, chamada final..."
-                        className={textareaClass}
                       />
                     </div>
 
                     <div>
                       <label className={labelClass}>CTA principal</label>
-                      <textarea
-                        rows={5}
+                      <RichTextEditor
                         value={page.mainCta}
-                        onChange={(e) => updatePage(index, "mainCta", e.target.value)}
+                        onChange={(value) => updatePage(index, "mainCta", value)}
                         placeholder="Ex: Entrar em contato, agendar diagnóstico, baixar material, comprar, solicitar orçamento ou falar no WhatsApp."
-                        className={textareaClass}
                       />
                     </div>
                   </div>
@@ -313,12 +308,10 @@ export default function MapaDoSiteForm({
         </p>
 
         <div className="mt-6">
-          <textarea
-            rows={8}
+          <RichTextEditor
             value={data.strategicNotes}
-            onChange={(e) => setData((c) => ({ ...c, strategicNotes: e.target.value }))}
+            onChange={(value) => setData((c) => ({ ...c, strategicNotes: value }))}
             placeholder="Registre observações estratégicas sobre a organização do site, fluxo de navegação, experiência do usuário e prioridades."
-            className={textareaClass}
           />
         </div>
       </section>

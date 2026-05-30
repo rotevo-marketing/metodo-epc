@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
+import RichTextEditor from "@/Components/RichTextEditor";
 
 export type EditorialLineItem = {
   title: string;
@@ -126,7 +127,7 @@ function TextAreaField({
   label,
   value,
   placeholder,
-  rows = 5,
+  rows: _rows,
   onChange,
 }: {
   label: string;
@@ -140,14 +141,7 @@ function TextAreaField({
       <label className="mb-2 block text-sm font-semibold text-slate-600">
         {label}
       </label>
-
-      <textarea
-        rows={rows}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        placeholder={placeholder}
-        className="w-full resize-none rounded-2xl border border-slate-200 px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
-      />
+      <RichTextEditor value={value} onChange={onChange} placeholder={placeholder} />
     </div>
   );
 }
@@ -467,17 +461,12 @@ export default function LinhasEditoriaisForm({
         title="Diretrizes gerais das linhas editoriais"
         description="Use este campo para orientar a lógica geral da produção de conteúdo, equilíbrio entre linhas, prioridades e cuidados editoriais."
       >
-        <textarea
-          rows={7}
+        <RichTextEditor
           value={data.generalGuidelines}
-          onChange={(event) =>
-            setData((current) => ({
-              ...current,
-              generalGuidelines: event.target.value,
-            }))
+          onChange={(value) =>
+            setData((current) => ({ ...current, generalGuidelines: value }))
           }
           placeholder="Ex: Manter equilíbrio entre autoridade, conexão e conversão. Priorizar conteúdos educativos no topo do funil, conteúdos de prova no meio e conteúdos de oferta no fundo. Evitar temas que não reforcem o posicionamento central."
-          className="w-full resize-none rounded-2xl border border-slate-200 px-4 py-3 leading-7 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
         />
       </SectionCard>
 
