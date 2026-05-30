@@ -161,6 +161,14 @@ export function ModuleHeader({
     if (s.includes("materiais")) return "/icons/28-materiais-educacionais.svg";
     if (s.includes("estrategia-do-site")) return "/icons/29-estrategia-do-site.svg";
     if (s.includes("mapa-do-site")) return "/icons/30-mapa-do-site.svg";
+    if (s.includes("captacao-de-lead")) return "/icons/31-campanha-leads.svg";
+    if (s.includes("conversao-de-vendas")) return "/icons/32-campanha-vendas.svg";
+    if (s.includes("distribuicao-de-conteudo")) return "/icons/33-campanha-conteudo.svg";
+    if (s.includes("fluxo-de-automacao")) return "/icons/34-fluxo-de-automacao.svg";
+    if (s.includes("linha-do-tempo")) return "/icons/35-linha-do-tempo.svg";
+    if (s.includes("calendario-de-conteudo")) return "/icons/36-calendario-de-conteudo.svg";
+    if (s.includes("metricas-e-indicadores")) return "/icons/37-metricas-e-indicadores.svg";
+    if (s.includes("orientacoes")) return "/icons/38-orientacoes.svg";
     return "/icons/38-orientacoes.svg";
   }
 
