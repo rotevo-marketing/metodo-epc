@@ -554,24 +554,27 @@ function DetailMode({
       <section className="px-6 py-8 lg:px-10 lg:py-10 xl:px-14">
         <div className="mx-auto grid max-w-[1520px] gap-8 lg:grid-cols-[315px_minmax(0,1fr)] xl:gap-10">
           {/* Sidebar */}
-          <aside className="h-fit rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-slate-200 lg:sticky lg:top-6">
-            <p className="text-xs font-medium uppercase tracking-[0.32em] text-slate-400">
-              Navegação
-            </p>
-            <h2 className="mt-3 text-2xl font-light tracking-[-0.03em] text-slate-950">
-              {clientName}
-            </h2>
+          <aside className="lg:sticky lg:top-6">
+            <div className="flex max-h-[calc(100vh-3rem)] flex-col overflow-hidden rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-slate-200">
+              <div className="shrink-0">
+                <p className="text-xs font-medium uppercase tracking-[0.32em] text-slate-400">
+                  Navegação
+                </p>
+                <h2 className="mt-3 text-2xl font-light tracking-[-0.03em] text-slate-950">
+                  {clientName}
+                </h2>
 
-            <div className="mt-5 flex gap-3 rounded-[1.25rem] bg-slate-50 p-4 text-slate-600 ring-1 ring-slate-200">
-              <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-slate-950 shadow-sm ring-1 ring-slate-200">
-                <ArrowIcon />
+                <div className="mt-5 flex gap-3 rounded-[1.25rem] bg-slate-50 p-4 text-slate-600 ring-1 ring-slate-200">
+                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-slate-950 shadow-sm ring-1 ring-slate-200">
+                    <ArrowIcon />
+                  </div>
+                  <p className="text-sm leading-6">
+                    Selecione uma seção para visualizar a apresentação estratégica.
+                  </p>
+                </div>
               </div>
-              <p className="text-sm leading-6">
-                Selecione uma seção para visualizar a apresentação estratégica.
-              </p>
-            </div>
 
-            <nav className="mt-7 max-h-[calc(100vh-20rem)] space-y-6 overflow-y-auto pr-1">
+              <nav className="mt-7 min-h-0 flex-1 space-y-6 overflow-y-auto pr-1">
               {groupedSections.map((group) => (
                 <div key={group.category}>
                   <p className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-400">
@@ -621,7 +624,8 @@ function DetailMode({
                   </div>
                 </div>
               ))}
-            </nav>
+              </nav>
+            </div>
           </aside>
 
           {/* Main content */}
