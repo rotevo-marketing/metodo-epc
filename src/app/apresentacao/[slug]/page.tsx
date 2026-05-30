@@ -554,7 +554,7 @@ function DetailMode({
       <section className="px-6 py-8 lg:px-10 lg:py-10 xl:px-14">
         <div className="mx-auto grid max-w-[1520px] gap-8 lg:grid-cols-[315px_minmax(0,1fr)] xl:gap-10">
           {/* Sidebar */}
-          <aside className="lg:sticky lg:top-6">
+          <aside className="lg:sticky lg:top-6 lg:self-start">
             <div className="max-h-[calc(100vh-3rem)] overflow-y-auto rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-slate-200">
               <p className="text-xs font-medium uppercase tracking-[0.32em] text-slate-400">
                 Navegação
@@ -572,7 +572,7 @@ function DetailMode({
                 </p>
               </div>
 
-              <nav className="mt-7 space-y-6 pr-1">
+              <nav className="mt-7 space-y-6">
               {groupedSections.map((group) => (
                 <div key={group.category}>
                   <p className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-400">
