@@ -571,7 +571,7 @@ function DetailMode({
               </p>
             </div>
 
-            <nav className="mt-7 max-h-[700px] space-y-6 overflow-y-auto pr-1">
+            <nav className="mt-7 space-y-6">
               {groupedSections.map((group) => (
                 <div key={group.category}>
                   <p className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-400">
