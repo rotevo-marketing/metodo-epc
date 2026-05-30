@@ -69,8 +69,8 @@ export default function EmpresaPresentation({ data }: { data: unknown }) {
 
   return (
     <article className="space-y-4">
-      {/* Header — integrated, no card border */}
-      <div className="p-6 lg:p-8">
+      {/* Header */}
+      <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
         <div className="flex items-center gap-5">
           <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-slate-950">
             <ModuleIcon slug="dna-da-empresa" size="lg" inverted />
@@ -84,7 +84,7 @@ export default function EmpresaPresentation({ data }: { data: unknown }) {
             </h2>
           </div>
         </div>
-      </div>
+      </section>
 
       {primaryFields.length > 0 && (
         <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">

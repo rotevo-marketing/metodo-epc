@@ -92,17 +92,17 @@ export default function ObjetivosPresentation({ data }: { data: unknown }) {
 
       {/* Main objective */}
       {hasMainObjective && (
-        <section className="rounded-[2rem] bg-slate-950 p-8 shadow-sm lg:p-12">
-          <p className="text-xs font-semibold uppercase tracking-[0.32em] text-white/50">
+        <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
+          <p className="text-xs font-semibold uppercase tracking-[0.32em] text-slate-400">
             Objetivo principal
           </p>
           {mainObjective!.title && (
-            <h3 className="mt-5 text-3xl font-light tracking-[-0.04em] text-white lg:text-4xl">
+            <h3 className="mt-5 text-3xl font-light tracking-[-0.04em] text-slate-950 lg:text-4xl">
               {mainObjective!.title}
             </h3>
           )}
           {mainObjective!.description && (
-            <p className="mt-4 text-base leading-8 text-white/75">
+            <p className="mt-4 text-base leading-8 text-slate-700">
               {mainObjective!.description}
             </p>
           )}
