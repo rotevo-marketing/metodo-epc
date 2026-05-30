@@ -40,7 +40,7 @@ export default function MapaSitePresentation({ data }: { data: unknown }) {
   return (
     <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
       <ModuleHeader
-        slug="mapa-site"
+        slug="mapa-do-site"
         group="Estratégia Editorial e Canais"
         title="Mapa do Site"
         description="Mapeamento das páginas do site: tipo, objetivo, seções e CTA de cada página."
