@@ -42,9 +42,9 @@ export default function PesquisaConcorrenciaPresentation({
   );
 
   return (
-    <article className="space-y-6">
+    <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
       {/* Header */}
-      <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
+      <section className="p-8 lg:p-12">
         <div className="flex items-center gap-5">
           <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-slate-950">
             <ModuleIcon slug="pesquisa-de-concorrencia" size="lg" inverted />
@@ -69,7 +69,7 @@ export default function PesquisaConcorrenciaPresentation({
         return (
           <section
             key={i}
-            className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12"
+            className="p-8 lg:p-12"
           >
             {/* Competitor header */}
             <div className="flex items-center gap-5">
@@ -126,7 +126,7 @@ export default function PesquisaConcorrenciaPresentation({
       })}
 
       {!d && (
-        <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200">
+        <section className="p-8">
           <p className="text-slate-500">
             Este módulo ainda não foi preenchido no planejamento.
           </p>

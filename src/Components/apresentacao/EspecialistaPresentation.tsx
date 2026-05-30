@@ -72,9 +72,9 @@ export default function EspecialistaPresentation({ data }: { data: unknown }) {
   const filledFields = fieldLabels.filter(([k]) => fields[k]?.trim());
 
   return (
-    <article className="space-y-4">
+    <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
       {/* Header */}
-      <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
+      <section className="p-8 lg:p-12">
         <div className="flex items-center gap-5">
           <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-slate-950">
             <ModuleIcon slug="dna-do-especialista" size="lg" inverted />
@@ -92,7 +92,7 @@ export default function EspecialistaPresentation({ data }: { data: unknown }) {
 
       {/* Photo standalone — only when no characteristics */}
       {photo && characteristics.length === 0 && (
-        <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
+        <section className="p-8 lg:p-12">
           <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
             Foto do especialista
           </p>
@@ -106,7 +106,7 @@ export default function EspecialistaPresentation({ data }: { data: unknown }) {
 
       {/* Fields — each in its own card */}
       {filledFields.length > 0 && (
-        <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
+        <section className="p-8 lg:p-12">
           <h3 className="mb-6 text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl">
             Sobre o especialista
           </h3>
@@ -120,7 +120,7 @@ export default function EspecialistaPresentation({ data }: { data: unknown }) {
 
       {/* Personalidade do especialista — grid layout */}
       {characteristics.length > 0 && (
-        <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
+        <section className="p-8 lg:p-12">
           <p className="mb-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
             Personalidade do especialista
           </p>
@@ -181,7 +181,7 @@ export default function EspecialistaPresentation({ data }: { data: unknown }) {
       )}
 
       {!d && (
-        <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200">
+        <section className="p-8">
           <p className="text-slate-500">
             Este módulo ainda não foi preenchido no planejamento.
           </p>

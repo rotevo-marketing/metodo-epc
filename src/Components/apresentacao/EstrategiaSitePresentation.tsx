@@ -31,7 +31,7 @@ export default function EstrategiaSitePresentation({ data }: { data: unknown }) 
   const filledExtRefs = (d?.externalReferences ?? []).filter((r) => r.title?.trim() || r.link?.trim());
 
   return (
-    <article className="space-y-6">
+    <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
       <ModuleHeader
         slug="estrategia-site"
         group="Estratégia Editorial e Canais"

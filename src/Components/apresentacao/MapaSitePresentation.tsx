@@ -38,7 +38,7 @@ export default function MapaSitePresentation({ data }: { data: unknown }) {
   const filledPages = (d?.pages ?? []).filter((p) => p.title?.trim());
 
   return (
-    <article className="space-y-6">
+    <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
       <ModuleHeader
         slug="mapa-site"
         group="Estratégia Editorial e Canais"

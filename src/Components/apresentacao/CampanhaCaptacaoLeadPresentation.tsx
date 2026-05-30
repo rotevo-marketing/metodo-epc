@@ -55,7 +55,7 @@ export default function CampanhaCaptacaoLeadPresentation({ data }: { data: unkno
   const filledMaterials = (d?.materials ?? []).filter((m) => m.title?.trim());
 
   return (
-    <article className="space-y-6">
+    <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
       <ModuleHeader
         slug="campanha-captacao-de-lead"
         group="Campanhas, Automações e Conversão"

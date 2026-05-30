@@ -132,9 +132,9 @@ export default function TomDeVozPresentation({ data }: { data: unknown }) {
   const filledTones = tonePairs.filter((p) => toneChoices[p.key]);
 
   return (
-    <article className="space-y-6">
+    <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
       {/* Header */}
-      <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
+      <section className="p-8 lg:p-12">
         <div className="flex items-center gap-5">
           <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-slate-950">
             <ModuleIcon slug="tom-de-voz" size="lg" inverted />
@@ -152,7 +152,7 @@ export default function TomDeVozPresentation({ data }: { data: unknown }) {
 
       {/* Characteristics */}
       {characteristics.length > 0 && (
-        <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
+        <section className="p-8 lg:p-12">
           <h3 className="mb-6 text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl">
             Características do tom
           </h3>
@@ -178,7 +178,7 @@ export default function TomDeVozPresentation({ data }: { data: unknown }) {
 
       {/* Tone choices */}
       {filledTones.length > 0 && (
-        <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
+        <section className="p-8 lg:p-12">
           <h3 className="mb-6 text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl">
             Posicionamento de tom
           </h3>
@@ -201,7 +201,7 @@ export default function TomDeVozPresentation({ data }: { data: unknown }) {
 
       {/* Emotions */}
       {emotions.length > 0 && (
-        <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
+        <section className="p-8 lg:p-12">
           <h3 className="mb-6 text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl">
             Emoções transmitidas
           </h3>
@@ -220,7 +220,7 @@ export default function TomDeVozPresentation({ data }: { data: unknown }) {
 
       {/* Vocabulary */}
       {filledVocabulary.length > 0 && (
-        <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
+        <section className="p-8 lg:p-12">
           <h3 className="mb-6 text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl">
             Vocabulário da marca
           </h3>
@@ -242,7 +242,7 @@ export default function TomDeVozPresentation({ data }: { data: unknown }) {
 
       {/* Observations */}
       {observations && (
-        <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
+        <section className="p-8 lg:p-12">
           <h3 className="mb-5 text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl">
             Observações
           </h3>
@@ -254,7 +254,7 @@ export default function TomDeVozPresentation({ data }: { data: unknown }) {
 
       {/* References */}
       {references.length > 0 && (
-        <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
+        <section className="p-8 lg:p-12">
           <h3 className="mb-6 text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl">
             Referências de tom
           </h3>
@@ -297,7 +297,7 @@ export default function TomDeVozPresentation({ data }: { data: unknown }) {
       )}
 
       {!d && (
-        <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200">
+        <section className="p-8">
           <p className="text-slate-500">
             Este módulo ainda não foi preenchido no planejamento.
           </p>

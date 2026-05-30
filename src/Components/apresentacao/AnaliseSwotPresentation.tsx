@@ -44,9 +44,9 @@ export default function AnaliseSwotPresentation({ data }: { data: unknown }) {
   const filledQuadrants = swotQuadrants.filter((q) => fields[q.key]?.trim());
 
   return (
-    <article className="space-y-6">
+    <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
       {/* Header */}
-      <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
+      <section className="p-8 lg:p-12">
         <div className="flex items-center gap-5">
           <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-slate-950">
             <ModuleIcon slug="analise-swot" size="lg" inverted />
@@ -64,7 +64,7 @@ export default function AnaliseSwotPresentation({ data }: { data: unknown }) {
 
       {/* SWOT grid */}
       {filledQuadrants.length > 0 && (
-        <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
+        <section className="p-8 lg:p-12">
           <h3 className="mb-8 text-3xl font-light tracking-[-0.04em] text-slate-950">
             Matriz SWOT
           </h3>
@@ -89,7 +89,7 @@ export default function AnaliseSwotPresentation({ data }: { data: unknown }) {
 
       {/* Synthesis */}
       {synthesis && (
-        <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
+        <section className="p-8 lg:p-12">
           <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
             Síntese estratégica
           </p>
@@ -100,7 +100,7 @@ export default function AnaliseSwotPresentation({ data }: { data: unknown }) {
       )}
 
       {!d && (
-        <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200">
+        <section className="p-8">
           <p className="text-slate-500">
             Este módulo ainda não foi preenchido no planejamento.
           </p>

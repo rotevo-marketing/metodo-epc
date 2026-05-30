@@ -40,7 +40,7 @@ export default function CalendarioConteudoPresentation({ data }: { data: unknown
   const filledDriveFolders = (d?.driveFolders ?? []).filter((f) => f.title?.trim());
 
   return (
-    <article className="space-y-6">
+    <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
       <ModuleHeader
         slug="calendario-de-conteudo"
         group="Execução, Acompanhamento e Gestão"

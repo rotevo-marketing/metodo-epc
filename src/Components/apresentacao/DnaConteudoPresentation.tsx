@@ -48,9 +48,9 @@ export default function DnaConteudoPresentation({ data }: { data: unknown }) {
   const otherFields = fieldLabels.filter(([k]) => fields[k]?.trim());
 
   return (
-    <article className="space-y-4">
+    <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
       {/* Header */}
-      <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
+      <section className="p-8 lg:p-12">
         <div className="flex items-center gap-5">
           <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-slate-950">
             <ModuleIcon slug="dna-de-conteudo" size="lg" inverted />
@@ -68,7 +68,7 @@ export default function DnaConteudoPresentation({ data }: { data: unknown }) {
 
       {/* Fundamentos */}
       {otherFields.length > 0 && (
-        <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
+        <section className="p-8 lg:p-12">
           <h3 className="mb-6 text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl">
             Fundamentos do DNA
           </h3>
@@ -82,14 +82,14 @@ export default function DnaConteudoPresentation({ data }: { data: unknown }) {
 
       {/* Big Idea */}
       {bigIdea && (
-        <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
+        <section className="p-8 lg:p-12">
           <Field label="Big Idea do Conteúdo" value={bigIdea} />
         </section>
       )}
 
       {/* Ideias secundárias */}
       {secondaryIdeas.length > 0 && (
-        <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
+        <section className="p-8 lg:p-12">
           <h3 className="mb-6 text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl">
             Ideias secundárias
           </h3>
@@ -108,7 +108,7 @@ export default function DnaConteudoPresentation({ data }: { data: unknown }) {
       )}
 
       {!d && (
-        <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200">
+        <section className="p-8">
           <p className="text-slate-500">
             Este módulo ainda não foi preenchido no planejamento.
           </p>

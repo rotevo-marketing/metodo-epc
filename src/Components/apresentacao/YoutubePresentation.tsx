@@ -38,7 +38,7 @@ export default function YoutubePresentation({ data }: { data: unknown }) {
   const d = isYoutubeData(data) ? data : null;
 
   return (
-    <article className="space-y-6">
+    <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
       <ModuleHeader
         slug="youtube"
         group="Estratégia Editorial e Canais"

@@ -59,7 +59,7 @@ export default function LinhaTempoPresentation({ data }: { data: unknown }) {
   const filledEvents = (d?.events ?? []).filter((e) => e.title?.trim() || e.date?.trim());
 
   return (
-    <article className="space-y-6">
+    <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
       <ModuleHeader
         slug="linha-do-tempo"
         group="Execução, Acompanhamento e Gestão"

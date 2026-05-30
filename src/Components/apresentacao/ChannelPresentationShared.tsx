@@ -118,7 +118,7 @@ export function FieldBlock({ label, value }: { label: string; value: string }) {
 
 export function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
+    <section className="p-8 lg:p-12">
       <h3 className="mb-6 text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl">{title}</h3>
       <div className="space-y-6">{children}</div>
     </section>
@@ -127,7 +127,7 @@ export function SectionCard({ title, children }: { title: string; children: Reac
 
 export function EmptyState() {
   return (
-    <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200">
+    <section className="p-8">
       <p className="text-slate-500">Este módulo ainda não foi preenchido no planejamento.</p>
     </section>
   );
@@ -165,7 +165,7 @@ export function ModuleHeader({
   }
 
   return (
-    <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
+    <section className="p-8 lg:p-12">
       <div className="flex items-center gap-5">
         <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-slate-950">
           <img

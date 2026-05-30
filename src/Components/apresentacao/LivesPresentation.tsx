@@ -50,7 +50,7 @@ export default function LivesPresentation({ data }: { data: unknown }) {
   const filledContents = (d?.contents ?? []).filter((c) => c.title?.trim());
 
   return (
-    <article className="space-y-6">
+    <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
       <ModuleHeader
         slug="lives"
         group="Estratégia Editorial e Canais"

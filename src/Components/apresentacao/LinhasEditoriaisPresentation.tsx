@@ -48,7 +48,7 @@ export default function LinhasEditoriaisPresentation({ data }: { data: unknown }
   const references = d?.references ?? [];
 
   return (
-    <article className="space-y-6">
+    <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
       <ModuleHeader
         slug="linhas-editoriais"
         group="Estratégia Editorial"
@@ -61,7 +61,7 @@ export default function LinhasEditoriaisPresentation({ data }: { data: unknown }
         return (
           <section
             key={i}
-            className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12"
+            className="p-8 lg:p-12"
           >
             <div className="mb-6">
               <span className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">

@@ -72,7 +72,7 @@ export default function FluxoAutomacaoPresentation({ data }: { data: unknown }) 
   const filledPlatforms = (d?.platforms ?? []).filter((p) => p.tool?.trim());
 
   return (
-    <article className="space-y-6">
+    <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
       <ModuleHeader
         slug="fluxo-de-automacao"
         group="Campanhas, Automações e Conversão"

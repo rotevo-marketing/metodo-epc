@@ -77,7 +77,7 @@ export default function FunilConteudoPresentation({ data }: { data: unknown }) {
     : [];
 
   return (
-    <article className="space-y-6">
+    <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
       <ModuleHeader
         slug="funil-de-conteudo"
         group="Estratégia Editorial"
@@ -86,7 +86,7 @@ export default function FunilConteudoPresentation({ data }: { data: unknown }) {
       />
 
       {overview && (
-        <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
+        <section className="p-8 lg:p-12">
           <FieldBlock label="Visão geral" value={overview} />
         </section>
       )}
@@ -98,7 +98,7 @@ export default function FunilConteudoPresentation({ data }: { data: unknown }) {
         return (
           <section
             key={i}
-            className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12"
+            className="p-8 lg:p-12"
           >
             <div className={`mb-6 inline-flex rounded-2xl px-4 py-2 ring-1 ${funnelColors[i] ?? "bg-slate-50 ring-slate-200 text-slate-700"}`}>
               <div>
