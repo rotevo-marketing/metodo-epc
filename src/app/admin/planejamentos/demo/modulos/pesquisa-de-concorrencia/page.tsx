@@ -305,7 +305,7 @@ export default function PesquisaDeConcorrenciaPage() {
               </p>
 
               <h1 className="mt-2 text-4xl font-bold tracking-tight">
-                Pesquisa de Concorrência
+                Análise de Concorrência
               </h1>
 
               <p className="mt-3 max-w-3xl text-slate-600">

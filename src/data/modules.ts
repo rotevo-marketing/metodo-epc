@@ -73,7 +73,7 @@ export const planningModules = [
   },
   {
     number: 8,
-    title: "Pesquisa de Concorrência",
+    title: "Análise de Concorrência",
     slug: "pesquisa-de-concorrencia",
     category: "Fundamentos Estratégicos do Projeto",
     description:

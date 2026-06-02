@@ -70,7 +70,7 @@ const menuGroups = [
         href: "/admin/planejamentos/demo/modulos/referencias-e-concorrentes",
       },
       {
-        label: "Pesquisa de Concorrência",
+        label: "Análise de Concorrência",
         href: "/admin/planejamentos/demo/modulos/pesquisa-de-concorrencia",
       },
       {

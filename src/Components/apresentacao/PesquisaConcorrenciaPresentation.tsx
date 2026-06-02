@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { ModuleIcon } from "./ModuleIcon";
 
 type CompetitorAnalysisItem = {
@@ -153,6 +154,11 @@ export default function PesquisaConcorrenciaPresentation({
   data: unknown;
 }) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const d = isCompetitorResearchData(data) ? data : null;
   const competitors = (d?.competitors ?? []).filter(
@@ -185,7 +191,7 @@ export default function PesquisaConcorrenciaPresentation({
                 Fundamentos Estratégicos
               </p>
               <h2 className="mt-2 text-5xl font-light tracking-[-0.05em] text-slate-950">
-                Pesquisa de Concorrência
+                Análise de Concorrência
               </h2>
             </div>
           </div>
@@ -306,13 +312,16 @@ export default function PesquisaConcorrenciaPresentation({
         )}
       </article>
 
-      {selectedCompetitor && selectedIndex !== null && (
-        <CompetitorModal
-          competitor={selectedCompetitor}
-          index={selectedIndex}
-          onClose={() => setSelectedIndex(null)}
-        />
-      )}
+      {mounted && selectedCompetitor && selectedIndex !== null &&
+        createPortal(
+          <CompetitorModal
+            competitor={selectedCompetitor}
+            index={selectedIndex}
+            onClose={() => setSelectedIndex(null)}
+          />,
+          document.body
+        )
+      }
     </>
   );
 }

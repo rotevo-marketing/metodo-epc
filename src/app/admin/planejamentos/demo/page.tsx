@@ -80,7 +80,7 @@ const groups = [
         icon: "/icons/09-referencias-e-concorrentes.svg",
       },
       {
-        title: "Pesquisa de Concorrência",
+        title: "Análise de Concorrência",
         description:
           "Análise aprofundada dos concorrentes, presença digital, comunicação e oportunidades.",
         href: "/admin/planejamentos/demo/modulos/pesquisa-de-concorrencia",
