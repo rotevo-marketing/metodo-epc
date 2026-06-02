@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { ModuleIcon } from "./ModuleIcon";
 import { RichText } from "./RichText";
 
@@ -70,89 +74,88 @@ const summaryFields: { key: keyof PersonaData; label: string }[] = [
   { key: "summaryJourney", label: "Jornada" },
 ];
 
-export default function PersonasPresentation({ data }: { data: unknown }) {
-  const d = isPersonasData(data) ? data : null;
-  const personas = (d?.personas ?? []).filter(
-    (p) => p.name?.trim() || p.photo?.trim()
+function PersonaModal({
+  persona,
+  index,
+  onClose,
+}: {
+  persona: PersonaData;
+  index: number;
+  onClose: () => void;
+}) {
+  const metaItems = [
+    persona.age && `${persona.age} anos`,
+    persona.gender,
+    persona.education,
+    persona.role,
+    persona.companySize,
+  ].filter(Boolean);
+
+  const activeBehaviors = behaviorLabels.filter((b) => persona.behaviors?.[b.key]);
+  const filledProfile = profileFields.filter(
+    (f) => (persona[f.key] as string)?.trim()
   );
 
   return (
-    <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
-      {/* Header */}
-      <section className="p-8 lg:p-12">
-        <div className="flex items-center gap-5">
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-slate-950">
-            <ModuleIcon slug="personas" size="lg" inverted />
-          </div>
-          <div>
-            <p className="text-xs font-medium uppercase tracking-[0.35em] text-slate-400">
-              Fundamentos Estratégicos
-            </p>
-            <h2 className="mt-2 text-5xl font-light tracking-[-0.05em] text-slate-950">
-              Personas
-            </h2>
-          </div>
-        </div>
-      </section>
-
-      {/* Personas */}
-      {personas.map((persona, i) => {
-        const activeBehaviors = behaviorLabels.filter(
-          (b) => persona.behaviors?.[b.key]
-        );
-        const filledProfile = profileFields.filter(
-          (f) => (persona[f.key] as string)?.trim()
-        );
-        const filledSummary = summaryFields.filter(
-          (f) => (persona[f.key] as string)?.trim()
-        );
-        const metaItems = [
-          persona.age && `${persona.age} anos`,
-          persona.gender,
-          persona.education,
-          persona.role,
-          persona.companySize,
-        ].filter(Boolean);
-
-        return (
-          <section
-            key={i}
-            className="p-8 lg:p-12"
-          >
-            {/* Persona header */}
-            <div className="flex items-center gap-5">
-              {persona.photo ? (
-                <img
-                  src={persona.photo}
-                  alt={persona.name || "Persona"}
-                  className="h-20 w-20 shrink-0 rounded-full object-cover ring-1 ring-slate-200"
-                />
-              ) : (
-                <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-slate-100 text-2xl font-bold text-slate-400 ring-1 ring-slate-200">
-                  {(persona.name || "P").charAt(0).toUpperCase()}
-                </div>
-              )}
-              <div>
-                <span className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                  Persona {i + 1}
-                </span>
-                {persona.name && (
-                  <h3 className="mt-1 text-2xl font-light tracking-[-0.03em] text-slate-950">
-                    {persona.name}
-                  </h3>
-                )}
-                {metaItems.length > 0 && (
-                  <p className="mt-1 text-sm text-slate-500">
-                    {metaItems.join(" · ")}
-                  </p>
-                )}
-              </div>
+    <div
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/60"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="persona-modal-name"
+      onClick={onClose}
+    >
+      <div
+        className="relative flex w-full max-w-2xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl max-h-[90vh]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Modal header */}
+        <div className="flex items-center gap-4 border-b border-slate-100 bg-slate-50/60 px-6 py-5">
+          {persona.photo ? (
+            <img
+              src={persona.photo}
+              alt={persona.name || "Persona"}
+              className="h-14 w-14 shrink-0 rounded-full object-cover ring-2 ring-white shadow-sm"
+            />
+          ) : (
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-slate-100 text-lg font-bold text-slate-400 ring-1 ring-slate-200">
+              {(persona.name || "P").charAt(0).toUpperCase()}
             </div>
+          )}
 
+          <div className="min-w-0 flex-1">
+            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+              Persona {index + 1}
+            </span>
+            <h3
+              id="persona-modal-name"
+              className="mt-0.5 truncate text-lg font-semibold tracking-tight text-slate-950"
+            >
+              {persona.name || "Persona"}
+            </h3>
+            {metaItems.length > 0 && (
+              <p className="mt-0.5 text-xs text-slate-500">
+                {metaItems.join(" · ")}
+              </p>
+            )}
+          </div>
+
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Fechar análise da persona"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-200 hover:text-slate-950"
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Modal body */}
+        <div className="overflow-y-auto px-6 py-6">
+          <div className="space-y-4">
             {/* Behaviors */}
             {activeBehaviors.length > 0 && (
-              <div className="mt-6">
-                <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+              <div className="rounded-2xl border border-slate-200 bg-slate-50/60 px-5 py-4">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
                   Comportamento de consumo
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -169,43 +172,214 @@ export default function PersonasPresentation({ data }: { data: unknown }) {
             )}
 
             {/* Profile fields */}
-            {filledProfile.length > 0 && (
-              <div className="mt-8 space-y-6">
-                {filledProfile.map((f) => (
-                  <div key={f.key}>
-                    <p className="mb-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                      {f.label}
-                    </p>
-                    <RichText content={persona[f.key] as string} className="text-sm leading-7 text-slate-700" />
-                  </div>
-                ))}
+            {filledProfile.map(({ key, label }) => (
+              <div
+                key={key}
+                className="rounded-2xl border border-slate-200 bg-slate-50/60 px-5 py-4"
+              >
+                <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+                  {label}
+                </p>
+                <RichText
+                  content={persona[key] as string}
+                  className="text-sm leading-7 text-slate-700"
+                />
               </div>
-            )}
+            ))}
+          </div>
+        </div>
 
-            {/* Summary */}
-            {filledSummary.length > 0 && (
-              <div className="mt-8 grid gap-4 rounded-2xl bg-slate-50 p-5 ring-1 ring-slate-200 sm:grid-cols-2">
-                {filledSummary.map((f) => (
-                  <div key={f.key}>
-                    <p className="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
-                      {f.label}
-                    </p>
-                    <RichText content={persona[f.key] as string} className="text-sm leading-6 text-slate-700" />
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
-        );
-      })}
+        {/* Modal footer */}
+        <div className="border-t border-slate-100 px-6 py-4">
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-full rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800"
+          >
+            Fechar
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-      {!d && (
-        <section className="p-8">
-          <p className="text-slate-500">
-            Este módulo ainda não foi preenchido no planejamento.
-          </p>
+export default function PersonasPresentation({ data }: { data: unknown }) {
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  const d = isPersonasData(data) ? data : null;
+  const personas = (d?.personas ?? []).filter(
+    (p) => p.name?.trim() || p.photo?.trim()
+  );
+
+  const selectedPersona =
+    selectedIndex !== null ? (personas[selectedIndex] ?? null) : null;
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (selectedIndex === null) return;
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setSelectedIndex(null);
+    }
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [selectedIndex]);
+
+  return (
+    <>
+      <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
+        {/* Header */}
+        <section className="p-8 lg:p-12">
+          <div className="flex items-center gap-5">
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-slate-950">
+              <ModuleIcon slug="personas" size="lg" inverted />
+            </div>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.35em] text-slate-400">
+                Fundamentos Estratégicos
+              </p>
+              <h2 className="mt-2 text-5xl font-light tracking-[-0.05em] text-slate-950">
+                Personas
+              </h2>
+            </div>
+          </div>
         </section>
-      )}
-    </article>
+
+        {/* Persona cards */}
+        {!d ? (
+          <section className="p-8">
+            <p className="text-slate-500">
+              Este módulo ainda não foi preenchido no planejamento.
+            </p>
+          </section>
+        ) : personas.length === 0 ? (
+          <section className="p-8">
+            <p className="text-slate-500">
+              Nenhuma persona foi cadastrada neste módulo ainda.
+            </p>
+          </section>
+        ) : (
+          <section className="space-y-5 p-6 lg:p-8">
+            {personas.map((persona, i) => {
+              const activeBehaviors = behaviorLabels.filter(
+                (b) => persona.behaviors?.[b.key]
+              );
+              const filledSummary = summaryFields.filter(
+                (f) => (persona[f.key] as string)?.trim()
+              );
+              const metaItems = [
+                persona.age && `${persona.age} anos`,
+                persona.gender,
+                persona.education,
+                persona.role,
+                persona.companySize,
+              ].filter(Boolean);
+
+              return (
+                <div
+                  key={i}
+                  className="overflow-hidden rounded-2xl ring-1 ring-slate-200"
+                >
+                  {/* Card header */}
+                  <div className="flex items-center gap-4 border-b border-slate-100 bg-slate-50/60 p-5">
+                    {persona.photo ? (
+                      <img
+                        src={persona.photo}
+                        alt={persona.name || "Persona"}
+                        className="h-14 w-14 shrink-0 rounded-full object-cover ring-1 ring-slate-200"
+                      />
+                    ) : (
+                      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xl font-bold text-slate-400 ring-1 ring-slate-200">
+                        {(persona.name || "P").charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <div className="min-w-0">
+                      <span className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                        Persona {i + 1}
+                      </span>
+                      {persona.name && (
+                        <h3 className="mt-0.5 truncate text-lg font-semibold tracking-tight text-slate-950">
+                          {persona.name}
+                        </h3>
+                      )}
+                      {metaItems.length > 0 && (
+                        <p className="mt-0.5 text-xs text-slate-500">
+                          {metaItems.join(" · ")}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Card body */}
+                  <div className="space-y-4 p-5">
+                    {/* Behaviors */}
+                    {activeBehaviors.length > 0 && (
+                      <div>
+                        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                          Comportamento de consumo
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {activeBehaviors.map((b) => (
+                            <span
+                              key={b.key}
+                              className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700"
+                            >
+                              {b.label}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Summary grid */}
+                    {filledSummary.length > 0 && (
+                      <div className="grid gap-3 rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200 sm:grid-cols-2">
+                        {filledSummary.map((f) => (
+                          <div key={f.key}>
+                            <p className="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+                              {f.label}
+                            </p>
+                            <RichText
+                              content={persona[f.key] as string}
+                              className="text-sm leading-6 text-slate-700"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Card footer */}
+                  <div className="border-t border-slate-100 p-5">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedIndex(i)}
+                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-950"
+                    >
+                      Ver análise completa →
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </section>
+        )}
+      </article>
+
+      {mounted && selectedPersona && selectedIndex !== null &&
+        createPortal(
+          <PersonaModal
+            persona={selectedPersona}
+            index={selectedIndex}
+            onClose={() => setSelectedIndex(null)}
+          />,
+          document.body
+        )
+      }
+    </>
   );
 }
