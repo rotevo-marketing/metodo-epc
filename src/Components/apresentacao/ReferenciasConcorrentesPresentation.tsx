@@ -1,6 +1,15 @@
 import { ModuleIcon } from "./ModuleIcon";
 import { RichText } from "./RichText";
 
+function isUrl(value: string): boolean {
+  return /^(https?:\/\/|www\.|[a-z0-9-]+\.[a-z]{2,})/i.test(value.trim());
+}
+
+function normalizeUrl(value: string): string {
+  const trimmed = value.trim();
+  return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+}
+
 type ChannelKey =
   | "site" | "instagram" | "tiktok" | "youtube" | "facebook"
   | "linkedin" | "whatsapp" | "blog" | "pinterest" | "podcast";
@@ -138,10 +147,21 @@ export default function ReferenciasConcorrentesPresentation({
                               <span className="text-xs font-semibold text-slate-500">
                                 {ch.label}
                               </span>
-                              <RichText
-                                content={item.channels[ch.key]}
-                                className="text-sm leading-6 text-slate-700"
-                              />
+                              {isUrl(item.channels[ch.key]) ? (
+                                <a
+                                  href={normalizeUrl(item.channels[ch.key])}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="mt-0.5 block break-all text-xs text-blue-700 underline underline-offset-2 transition hover:text-blue-800"
+                                >
+                                  {item.channels[ch.key]}
+                                </a>
+                              ) : (
+                                <RichText
+                                  content={item.channels[ch.key]}
+                                  className="text-sm leading-6 text-slate-700"
+                                />
+                              )}
                             </div>
                           </div>
                         ))}
