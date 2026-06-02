@@ -166,16 +166,9 @@ export default function PalavrasChavePresentation({
                   key={i}
                   type="button"
                   onClick={() => setSelectedKeyword(item)}
-                  className="flex cursor-pointer flex-col items-start rounded-full border border-[#c79e40]/20 bg-[#c79e40]/10 px-5 py-2.5 text-left transition hover:border-[#c79e40] hover:bg-[#c79e40] hover:text-black"
+                  className="cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm text-slate-900 transition hover:border-slate-300 hover:bg-slate-50"
                 >
-                  <span className="text-sm font-semibold text-[#7a5c0a] transition group-hover:text-black [.group:hover_&]:text-black">
-                    {item.keyword}
-                  </span>
-                  {item.volume && (
-                    <span className="mt-0.5 text-xs text-[#c79e40]/70">
-                      {item.volume} buscas
-                    </span>
-                  )}
+                  {item.keyword}
                 </button>
               ))}
             </div>
