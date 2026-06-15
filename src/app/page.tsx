@@ -130,17 +130,17 @@ export default function HomePage() {
         </header>
 
         {/* Hero */}
-        <div className="relative z-10 flex flex-1 items-center px-10 pb-12 xl:px-16">
-          <div className="max-w-none">
-            <p className="whitespace-nowrap text-[0.65rem] font-semibold uppercase tracking-[0.42em] text-white/65">
+        <div className="relative z-10 flex flex-1 items-center px-16 pb-12 xl:px-20">
+          <div className="w-full">
+            <p className="whitespace-nowrap text-sm font-semibold uppercase tracking-tight text-white/65">
               Bem-vindo ao seu ambiente estratégico!
             </p>
 
-            <h1 className="mt-7 max-w-sm text-4xl font-light leading-[1.1] tracking-[-0.04em] text-white xl:max-w-md xl:text-[2.75rem]">
+            <h1 className="mt-7 max-w-md text-4xl font-light leading-[1.1] tracking-[-0.04em] text-white xl:text-[2.75rem]">
               Agora existe um caminho claro para o seu projeto crescer.
             </h1>
 
-            <p className="mt-6 whitespace-nowrap text-sm leading-7 text-white/72">
+            <p className="mt-6 whitespace-nowrap text-lg leading-7 text-white/72">
               Entre com seus dados para visualizar a apresentação estratégica do projeto.
             </p>
           </div>
@@ -156,7 +156,7 @@ export default function HomePage() {
       <div className="relative flex w-full flex-col items-center justify-center bg-white px-6 py-12 lg:w-1/2">
         <Link
           href="/estrategista/login"
-          className="absolute right-6 top-6 inline-flex h-10 items-center justify-center rounded-full border border-slate-200 px-5 text-sm font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"
+          className="absolute right-6 top-6 inline-flex h-10 items-center justify-center rounded-full bg-black px-5 text-sm font-medium text-white transition-colors duration-200 hover:bg-[#5A3FA3]"
         >
           Espaço do estrategista
         </Link>
@@ -168,7 +168,7 @@ export default function HomePage() {
         <div className="w-full max-w-md">
           {/* Eyebrow + lock icon */}
           <div className="flex items-center justify-between gap-4">
-            <p className="text-[0.72rem] font-semibold uppercase tracking-[0.42em] text-slate-400">
+            <p className="text-xs font-semibold uppercase tracking-tight text-slate-400">
               Acessar planejamento
             </p>
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-slate-950 text-white">
@@ -225,7 +225,7 @@ export default function HomePage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="inline-flex h-12 cursor-pointer items-center justify-center rounded-xl bg-[#1a1a1a] px-8 text-sm font-semibold text-white transition hover:bg-[#333] disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex h-12 cursor-pointer items-center justify-center rounded-xl bg-black px-8 text-sm font-semibold text-white transition-colors duration-200 hover:bg-[#5A3FA3] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isLoading ? "Entrando..." : "Login"}
               </button>
