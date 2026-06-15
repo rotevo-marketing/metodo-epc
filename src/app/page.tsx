@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import { MetodoLogo } from "@/Components/MetodoBrand";
 
@@ -122,31 +123,24 @@ export default function HomePage() {
         <div className="pointer-events-none absolute bottom-[28%] right-[-80px] h-[220px] w-[220px] rounded-full border border-white/12" />
 
         {/* Nav */}
-        <header className="relative z-10 flex items-center justify-between px-10 py-8">
-          <a href="/" className="text-[1.35rem] font-semibold tracking-tight text-white">
-            mētodo<span className="text-[#C9A8FF]">.</span>
+        <header className="relative z-10 flex items-center px-10 py-8">
+          <a href="/">
+            <Image src="/brand/logo-light.svg" width={120} height={32} alt="Método EPC" />
           </a>
-
-          <Link
-            href="/estrategista/login"
-            className="inline-flex h-10 items-center justify-center rounded-full border border-white/25 px-6 text-sm font-medium text-white transition hover:border-white/50 hover:bg-white/10"
-          >
-            Espaço do estrategista
-          </Link>
         </header>
 
         {/* Hero */}
         <div className="relative z-10 flex flex-1 items-center px-10 pb-12 xl:px-16">
-          <div className="max-w-md">
-            <p className="text-[0.72rem] font-semibold uppercase tracking-[0.42em] text-white/65">
+          <div className="max-w-none">
+            <p className="whitespace-nowrap text-[0.65rem] font-semibold uppercase tracking-[0.42em] text-white/65">
               Bem-vindo ao seu ambiente estratégico!
             </p>
 
-            <h1 className="mt-7 text-4xl font-light leading-[1.1] tracking-[-0.04em] text-white xl:text-[2.75rem]">
+            <h1 className="mt-7 max-w-sm text-4xl font-light leading-[1.1] tracking-[-0.04em] text-white xl:max-w-md xl:text-[2.75rem]">
               Agora existe um caminho claro para o seu projeto crescer.
             </h1>
 
-            <p className="mt-6 text-[0.98rem] leading-7 text-white/72">
+            <p className="mt-6 whitespace-nowrap text-sm leading-7 text-white/72">
               Entre com seus dados para visualizar a apresentação estratégica do projeto.
             </p>
           </div>
@@ -159,7 +153,13 @@ export default function HomePage() {
       </div>
 
       {/* ── Right column – white ───────────────────────────── */}
-      <div className="flex w-full flex-col items-center justify-center bg-white px-6 py-12 lg:w-1/2">
+      <div className="relative flex w-full flex-col items-center justify-center bg-white px-6 py-12 lg:w-1/2">
+        <Link
+          href="/estrategista/login"
+          className="absolute right-6 top-6 inline-flex h-10 items-center justify-center rounded-full border border-slate-200 px-5 text-sm font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"
+        >
+          Espaço do estrategista
+        </Link>
         {/* Mobile-only logo */}
         <div className="mb-10 w-full max-w-md lg:hidden">
           <MetodoLogo href="/" size="md" variant="dark" />
@@ -176,7 +176,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <h1 className="mt-5 text-5xl font-light tracking-[-0.05em] text-slate-950">
+          <h1 className="mt-5 text-3xl font-light tracking-[-0.04em] text-slate-950">
             Entrar
           </h1>
 
