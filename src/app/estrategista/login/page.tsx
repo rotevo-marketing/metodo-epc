@@ -138,7 +138,7 @@ export default function EstrategistaLoginPage() {
               Espaço do estrategista.
             </h1>
 
-            <p className="mt-6 max-w-sm text-lg leading-7 text-white/72">
+            <p className="mt-6 max-w-lg text-lg leading-7 text-white/72">
               Entre com seus dados para acessar o painel administrativo, editar planejamentos e acompanhar os módulos estratégicos dos clientes.
             </p>
           </div>
@@ -228,7 +228,7 @@ export default function EstrategistaLoginPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="inline-flex h-12 cursor-pointer items-center justify-center rounded-xl bg-black px-8 text-sm font-semibold text-white transition-colors duration-200 hover:bg-[#5A3FA3] disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex h-12 cursor-pointer items-center justify-center whitespace-nowrap rounded-xl bg-black px-10 text-sm font-semibold text-white transition-colors duration-200 hover:bg-[#5A3FA3] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isLoading ? "Entrando..." : "Entrar no painel"}
               </button>
