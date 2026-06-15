@@ -113,134 +113,136 @@ export default function HomePage() {
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#020617] text-white">
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -top-28 left-[35%] h-[420px] w-[420px] rounded-full border border-white/10" />
-        <div className="absolute bottom-[-120px] left-[-40px] h-[180px] w-[180px] rounded-full border border-white/10" />
-        <div className="absolute right-[-120px] top-[20%] h-[320px] w-[320px] rounded-full border border-white/10" />
-      </div>
+    <main className="flex min-h-screen overflow-hidden">
+      {/* ── Left column – purple ───────────────────────────── */}
+      <div className="relative hidden flex-col overflow-hidden bg-[#5A3FA3] lg:flex lg:w-1/2">
+        {/* Decorative circles */}
+        <div className="pointer-events-none absolute -right-24 -top-24 h-[480px] w-[480px] rounded-full border border-white/15" />
+        <div className="pointer-events-none absolute -bottom-28 -left-28 h-[360px] w-[360px] rounded-full border border-white/10" />
+        <div className="pointer-events-none absolute bottom-[28%] right-[-80px] h-[220px] w-[220px] rounded-full border border-white/12" />
 
-      <div className="relative z-10 flex min-h-screen flex-col px-6 py-6 sm:px-8 lg:px-14">
-        <header className="flex items-start justify-between gap-6">
-          <MetodoLogo href="/" size="md" variant="light" />
+        {/* Nav */}
+        <header className="relative z-10 flex items-center justify-between px-10 py-8">
+          <a href="/" className="text-[1.35rem] font-semibold tracking-tight text-white">
+            mētodo<span className="text-[#C9A8FF]">.</span>
+          </a>
 
           <Link
             href="/estrategista/login"
-            className="inline-flex h-12 items-center justify-center rounded-full border border-white/15 px-7 text-sm font-semibold text-white transition hover:border-white/30 hover:bg-white/5"
+            className="inline-flex h-10 items-center justify-center rounded-full border border-white/25 px-6 text-sm font-medium text-white transition hover:border-white/50 hover:bg-white/10"
           >
             Espaço do estrategista
           </Link>
         </header>
 
-        <section className="flex flex-1 items-center py-10 lg:py-14">
-          <div className="grid w-full gap-10 lg:grid-cols-[1.02fr_0.98fr] lg:items-center">
-            <div className="max-w-[900px]">
-              <p className="text-[0.82rem] font-medium uppercase tracking-[0.42em] text-white/65">
-                Bem-vindo ao seu ambiente estratégico!
-              </p>
+        {/* Hero */}
+        <div className="relative z-10 flex flex-1 items-center px-10 pb-12 xl:px-16">
+          <div className="max-w-md">
+            <p className="text-[0.72rem] font-semibold uppercase tracking-[0.42em] text-white/65">
+              Bem-vindo ao seu ambiente estratégico!
+            </p>
 
-              <h1 className="mt-8 text-[3.15rem] font-light leading-[1.02] tracking-[-0.055em] text-white sm:text-[3.65rem] lg:text-[4rem]">
-                <span className="block whitespace-nowrap">
-                  Agora existe um caminho claro
-                </span>
-                <span className="block whitespace-nowrap">
-                  para o seu projeto crescer.
-                </span>
-              </h1>
+            <h1 className="mt-7 text-4xl font-light leading-[1.1] tracking-[-0.04em] text-white xl:text-[2.75rem]">
+              Agora existe um caminho claro para o seu projeto crescer.
+            </h1>
 
-              <p className="mt-8 max-w-[720px] text-[1.05rem] leading-relaxed text-white/82 lg:whitespace-nowrap">
-                Entre com seus dados para visualizar a apresentação estratégica do projeto.
-              </p>
-            </div>
-
-            <div className="rounded-[2rem] border border-white/10 bg-white/5 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.32)] backdrop-blur-sm">
-              <div className="rounded-[1.75rem] bg-white p-6 text-slate-950 sm:p-8">
-                <div className="flex items-start justify-between gap-5">
-                  <div>
-                    <p className="text-[0.82rem] font-semibold uppercase tracking-[0.38em] text-slate-400">
-                      Acessar planejamento
-                    </p>
-
-                    <h2 className="mt-4 text-5xl font-semibold tracking-[-0.04em] text-slate-950">
-                      Entrar
-                    </h2>
-                  </div>
-
-                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#020617] text-white">
-                    <LockIcon />
-                  </div>
-                </div>
-
-                <form onSubmit={handleLogin} className="mt-8 space-y-5">
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Email"
-                    className="h-14 w-full rounded-2xl border border-slate-200 bg-white px-5 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#c79e40]/60 focus:ring-2 focus:ring-[#c79e40]/10"
-                  />
-
-                  <div className="relative">
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Senha"
-                      className="h-14 w-full rounded-2xl border border-slate-200 bg-white px-5 pr-12 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#c79e40]/60 focus:ring-2 focus:ring-[#c79e40]/10"
-                    />
-
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword((v) => !v)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-700"
-                    >
-                      <EyeIcon />
-                    </button>
-                  </div>
-
-                  <button
-                    type="button"
-                    className="cursor-default text-sm text-slate-400"
-                    title="Recuperação de senha disponível em breve. Fale com o estrategista."
-                  >
-                    Esqueci minha senha
-                  </button>
-
-                  {errorMessage && (
-                    <p className="rounded-2xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
-                      {errorMessage}
-                    </p>
-                  )}
-
-                  <div className="flex flex-col gap-4 pt-1 sm:flex-row sm:items-center">
-                    <button
-                      type="submit"
-                      disabled={isLoading}
-                      className="inline-flex h-12 cursor-pointer items-center justify-center rounded-2xl bg-[#020617] px-7 text-sm font-semibold text-white transition hover:bg-[#f4f1ea] hover:text-black hover:ring-1 hover:ring-[#c79e40]/30 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      {isLoading ? "Entrando..." : "Login"}
-                    </button>
-
-                    <p className="text-sm text-slate-500">
-                      Ainda não tem acesso?{" "}
-                      <span className="font-semibold text-slate-950">
-                        Fale com o estrategista.
-                      </span>
-                    </p>
-                  </div>
-                </form>
-
-                <p className="mt-8 text-center text-sm text-slate-400">
-                  Acesso exclusivo para clientes com planejamento ativo.
-                </p>
-              </div>
-            </div>
+            <p className="mt-6 text-[0.98rem] leading-7 text-white/72">
+              Entre com seus dados para visualizar a apresentação estratégica do projeto.
+            </p>
           </div>
-        </section>
+        </div>
 
-        <footer className="pt-6 text-center text-xs text-white/55">
+        {/* Footer */}
+        <footer className="relative z-10 px-10 pb-8 text-xs text-white/40">
           © 2026 Metodo EPC. Todos os direitos reservados.
         </footer>
+      </div>
+
+      {/* ── Right column – white ───────────────────────────── */}
+      <div className="flex w-full flex-col items-center justify-center bg-white px-6 py-12 lg:w-1/2">
+        {/* Mobile-only logo */}
+        <div className="mb-10 w-full max-w-md lg:hidden">
+          <MetodoLogo href="/" size="md" variant="dark" />
+        </div>
+
+        <div className="w-full max-w-md">
+          {/* Eyebrow + lock icon */}
+          <div className="flex items-center justify-between gap-4">
+            <p className="text-[0.72rem] font-semibold uppercase tracking-[0.42em] text-slate-400">
+              Acessar planejamento
+            </p>
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-slate-950 text-white">
+              <LockIcon />
+            </div>
+          </div>
+
+          <h1 className="mt-5 text-5xl font-light tracking-[-0.05em] text-slate-950">
+            Entrar
+          </h1>
+
+          <form onSubmit={handleLogin} className="mt-8 space-y-4">
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email"
+              className="h-14 w-full rounded-xl bg-[#EEF1FA] px-5 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:ring-2 focus:ring-[#5A3FA3]/20"
+            />
+
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Senha"
+                className="h-14 w-full rounded-xl bg-[#EEF1FA] px-5 pr-12 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:ring-2 focus:ring-[#5A3FA3]/20"
+              />
+
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-700"
+              >
+                <EyeIcon />
+              </button>
+            </div>
+
+            <button
+              type="button"
+              className="cursor-default text-sm text-slate-400"
+              title="Recuperação de senha disponível em breve. Fale com o estrategista."
+            >
+              Esqueci minha senha
+            </button>
+
+            {errorMessage && (
+              <p className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+                {errorMessage}
+              </p>
+            )}
+
+            <div className="flex flex-col gap-4 pt-1 sm:flex-row sm:items-center">
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="inline-flex h-12 cursor-pointer items-center justify-center rounded-xl bg-[#1a1a1a] px-8 text-sm font-semibold text-white transition hover:bg-[#333] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isLoading ? "Entrando..." : "Login"}
+              </button>
+
+              <p className="text-sm text-slate-500">
+                Ainda não tem acesso?{" "}
+                <span className="font-semibold text-slate-950">
+                  Fale com o estrategista.
+                </span>
+              </p>
+            </div>
+          </form>
+
+          <p className="mt-10 text-center text-sm text-slate-400">
+            Acesso exclusivo para clientes com planejamento ativo.
+          </p>
+        </div>
       </div>
     </main>
   );
