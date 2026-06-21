@@ -136,8 +136,8 @@ export default function HomePage() {
               Bem-vindo ao seu ambiente estratégico!
             </p>
 
-            <h1 className="mt-7 max-w-md text-4xl font-light leading-[1.1] tracking-[-0.04em] text-white xl:text-[2.75rem]">
-              Agora existe um caminho claro para o seu projeto crescer.
+            <h1 className="mt-7 max-w-2xl text-4xl font-light leading-[1.1] tracking-[-0.04em] text-white xl:text-[2.75rem]">
+              Agora existe um caminho claro<br />para o seu projeto crescer.
             </h1>
 
             <p className="mt-6 whitespace-nowrap text-lg leading-7 text-white/72">
@@ -156,7 +156,7 @@ export default function HomePage() {
       <div className="relative flex w-full flex-col items-center justify-center bg-white px-6 py-12 lg:w-1/2">
         <Link
           href="/estrategista/login"
-          className="absolute right-6 top-6 inline-flex h-10 items-center justify-center rounded-full bg-black px-5 text-sm font-medium text-white transition-colors duration-200 hover:bg-[#5A3FA3]"
+          className="absolute right-6 top-6 inline-flex h-10 items-center justify-center rounded-full border border-slate-200 bg-white px-5 text-sm font-medium text-slate-600 transition-colors duration-200 hover:border-slate-300 hover:bg-slate-50"
         >
           Espaço do estrategista
         </Link>
@@ -207,13 +207,18 @@ export default function HomePage() {
               </button>
             </div>
 
-            <button
-              type="button"
-              className="cursor-default text-sm text-slate-400"
-              title="Recuperação de senha disponível em breve. Fale com o estrategista."
-            >
-              Esqueci minha senha
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                className="cursor-default text-sm text-slate-400"
+                title="Recuperação de senha disponível em breve. Fale com o estrategista."
+              >
+                Esqueci minha senha
+              </button>
+              <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                em breve
+              </span>
+            </div>
 
             {errorMessage && (
               <p className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
@@ -227,7 +232,7 @@ export default function HomePage() {
                 disabled={isLoading}
                 className="inline-flex h-12 cursor-pointer items-center justify-center rounded-xl bg-black px-8 text-sm font-semibold text-white transition-colors duration-200 hover:bg-[#5A3FA3] disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {isLoading ? "Entrando..." : "Login"}
+                {isLoading ? "Entrando..." : "Entrar"}
               </button>
 
               <p className="text-sm text-slate-500">
