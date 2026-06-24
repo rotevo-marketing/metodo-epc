@@ -130,7 +130,7 @@ export default function EstrategistaLoginPage() {
         {/* Hero */}
         <div className="relative z-10 flex flex-1 items-center px-16 pb-12 xl:px-20">
           <div className="w-full">
-            <h1 className="max-w-md text-4xl font-normal leading-[1.25] tracking-[-0.01em] text-white xl:text-[2.75rem]">
+            <h1 className="whitespace-nowrap text-4xl font-normal leading-[1.25] tracking-[-0.01em] text-white xl:text-[2.75rem]">
               Espaço do estrategista.
             </h1>
           </div>
