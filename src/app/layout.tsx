@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
-import { Poppins } from "next/font/google";
+import { Lora, Inter } from "next/font/google";
 import "./globals.css";
 
-const quincy = localFont({
-  src: "../fonts/Quincy-Regular.ttf",
+const lora = Lora({
   variable: "--font-heading",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
-const poppins = Poppins({
+const inter = Inter({
   variable: "--font-body",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
@@ -29,7 +29,7 @@ export default function RootLayout({
   return (
     <html
       lang="pt-BR"
-      className={`${quincy.variable} ${poppins.variable} h-full antialiased`}
+      className={`${lora.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

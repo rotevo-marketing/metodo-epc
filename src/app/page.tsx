@@ -136,7 +136,7 @@ export default function HomePage() {
               Bem-vindo ao seu ambiente estratégico!
             </p>
 
-            <h1 className="mt-7 max-w-2xl text-4xl font-light leading-[1.1] tracking-[-0.04em] text-white xl:text-[2.75rem]">
+            <h1 className="mt-7 max-w-2xl text-4xl font-normal leading-[1.25] tracking-[-0.01em] text-white xl:text-[2.75rem]">
               Agora existe um caminho claro<br />para o seu projeto crescer.
             </h1>
 
@@ -156,7 +156,7 @@ export default function HomePage() {
       <div className="relative flex w-full flex-col items-center justify-center bg-white px-6 py-12 lg:w-1/2">
         <Link
           href="/estrategista/login"
-          className="absolute right-6 top-6 inline-flex h-10 items-center justify-center rounded-full border border-black bg-white px-5 text-sm font-medium text-black transition-colors duration-200 hover:bg-gray-50"
+          className="absolute right-6 top-6 inline-flex h-10 items-center justify-center rounded-full border border-black bg-white px-5 text-sm font-medium text-black transition-colors duration-200 hover:bg-black hover:text-white"
         >
           Espaço do estrategista
         </Link>
@@ -176,7 +176,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <h1 className="mt-5 text-3xl font-light tracking-[-0.04em] text-slate-950">
+          <h1 className="mt-5 text-3xl font-normal tracking-[-0.01em] text-slate-950">
             Entrar
           </h1>
 
