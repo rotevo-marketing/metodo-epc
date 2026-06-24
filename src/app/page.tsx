@@ -132,17 +132,9 @@ export default function HomePage() {
         {/* Hero */}
         <div className="relative z-10 flex flex-1 items-center px-16 pb-12 xl:px-20">
           <div className="w-full">
-            <p className="whitespace-nowrap text-sm font-semibold uppercase tracking-tight text-white/65">
-              Bem-vindo ao seu ambiente estratégico!
-            </p>
-
-            <h1 className="mt-7 max-w-2xl text-4xl font-normal leading-[1.25] tracking-[-0.01em] text-white xl:text-[2.75rem]">
+            <h1 className="max-w-2xl text-4xl font-normal leading-[1.25] tracking-[-0.01em] text-white xl:text-[2.75rem]">
               Agora existe um caminho claro<br />para o seu projeto crescer.
             </h1>
-
-            <p className="mt-6 whitespace-nowrap text-lg leading-7 text-white/72">
-              Entre com seus dados para visualizar a apresentação estratégica do projeto.
-            </p>
           </div>
         </div>
 
@@ -166,11 +158,8 @@ export default function HomePage() {
         </div>
 
         <div className="w-full max-w-md">
-          {/* Eyebrow + lock icon */}
-          <div className="flex items-center justify-between gap-4">
-            <p className="text-xs font-semibold uppercase tracking-tight text-slate-400">
-              Acessar planejamento
-            </p>
+          {/* Lock icon */}
+          <div className="flex justify-end">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-slate-950 text-white">
               <LockIcon />
             </div>
