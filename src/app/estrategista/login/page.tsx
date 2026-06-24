@@ -113,8 +113,8 @@ export default function EstrategistaLoginPage() {
 
   return (
     <main className="flex min-h-screen overflow-hidden">
-      {/* ── Left column – purple ───────────────────────────── */}
-      <div className="relative hidden flex-col overflow-hidden bg-[#5A3FA3] lg:flex lg:w-1/2">
+      {/* ── Left column – black ────────────────────────────── */}
+      <div className="relative hidden flex-col overflow-hidden bg-black lg:flex lg:w-1/2">
         {/* Decorative circles */}
         <div className="pointer-events-none absolute -right-24 -top-24 h-[480px] w-[480px] rounded-full border border-white/15" />
         <div className="pointer-events-none absolute -bottom-28 -left-28 h-[360px] w-[360px] rounded-full border border-white/10" />
@@ -123,24 +123,16 @@ export default function EstrategistaLoginPage() {
         {/* Nav */}
         <header className="relative z-10 flex items-center px-10 py-8">
           <a href="/">
-            <Image src="/brand/logo-light.png" width={120} height={32} alt="Método EPC" />
+            <Image src="/brand/logo-light.png" width={150} height={40} alt="Método EPC" style={{ width: "150px", height: "auto" }} />
           </a>
         </header>
 
         {/* Hero */}
         <div className="relative z-10 flex flex-1 items-center px-16 pb-12 xl:px-20">
           <div className="w-full">
-            <p className="text-sm font-semibold uppercase tracking-tight text-white/65">
-              Acesso interno
-            </p>
-
-            <h1 className="mt-7 max-w-md text-4xl font-light leading-[1.1] tracking-[-0.04em] text-white xl:text-[2.75rem]">
+            <h1 className="max-w-md text-4xl font-normal leading-[1.25] tracking-[-0.01em] text-white xl:text-[2.75rem]">
               Espaço do estrategista.
             </h1>
-
-            <p className="mt-6 max-w-lg text-lg leading-7 text-white/72">
-              Entre com seus dados para acessar o painel administrativo, editar planejamentos e acompanhar os módulos estratégicos dos clientes.
-            </p>
           </div>
         </div>
 
@@ -154,7 +146,7 @@ export default function EstrategistaLoginPage() {
       <div className="relative flex w-full flex-col items-center justify-center bg-white px-6 py-12 lg:w-1/2">
         <Link
           href="/"
-          className="absolute right-6 top-6 inline-flex h-10 items-center justify-center rounded-full bg-black px-5 text-sm font-medium text-white transition-colors duration-200 hover:bg-[#5A3FA3]"
+          className="absolute right-6 top-6 inline-flex h-10 items-center justify-center rounded-full border border-black bg-white px-5 text-sm font-medium text-black transition-colors duration-200 hover:bg-black hover:text-white"
         >
           Voltar ao login do cliente
         </Link>
@@ -167,17 +159,14 @@ export default function EstrategistaLoginPage() {
         </div>
 
         <div className="w-full max-w-md">
-          {/* Eyebrow + lock icon */}
-          <div className="flex items-center justify-between gap-4">
-            <p className="text-xs font-semibold uppercase tracking-tight text-slate-400">
-              Acessar painel
-            </p>
+          {/* Lock icon */}
+          <div className="flex justify-end">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-slate-950 text-white">
               <LockIcon />
             </div>
           </div>
 
-          <h1 className="mt-5 text-3xl font-light tracking-[-0.04em] text-slate-950">
+          <h1 className="mt-5 text-3xl font-normal tracking-[-0.01em] text-slate-950">
             Entrar
           </h1>
 
@@ -187,7 +176,7 @@ export default function EstrategistaLoginPage() {
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               placeholder="Email"
-              className="h-14 w-full rounded-xl bg-[#EEF1FA] px-5 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:ring-2 focus:ring-[#5A3FA3]/20"
+              className="h-14 w-full rounded-xl bg-gray-100 px-5 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:ring-2 focus:ring-black/10"
             />
 
             <div className="relative">
@@ -196,7 +185,7 @@ export default function EstrategistaLoginPage() {
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 placeholder="Senha"
-                className="h-14 w-full rounded-xl bg-[#EEF1FA] px-5 pr-12 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:ring-2 focus:ring-[#5A3FA3]/20"
+                className="h-14 w-full rounded-xl bg-gray-100 px-5 pr-12 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:ring-2 focus:ring-black/10"
               />
 
               <button
@@ -213,7 +202,7 @@ export default function EstrategistaLoginPage() {
                 type="checkbox"
                 checked={rememberMe}
                 onChange={(event) => setRememberMe(event.target.checked)}
-                className="h-4 w-4 rounded border-slate-300 accent-[#5A3FA3]"
+                className="h-4 w-4 rounded border-slate-300 accent-black"
               />
               Lembrar de mim
             </label>
@@ -228,7 +217,7 @@ export default function EstrategistaLoginPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="inline-flex h-12 cursor-pointer items-center justify-center whitespace-nowrap rounded-xl bg-black px-10 text-sm font-semibold text-white transition-colors duration-200 hover:bg-[#5A3FA3] disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex h-12 cursor-pointer items-center justify-center whitespace-nowrap rounded-xl bg-black px-10 text-sm font-semibold text-white transition-colors duration-200 hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isLoading ? "Entrando..." : "Entrar no painel"}
               </button>
