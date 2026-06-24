@@ -123,7 +123,7 @@ export default function EstrategistaLoginPage() {
         {/* Nav */}
         <header className="relative z-10 flex items-center px-10 py-8">
           <a href="/">
-            <Image src="/brand/logo-light.svg" width={120} height={32} alt="Método EPC" />
+            <Image src="/brand/logo-light.png" width={120} height={32} alt="Método EPC" />
           </a>
         </header>
 
@@ -162,7 +162,7 @@ export default function EstrategistaLoginPage() {
         {/* Mobile-only logo */}
         <div className="mb-10 w-full max-w-md lg:hidden">
           <a href="/">
-            <Image src="/brand/logo-dark.svg" width={120} height={32} alt="Método EPC" />
+            <Image src="/brand/logo-dark.png" width={120} height={32} alt="Método EPC" />
           </a>
         </div>
 

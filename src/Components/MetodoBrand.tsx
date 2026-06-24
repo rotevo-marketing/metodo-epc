@@ -24,7 +24,7 @@ export function MetodoLogo({
   variant = "dark",
 }: MetodoLogoProps) {
   const src =
-    variant === "light" ? "/brand/logo-light.svg" : "/brand/logo-dark.svg";
+    variant === "light" ? "/brand/logo-light.png" : "/brand/logo-dark.png";
 
   const logo = (
     <img
