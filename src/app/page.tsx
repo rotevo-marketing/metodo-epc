@@ -116,7 +116,7 @@ export default function HomePage() {
   return (
     <main className="flex min-h-screen overflow-hidden">
       {/* ── Left column – purple ───────────────────────────── */}
-      <div className="relative hidden flex-col overflow-hidden bg-[#5A3FA3] lg:flex lg:w-1/2">
+      <div className="relative hidden flex-col overflow-hidden bg-black lg:flex lg:w-1/2">
         {/* Decorative circles */}
         <div className="pointer-events-none absolute -right-24 -top-24 h-[480px] w-[480px] rounded-full border border-white/15" />
         <div className="pointer-events-none absolute -bottom-28 -left-28 h-[360px] w-[360px] rounded-full border border-white/10" />
@@ -156,7 +156,7 @@ export default function HomePage() {
       <div className="relative flex w-full flex-col items-center justify-center bg-white px-6 py-12 lg:w-1/2">
         <Link
           href="/estrategista/login"
-          className="absolute right-6 top-6 inline-flex h-10 items-center justify-center rounded-full border border-slate-200 bg-white px-5 text-sm font-medium text-slate-600 transition-colors duration-200 hover:border-slate-300 hover:bg-slate-50"
+          className="absolute right-6 top-6 inline-flex h-10 items-center justify-center rounded-full border border-black bg-white px-5 text-sm font-medium text-black transition-colors duration-200 hover:bg-gray-50"
         >
           Espaço do estrategista
         </Link>
@@ -186,7 +186,7 @@ export default function HomePage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email"
-              className="h-14 w-full rounded-xl bg-[#EEF1FA] px-5 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:ring-2 focus:ring-[#5A3FA3]/20"
+              className="h-14 w-full rounded-xl bg-gray-100 px-5 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:ring-2 focus:ring-black/10"
             />
 
             <div className="relative">
@@ -195,7 +195,7 @@ export default function HomePage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Senha"
-                className="h-14 w-full rounded-xl bg-[#EEF1FA] px-5 pr-12 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:ring-2 focus:ring-[#5A3FA3]/20"
+                className="h-14 w-full rounded-xl bg-gray-100 px-5 pr-12 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:ring-2 focus:ring-black/10"
               />
 
               <button
@@ -230,7 +230,7 @@ export default function HomePage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="inline-flex h-12 cursor-pointer items-center justify-center rounded-xl bg-black px-8 text-sm font-semibold text-white transition-colors duration-200 hover:bg-[#5A3FA3] disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex h-12 cursor-pointer items-center justify-center rounded-xl bg-black px-8 text-sm font-semibold text-white transition-colors duration-200 hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isLoading ? "Entrando..." : "Entrar"}
               </button>
