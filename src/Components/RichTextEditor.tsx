@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -27,8 +27,8 @@ function ToolbarBtn({
       title={title}
       className={`inline-flex h-8 w-8 items-center justify-center rounded-md text-sm font-semibold transition-colors ${
         isActive
-          ? "bg-[#c79e40]/10 text-[#c79e40]"
-          : "text-slate-600 hover:bg-[#c79e40]/10 hover:text-[#c79e40]"
+          ? "bg-slate-200 text-slate-900"
+          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
       }`}
     >
       {children}
@@ -76,7 +76,7 @@ export default function RichTextEditor({
     },
     editorProps: {
       attributes: {
-        class: "prose prose-slate max-w-none outline-none focus:outline-none px-4 py-4 text-slate-800 prose-p:leading-7 prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-0.5 prose-strong:font-semibold prose-a:text-[#c79e40]",
+        class: "prose prose-slate max-w-none outline-none focus:outline-none px-4 py-4 text-slate-800 prose-p:leading-7 prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-0.5 prose-strong:font-semibold prose-a:text-slate-900",
         style: `min-height:${minHeight}px`,
       },
     },
@@ -109,7 +109,7 @@ export default function RichTextEditor({
   if (!editor) return null;
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white focus-within:ring-2 focus-within:ring-[#c79e40]/20">
+    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white focus-within:ring-2 focus-within:ring-black/10">
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-0.5 border-b border-slate-200 bg-slate-50 px-3 py-2">
         <ToolbarBtn

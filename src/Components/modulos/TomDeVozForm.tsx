@@ -173,7 +173,7 @@ function VocabularyListField({
               value={item}
               onChange={(e) => updateItem(i, e.target.value)}
               placeholder={i === 0 ? "Adicionar item..." : "Mais um item..."}
-              className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm leading-6 outline-none transition placeholder:text-slate-400 focus:border-[#c79e40]/60 focus:ring-2 focus:ring-[#c79e40]/10"
+              className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm leading-6 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-2 focus:ring-black/10"
             />
             {displayItems.length > 1 && (
               <button
@@ -190,7 +190,7 @@ function VocabularyListField({
       <button
         type="button"
         onClick={addItem}
-        className="mt-3 cursor-pointer rounded-full border border-[#c79e40]/20 bg-[#c79e40]/10 px-4 py-1.5 text-sm font-semibold text-[#c79e40] transition-colors hover:border-[#c79e40] hover:bg-[#c79e40] hover:text-black"
+        className="mt-3 cursor-pointer rounded-full border border-slate-200 bg-slate-100 px-4 py-1.5 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-950 hover:bg-slate-950 hover:text-black"
       >
         {addLabel}
       </button>
@@ -461,7 +461,7 @@ export default function TomDeVozForm({
         <button
           type="button"
           onClick={addCharacteristic}
-          className="mt-5 cursor-pointer rounded-full border border-[#c79e40]/20 bg-[#c79e40]/10 px-5 py-3 text-sm font-semibold text-[#c79e40] transition-colors hover:bg-[#c79e40] hover:border-[#c79e40] hover:text-black"
+          className="mt-5 cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-950 hover:border-slate-950 hover:text-white"
         >
           + Nova característica
         </button>
@@ -676,7 +676,7 @@ export default function TomDeVozForm({
         <button
           type="button"
           onClick={addReference}
-          className="mt-5 cursor-pointer rounded-full border border-[#c79e40]/20 bg-[#c79e40]/10 px-5 py-3 text-sm font-semibold text-[#c79e40] transition-colors hover:bg-[#c79e40] hover:border-[#c79e40] hover:text-black"
+          className="mt-5 cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-950 hover:border-slate-950 hover:text-white"
         >
           + Nova referência
         </button>

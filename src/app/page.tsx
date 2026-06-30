@@ -125,7 +125,7 @@ export default function HomePage() {
         {/* Nav */}
         <header className="relative z-10 flex items-center px-10 py-8">
           <a href="/">
-            <Image src="/brand/logo-light.png" width={150} height={40} alt="Método EPC" style={{ width: "150px", height: "auto" }} />
+            <Image src="/brand/logo-light.png" width={150} height={40} alt="Rotevo" style={{ width: "150px", height: "auto" }} />
           </a>
         </header>
 
@@ -140,7 +140,7 @@ export default function HomePage() {
 
         {/* Footer */}
         <footer className="relative z-10 px-10 pb-8 text-xs text-white/40">
-          © 2026 Metodo EPC. Todos os direitos reservados.
+          © 2026 Rotevo. Todos os direitos reservados.
         </footer>
       </div>
 

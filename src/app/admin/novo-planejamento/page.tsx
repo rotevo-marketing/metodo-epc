@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
@@ -193,7 +193,7 @@ export default function NovoPlanejamentoPage() {
           <MetodoLogo variant="dark" />
           <Link
             href="/admin"
-            className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40"
+            className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-50 hover:ring-slate-300"
           >
             Voltar
           </Link>
@@ -214,7 +214,7 @@ export default function NovoPlanejamentoPage() {
         <MetodoLogo variant="dark" />
         <Link
           href="/admin"
-          className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40"
+          className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-50 hover:ring-slate-300"
         >
           Voltar ao painel
         </Link>
@@ -252,7 +252,7 @@ export default function NovoPlanejamentoPage() {
                 value={clientName}
                 onChange={(e) => setClientName(e.target.value)}
                 placeholder="Ex: Cliente Demo"
-                className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-[#c79e40]/60 focus:ring-2 focus:ring-[#c79e40]/10"
+                className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-black/10"
               />
               {clientSlug && (
                 <p className="mt-2 text-xs text-slate-400">
@@ -271,7 +271,7 @@ export default function NovoPlanejamentoPage() {
                 value={projectTitle}
                 onChange={(e) => setProjectTitle(e.target.value)}
                 placeholder="Ex: Planejamento Estratégico 2026"
-                className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-[#c79e40]/60 focus:ring-2 focus:ring-[#c79e40]/10"
+                className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-black/10"
               />
               {projectSlug && (
                 <p className="mt-2 text-xs text-slate-400">
@@ -374,7 +374,7 @@ export default function NovoPlanejamentoPage() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Ex: Planejamento estratégico inicial do cliente."
-                className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-[#c79e40]/60 focus:ring-2 focus:ring-[#c79e40]/10"
+                className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-black/10"
               />
             </div>
 
@@ -393,7 +393,7 @@ export default function NovoPlanejamentoPage() {
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <Link
                 href="/admin"
-                className="inline-flex items-center justify-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40"
+                className="inline-flex items-center justify-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-slate-50 hover:ring-slate-300"
               >
                 Cancelar
               </Link>
@@ -401,7 +401,7 @@ export default function NovoPlanejamentoPage() {
               <button
                 type="submit"
                 disabled={isUploading}
-                className="inline-flex cursor-pointer items-center justify-center rounded-full bg-slate-950 px-8 py-3 text-sm font-semibold text-white transition hover:bg-[#f4f1ea] hover:text-black hover:ring-1 hover:ring-[#c79e40]/30 disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex cursor-pointer items-center justify-center rounded-full bg-slate-950 px-8 py-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 Escolher módulos
               </button>

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -44,7 +44,7 @@ function getStatusLabel(status: string) {
 
 function getStatusClass(status: string) {
   if (status === "published") return "bg-emerald-100 text-emerald-700";
-  if (status === "in_progress") return "bg-[#c79e40]/10 text-[#7a5c0a]";
+  if (status === "in_progress") return "bg-slate-100 text-slate-600";
   if (status === "archived") return "bg-slate-200 text-slate-500";
   return "bg-slate-100 text-slate-600";
 }
@@ -138,7 +138,7 @@ export default function ClientAreaPage() {
         <button
           type="button"
           onClick={handleLogout}
-          className="cursor-pointer rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40"
+          className="cursor-pointer rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-50 hover:ring-slate-300"
         >
           Sair
         </button>
@@ -146,7 +146,7 @@ export default function ClientAreaPage() {
 
       <section className="mx-auto max-w-5xl px-6 pb-20 lg:px-10">
         <div className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-10">
-          <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[#c79e40]">
+          <p className="text-sm font-semibold uppercase tracking-[0.22em] text-slate-400">
             Área do cliente
           </p>
 
@@ -210,7 +210,7 @@ export default function ClientAreaPage() {
                           <h3 className="text-xl font-bold tracking-[-0.03em]">
                             {clientName || project.title}
                           </h3>
-                          <span className="rounded-full bg-[#c79e40]/10 px-3 py-1 text-xs font-bold text-[#7a5c0a]">
+                          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">
                             Em produção
                           </span>
                         </div>
@@ -226,7 +226,7 @@ export default function ClientAreaPage() {
                     </div>
 
                     {hasSchedule && (
-                      <div className="mt-6 rounded-2xl border-l-4 border-[#c79e40]/30 bg-slate-50 px-5 py-5">
+                      <div className="mt-6 rounded-2xl border-l-4 border-slate-200 bg-slate-50 px-5 py-5">
                         <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-slate-400">
                           Cronograma previsto
                         </p>
@@ -258,7 +258,7 @@ export default function ClientAreaPage() {
                     <div className="mt-6 flex justify-end">
                       <a
                         href={`/apresentacao/${project.slug}`}
-                        className="inline-flex items-center justify-center rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-[#f4f1ea] hover:text-black hover:ring-1 hover:ring-[#c79e40]/30"
+                        className="inline-flex items-center justify-center rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
                       >
                         Ver status do planejamento
                       </a>
@@ -319,7 +319,7 @@ export default function ClientAreaPage() {
 
                     <a
                       href={`/apresentacao/${project.slug}`}
-                      className="inline-flex shrink-0 items-center justify-center rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-[#f4f1ea] hover:text-black hover:ring-1 hover:ring-[#c79e40]/30"
+                      className="inline-flex shrink-0 items-center justify-center rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
                     >
                       Ver apresentação
                     </a>

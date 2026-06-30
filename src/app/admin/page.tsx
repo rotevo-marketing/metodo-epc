@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
@@ -52,11 +52,11 @@ function getStatusClass(status: PlanningProject["status"]) {
   }
 
   if (status === "draft") {
-    return "bg-[#c79e40]/10 text-[#7a5c0a]";
+    return "bg-slate-100 text-slate-600";
   }
 
   if (status === "in_progress") {
-    return "bg-[#c79e40]/10 text-[#7a5c0a]";
+    return "bg-slate-100 text-slate-600";
   }
 
   if (status === "archived") {
@@ -238,14 +238,14 @@ export default function AdminPage() {
           <button
             type="button"
             onClick={handleLogout}
-            className="cursor-pointer rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40"
+            className="cursor-pointer rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-50 hover:ring-slate-300"
           >
             Sair
           </button>
 
           <Link
             href="/admin/novo-planejamento"
-            className="rounded-full bg-slate-950 px-8 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#f4f1ea] hover:text-black hover:ring-1 hover:ring-[#c79e40]/30"
+            className="rounded-full bg-slate-950 px-8 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800"
           >
             Criar novo planejamento
           </Link>
@@ -254,9 +254,9 @@ export default function AdminPage() {
 
       <section className="mx-auto max-w-6xl px-6 pb-20 lg:px-10">
         <div className="overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
-          <div className="h-1 bg-[#c79e40]/20" />
+          <div className="h-1 bg-slate-200" />
           <div className="p-8 lg:p-10">
-            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[#c79e40]">
+            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-slate-400">
               Painel administrativo
             </p>
 
@@ -271,7 +271,7 @@ export default function AdminPage() {
 
             <div className="mt-10 grid gap-4 md:grid-cols-3">
               <div className="overflow-hidden rounded-2xl border border-slate-200">
-                <div className="h-0.5 bg-[#c79e40]/30" />
+                <div className="h-0.5 bg-slate-200" />
                 <div className="p-6">
                   <p className="text-sm text-slate-500">Total de planejamentos</p>
                   <strong className="mt-3 block text-4xl font-bold tracking-[-0.04em] text-slate-950">
@@ -281,7 +281,7 @@ export default function AdminPage() {
               </div>
 
               <div className="overflow-hidden rounded-2xl border border-slate-200">
-                <div className="h-0.5 bg-[#c79e40]/30" />
+                <div className="h-0.5 bg-slate-200" />
                 <div className="p-6">
                   <p className="text-sm text-slate-500">Em produção</p>
                   <strong className="mt-3 block text-4xl font-bold tracking-[-0.04em] text-slate-950">
@@ -291,7 +291,7 @@ export default function AdminPage() {
               </div>
 
               <div className="overflow-hidden rounded-2xl border border-slate-200">
-                <div className="h-0.5 bg-[#c79e40]/30" />
+                <div className="h-0.5 bg-slate-200" />
                 <div className="p-6">
                   <p className="text-sm text-slate-500">Publicados</p>
                   <strong className="mt-3 block text-4xl font-bold tracking-[-0.04em] text-slate-950">
@@ -340,7 +340,7 @@ export default function AdminPage() {
 
             <Link
               href="/admin/novo-planejamento"
-              className="mt-6 inline-flex rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#f4f1ea] hover:text-black hover:ring-1 hover:ring-[#c79e40]/30"
+              className="mt-6 inline-flex rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
             >
               Criar novo planejamento
             </Link>
@@ -416,14 +416,14 @@ export default function AdminPage() {
                       <div className="flex flex-wrap gap-2">
                         <Link
                           href={`/admin/planejamentos/${clientSlug}`}
-                          className="inline-flex items-center justify-center rounded-full bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#f4f1ea] hover:text-black hover:ring-1 hover:ring-[#c79e40]/30"
+                          className="inline-flex items-center justify-center rounded-full bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-800"
                         >
                           Editar planejamento
                         </Link>
 
                         <Link
                           href={`/apresentacao/${project.slug}`}
-                          className="inline-flex items-center justify-center rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40"
+                          className="inline-flex items-center justify-center rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-slate-50 hover:ring-slate-300"
                         >
                           Ver apresentação
                         </Link>
@@ -433,7 +433,7 @@ export default function AdminPage() {
                       <div className="flex flex-wrap items-center gap-2">
                         <Link
                           href={`/admin/planejamentos/${clientSlug}/acesso`}
-                          className="inline-flex items-center justify-center rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40"
+                          className="inline-flex items-center justify-center rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-slate-50 hover:ring-slate-300"
                         >
                           Configurar acesso
                         </Link>
@@ -454,7 +454,7 @@ export default function AdminPage() {
                             type="button"
                             onClick={() => handlePublishProject(project, "draft")}
                             disabled={isPublishingId === project.id || isDeleting}
-                            className="inline-flex cursor-pointer items-center justify-center rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-slate-600 ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40 disabled:cursor-not-allowed disabled:opacity-40"
+                            className="inline-flex cursor-pointer items-center justify-center rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-slate-600 ring-1 ring-slate-200 transition hover:bg-slate-50 hover:ring-slate-300 disabled:cursor-not-allowed disabled:opacity-40"
                           >
                             {isPublishingId === project.id ? "Atualizando..." : "Voltar para rascunho"}
                           </button>

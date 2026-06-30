@@ -1,4 +1,4 @@
-import { moduleCategories, planningModules } from "@/data/modules";
+﻿import { moduleCategories, planningModules } from "@/data/modules";
 
 const camposSwot = [
   {
@@ -36,7 +36,7 @@ export default function AnaliseSwotPage() {
     <main className="min-h-screen bg-slate-100 text-slate-950">
       <aside className="fixed left-0 top-0 hidden h-screen w-80 overflow-y-auto border-r border-slate-200 bg-white p-6 lg:block">
         <a href="/admin" className="block">
-          <h1 className="text-2xl font-bold">Metodo EPC</h1>
+          <h1 className="text-2xl font-bold">Rotevo</h1>
           <p className="mt-2 text-sm text-slate-500">Painel administrativo</p>
         </a>
 

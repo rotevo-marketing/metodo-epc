@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -308,7 +308,7 @@ function PageSidebar() {
     <aside className="fixed left-0 top-0 hidden h-screen w-72 overflow-y-auto bg-white px-5 py-6 ring-1 ring-slate-200 lg:block">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight text-slate-950">
-          Metodo EPC
+          Rotevo
         </h1>
         <p className="mt-1 text-xs text-slate-500">Painel administrativo</p>
       </div>

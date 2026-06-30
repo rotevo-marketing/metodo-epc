@@ -123,7 +123,7 @@ export default function EstrategistaLoginPage() {
         {/* Nav */}
         <header className="relative z-10 flex items-center px-10 py-8">
           <a href="/">
-            <Image src="/brand/logo-light.png" width={150} height={40} alt="Método EPC" style={{ width: "150px", height: "auto" }} />
+            <Image src="/brand/logo-light.png" width={150} height={40} alt="Rotevo" style={{ width: "150px", height: "auto" }} />
           </a>
         </header>
 
@@ -138,7 +138,7 @@ export default function EstrategistaLoginPage() {
 
         {/* Footer */}
         <footer className="relative z-10 px-10 pb-8 text-xs text-white/40">
-          © 2026 Metodo EPC. Todos os direitos reservados.
+          © 2026 Rotevo. Todos os direitos reservados.
         </footer>
       </div>
 
@@ -154,7 +154,7 @@ export default function EstrategistaLoginPage() {
         {/* Mobile-only logo */}
         <div className="mb-10 w-full max-w-md lg:hidden">
           <a href="/">
-            <Image src="/brand/logo-dark.png" width={120} height={32} alt="Método EPC" />
+            <Image src="/brand/logo-dark.png" width={120} height={32} alt="Rotevo" />
           </a>
         </div>
 
@@ -229,7 +229,7 @@ export default function EstrategistaLoginPage() {
           </form>
 
           <p className="mt-10 text-center text-sm text-slate-400">
-            Painel interno do Metodo EPC.
+            Painel interno da Rotevo.
           </p>
         </div>
       </div>

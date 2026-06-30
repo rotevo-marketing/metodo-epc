@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
@@ -62,11 +62,11 @@ function getStatusClass(status: PlanningProject["status"]) {
   }
 
   if (status === "draft") {
-    return "bg-[#c79e40]/10 text-[#7a5c0a]";
+    return "bg-slate-100 text-slate-600";
   }
 
   if (status === "in_progress") {
-    return "bg-[#c79e40]/10 text-[#7a5c0a]";
+    return "bg-slate-100 text-slate-600";
   }
 
   if (status === "archived") {
@@ -304,7 +304,7 @@ export default function PlanejamentoClientePage() {
         <div className="flex items-center gap-3">
           <Link
             href="/admin"
-            className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40"
+            className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-50 hover:ring-slate-300"
           >
             Voltar ao painel
           </Link>
@@ -312,7 +312,7 @@ export default function PlanejamentoClientePage() {
           {project ? (
             <Link
               href={`/admin/planejamentos/${clientSlug}/acesso`}
-              className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40"
+              className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-50 hover:ring-slate-300"
             >
               Configurar acesso
             </Link>
@@ -321,7 +321,7 @@ export default function PlanejamentoClientePage() {
           {project ? (
             <Link
               href={`/apresentacao/${project.slug}`}
-              className="rounded-full bg-slate-950 px-8 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#f4f1ea] hover:text-black hover:ring-1 hover:ring-[#c79e40]/30"
+              className="rounded-full bg-slate-950 px-8 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800"
             >
               Ver apresentação
             </Link>
@@ -348,7 +348,7 @@ export default function PlanejamentoClientePage() {
 
             <Link
               href="/admin"
-              className="mt-8 inline-flex rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-[#f4f1ea] hover:text-black hover:ring-1 hover:ring-[#c79e40]/30"
+              className="mt-8 inline-flex rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
             >
               Voltar ao painel
             </Link>
@@ -358,11 +358,11 @@ export default function PlanejamentoClientePage() {
         {!isLoading && project ? (
           <>
             <div className="overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
-              <div className="h-1 bg-[#c79e40]/20" />
+              <div className="h-1 bg-slate-200" />
               <div className="p-8 lg:p-10">
                 <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
                   <div>
-                    <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[#c79e40]">
+                    <p className="text-sm font-semibold uppercase tracking-[0.22em] text-slate-400">
                       Configuração do planejamento
                     </p>
 
@@ -400,7 +400,7 @@ export default function PlanejamentoClientePage() {
                   </div>
 
                   <div className="overflow-hidden rounded-2xl bg-slate-50 ring-1 ring-slate-200 lg:min-w-72">
-                    <div className="h-0.5 bg-[#c79e40]/30" />
+                    <div className="h-0.5 bg-slate-200" />
                     <div className="p-5">
                       <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">
                         Status
@@ -431,7 +431,7 @@ export default function PlanejamentoClientePage() {
                             type="button"
                             onClick={() => handlePublish("draft")}
                             disabled={isPublishing}
-                            className="w-full cursor-pointer rounded-2xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40 disabled:cursor-not-allowed disabled:opacity-60"
+                            className="w-full cursor-pointer rounded-2xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 ring-1 ring-slate-200 transition hover:bg-slate-50 hover:ring-slate-300 disabled:cursor-not-allowed disabled:opacity-60"
                           >
                             {isPublishing ? "Atualizando..." : "Voltar para rascunho"}
                           </button>
@@ -464,7 +464,7 @@ export default function PlanejamentoClientePage() {
             <div className="sticky top-0 z-10 mt-8 rounded-3xl bg-white/95 p-5 shadow-sm ring-1 ring-slate-200 backdrop-blur lg:p-6">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#c79e40]">
+                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">
                     Seleção de módulos
                   </p>
 
@@ -481,7 +481,7 @@ export default function PlanejamentoClientePage() {
                   <button
                     type="button"
                     onClick={selectAllModules}
-                    className="cursor-pointer rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40"
+                    className="cursor-pointer rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-slate-50 hover:ring-slate-300"
                   >
                     Selecionar todos
                   </button>
@@ -489,7 +489,7 @@ export default function PlanejamentoClientePage() {
                   <button
                     type="button"
                     onClick={clearModules}
-                    className="cursor-pointer rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40"
+                    className="cursor-pointer rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-slate-50 hover:ring-slate-300"
                   >
                     Limpar
                   </button>
@@ -498,7 +498,7 @@ export default function PlanejamentoClientePage() {
                     type="button"
                     onClick={saveModuleSelection}
                     disabled={isSaving}
-                    className="cursor-pointer rounded-full bg-slate-950 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-[#f4f1ea] hover:text-black hover:ring-1 hover:ring-[#c79e40]/30 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="cursor-pointer rounded-full bg-slate-950 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {isSaving ? "Salvando..." : "Salvar seleção"}
                   </button>
@@ -530,7 +530,7 @@ export default function PlanejamentoClientePage() {
 
                 return (
                   <section key={category}>
-                    <h3 className="border-l-2 border-[#c79e40]/50 pl-3 text-xl font-bold tracking-[-0.03em]">
+                    <h3 className="border-l-2 border-slate-300 pl-3 text-xl font-bold tracking-[-0.03em]">
                       {category}
                     </h3>
 
@@ -588,7 +588,7 @@ export default function PlanejamentoClientePage() {
                               {isSelected ? (
                                 <Link
                                   href={`/admin/planejamentos/${clientSlug}/modulos/${module.slug}`}
-                                  className="inline-flex rounded-full bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#f4f1ea] hover:text-black hover:ring-1 hover:ring-[#c79e40]/30"
+                                  className="inline-flex rounded-full bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-800"
                                 >
                                   Preencher módulo
                                 </Link>

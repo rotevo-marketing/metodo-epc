@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { MetodoFooter, MetodoLogo } from "@/Components/MetodoBrand";
 
 const clientName = "Cliente Demo";
@@ -316,7 +316,7 @@ function PlanningFooter() {
       <div className="mx-auto flex max-w-7xl flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <p className="text-lg font-semibold tracking-[-0.03em] text-slate-950">
-            Metodo EPC
+            Rotevo
           </p>
 
           <p className="mt-2 max-w-xl text-sm leading-6 text-slate-500">
@@ -326,10 +326,10 @@ function PlanningFooter() {
 
         <div className="flex flex-col gap-3 text-sm text-slate-500 lg:items-end">
           <a
-            href="mailto:otavio@metodoepc.com.br"
+            href="mailto:contato@rotevo.com.br"
             className="font-medium transition hover:text-slate-950"
           >
-            otavio@metodoepc.com.br
+            contato@rotevo.com.br
           </a>
 
           <a
@@ -342,7 +342,7 @@ function PlanningFooter() {
           </a>
 
           <p className="text-xs text-slate-400">
-            © 2026 Metodo EPC. Todos os direitos reservados.
+            © 2026 Rotevo. Todos os direitos reservados.
           </p>
         </div>
       </div>

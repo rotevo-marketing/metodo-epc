@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -244,7 +244,7 @@ function InProducaoMode({
         )}
       </section>
 
-      <MetodoFooter description="Planejamento estratégico desenvolvido pelo Método EPC." />
+      <MetodoFooter description="Planejamento estratégico desenvolvido pela Rotevo." />
     </main>
   );
 }
@@ -415,7 +415,7 @@ function OverviewMode({
         </div>
       </section>
 
-      <MetodoFooter description="Planejamento estratégico desenvolvido pelo Método EPC." />
+      <MetodoFooter description="Planejamento estratégico desenvolvido pela Rotevo." />
     </main>
   );
 }
@@ -709,7 +709,7 @@ function DetailMode({
         </div>
       </section>
 
-      <MetodoFooter description="Planejamento estratégico desenvolvido pelo Método EPC." />
+      <MetodoFooter description="Planejamento estratégico desenvolvido pela Rotevo." />
     </main>
   );
 }

@@ -1,4 +1,4 @@
-function GuideIcon() {
+﻿function GuideIcon() {
   return (
     <svg viewBox="0 0 64 64" aria-hidden="true" className="h-9 w-9" fill="none">
       <path
@@ -87,7 +87,7 @@ export default function ResumoEstrategico() {
         </p>
 
         <p>
-          O Método EPC nasce de uma necessidade comum no mercado: tirar o
+          A Rotevo nasce de uma necessidade comum no mercado: tirar o
           marketing da superficialidade. Em vez de trabalhar apenas com posts,
           ideias soltas ou ações desconectadas, este planejamento mostra a lógica
           por trás das decisões e cria uma base mais clara para comunicar,
@@ -214,11 +214,11 @@ export default function ResumoEstrategico() {
 
           <div className="mt-6 flex flex-col gap-3 text-sm text-slate-700 sm:flex-row sm:items-center sm:gap-6">
             <a
-              href="mailto:otavio@metodoepc.com.br"
+              href="mailto:contato@rotevo.com.br"
               className="inline-flex items-center gap-2 font-medium transition hover:text-slate-950"
             >
               <EmailIcon />
-              otavio@metodoepc.com.br
+              contato@rotevo.com.br
             </a>
 
             <a

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -34,7 +34,7 @@ function getStatusLabel(status: PlanningProject["status"]) {
 
 function getStatusClass(status: PlanningProject["status"]) {
   if (status === "published") return "bg-emerald-100 text-emerald-700";
-  if (status === "in_progress") return "bg-[#c79e40]/10 text-[#7a5c0a]";
+  if (status === "in_progress") return "bg-slate-100 text-slate-600";
   if (status === "archived") return "bg-slate-200 text-slate-500";
   return "bg-slate-100 text-slate-600";
 }
@@ -57,7 +57,7 @@ function CopyButton({ value, label }: { value: string; label?: string }) {
     <button
       type="button"
       onClick={handleCopy}
-      className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-slate-100 px-4 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-[#c79e40]/10 hover:text-[#7a5c0a] active:bg-[#c79e40]/15"
+      className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-slate-100 px-4 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-700 active:bg-slate-200"
     >
       {copied ? "Copiado!" : (label ?? "Copiar")}
     </button>
@@ -212,7 +212,7 @@ export default function AcessoClientePage() {
     ? `insert into profiles (id, full_name, email, role, client_id)\nvalues (\n  '${activeUid}',\n  '${client?.name ?? ""}',\n  '${email}',\n  'client',\n  '${client?.id ?? ""}'\n)\non conflict (id) do update set\n  full_name = excluded.full_name,\n  email = excluded.email,\n  role = excluded.role,\n  client_id = excluded.client_id,\n  updated_at = now();`
     : null;
 
-  const clientMessage = `Olá, ${client?.name ?? ""}.\nSeu acesso ao planejamento estratégico está disponível:\n\nURL: https://app.metodoepc.com.br\nLogin: ${email}\nSenha provisória: ${password}`;
+  const clientMessage = `Olá, ${client?.name ?? ""}.\nSeu acesso ao planejamento estratégico está disponível:\n\nURL: https://app.rotevo.com.br\nLogin: ${email}\nSenha provisória: ${password}`;
 
   return (
     <main className="min-h-screen bg-slate-100 text-slate-950">
@@ -221,7 +221,7 @@ export default function AcessoClientePage() {
 
         <Link
           href={`/admin/planejamentos/${clientSlug}`}
-          className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm ring-1 ring-slate-200 transition hover:bg-[#c79e40]/5 hover:ring-[#c79e40]/40"
+          className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-50 hover:ring-slate-300"
         >
           Voltar ao planejamento
         </Link>
@@ -240,7 +240,7 @@ export default function AcessoClientePage() {
             <h1 className="mt-4 text-2xl font-bold tracking-[-0.04em]">{errorMessage}</h1>
             <Link
               href="/admin"
-              className="mt-8 inline-flex rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-[#f4f1ea] hover:text-black hover:ring-1 hover:ring-[#c79e40]/30"
+              className="mt-8 inline-flex rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
             >
               Voltar ao painel
             </Link>
@@ -303,7 +303,7 @@ export default function AcessoClientePage() {
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="email@cliente.com"
                       disabled={createSuccess}
-                      className="flex-1 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 placeholder-slate-400 focus:border-[#c79e40]/60 focus:outline-none focus:ring-2 focus:ring-[#c79e40]/10 disabled:opacity-60"
+                      className="flex-1 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 placeholder-slate-400 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-black/10 disabled:opacity-60"
                     />
                     {email && <CopyButton value={email} label="Copiar e-mail" />}
                   </div>
@@ -319,7 +319,7 @@ export default function AcessoClientePage() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       disabled={createSuccess}
-                      className="flex-1 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-mono text-sm text-slate-950 focus:border-[#c79e40]/60 focus:outline-none focus:ring-2 focus:ring-[#c79e40]/10 disabled:opacity-60"
+                      className="flex-1 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-mono text-sm text-slate-950 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-black/10 disabled:opacity-60"
                     />
                     <CopyButton value={password} label="Copiar senha" />
                   </div>
@@ -337,7 +337,7 @@ export default function AcessoClientePage() {
                       type="button"
                       onClick={handleCreateAccess}
                       disabled={isCreating || !email || !password}
-                      className="cursor-pointer rounded-full bg-slate-950 px-8 py-3.5 text-sm font-semibold text-white transition hover:bg-[#f4f1ea] hover:text-black hover:ring-1 hover:ring-[#c79e40]/30 disabled:cursor-not-allowed disabled:opacity-50"
+                      className="cursor-pointer rounded-full bg-slate-950 px-8 py-3.5 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {isCreating ? "Criando acesso..." : "Criar acesso automaticamente"}
                     </button>
@@ -500,7 +500,7 @@ export default function AcessoClientePage() {
                           value={uid}
                           onChange={(e) => setUid(e.target.value)}
                           placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-                          className="flex-1 rounded-2xl border border-slate-200 bg-white px-4 py-3 font-mono text-sm text-slate-950 placeholder-slate-400 focus:border-[#c79e40]/60 focus:outline-none focus:ring-2 focus:ring-[#c79e40]/10"
+                          className="flex-1 rounded-2xl border border-slate-200 bg-white px-4 py-3 font-mono text-sm text-slate-950 placeholder-slate-400 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-black/10"
                         />
                         {uid.trim() && <CopyButton value={uid.trim()} label="Copiar UID" />}
                       </div>

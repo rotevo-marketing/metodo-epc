@@ -88,7 +88,7 @@ function PageSidebar() {
   return (
     <aside className="fixed left-0 top-0 hidden h-screen w-80 overflow-y-auto border-r border-slate-200 bg-white p-6 lg:block">
       <a href="/admin" className="block">
-        <h1 className="text-2xl font-bold">Metodo EPC</h1>
+        <h1 className="text-2xl font-bold">Rotevo</h1>
         <p className="mt-2 text-sm text-slate-500">Painel administrativo</p>
       </a>
 
@@ -492,7 +492,7 @@ export default function LinkedInPage() {
         <button
           type="button"
           onClick={() => addTextListItem(listKey)}
-          className="mt-4 cursor-pointer rounded-full border border-[#c79e40]/20 bg-[#c79e40]/10 px-5 py-3 text-sm font-semibold text-[#c79e40] transition-colors hover:bg-[#c79e40] hover:border-[#c79e40] hover:text-black"
+          className="mt-4 cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-950 hover:border-slate-950 hover:text-white"
         >
           + {buttonLabel}
         </button>
@@ -819,7 +819,7 @@ export default function LinkedInPage() {
               <button
                 type="button"
                 onClick={addFrequencyItem}
-                className="mt-5 cursor-pointer rounded-full border border-[#c79e40]/20 bg-[#c79e40]/10 px-5 py-3 text-sm font-semibold text-[#c79e40] transition-colors hover:bg-[#c79e40] hover:border-[#c79e40] hover:text-black"
+                className="mt-5 cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-950 hover:border-slate-950 hover:text-white"
               >
                 + Novo formato
               </button>
@@ -978,7 +978,7 @@ export default function LinkedInPage() {
               <button
                 type="button"
                 onClick={addReference}
-                className="mt-5 cursor-pointer rounded-full border border-[#c79e40]/20 bg-[#c79e40]/10 px-5 py-3 text-sm font-semibold text-[#c79e40] transition-colors hover:bg-[#c79e40] hover:border-[#c79e40] hover:text-black"
+                className="mt-5 cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-950 hover:border-slate-950 hover:text-white"
               >
                 + Nova referência
               </button>
