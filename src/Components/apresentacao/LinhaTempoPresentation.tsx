@@ -43,7 +43,7 @@ function isTimelineData(v: unknown): v is TimelineData {
 
 const priorityColors: Record<string, string> = {
   Alta: "bg-red-100 text-red-700",
-  Média: "bg-amber-100 text-amber-700",
+  Média: "bg-slate-100 text-slate-600",
   Baixa: "bg-slate-100 text-slate-600",
 };
 

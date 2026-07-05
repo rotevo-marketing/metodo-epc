@@ -89,7 +89,7 @@ export default function DnaConteudoPresentation({ data }: { data: unknown }) {
                 key={i}
                 className="flex items-start gap-3 text-base leading-7 text-slate-700"
               >
-                <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-[#c79e40]/50" />
+                <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-slate-300" />
                 {idea}
               </li>
             ))}

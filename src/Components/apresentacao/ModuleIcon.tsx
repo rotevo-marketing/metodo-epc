@@ -39,6 +39,20 @@ export function getIconPath(slug: string): string {
   return "/icons/38-orientacoes.svg";
 }
 
+/**
+ * Renders the icon circle used on module cards in the presentation grid.
+ * Style is controlled by the global .rotevo-card-icon CSS class:
+ *   - Normal: slate-100 background, slate-800 icon
+ *   - Hover (requires parent with class="group"): black background, white icon
+ */
+export function ModuleCardIcon({ slug }: { slug: string }) {
+  return (
+    <div className="rotevo-card-icon">
+      <ModuleIcon slug={slug} />
+    </div>
+  );
+}
+
 export function ModuleIcon({
   slug,
   size = "sm",

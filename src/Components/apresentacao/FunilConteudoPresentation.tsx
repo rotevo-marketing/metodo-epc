@@ -58,7 +58,7 @@ const stageFields: { key: keyof ContentFunnelStageData; label: string }[] = [
 const funnelColors = [
   "bg-blue-50 ring-blue-200 text-blue-700",
   "bg-violet-50 ring-violet-200 text-violet-700",
-  "bg-amber-50 ring-amber-200 text-amber-700",
+  "bg-slate-50 ring-slate-200 text-slate-600",
   "bg-emerald-50 ring-emerald-200 text-emerald-700",
 ];
 

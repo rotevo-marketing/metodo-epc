@@ -1,7 +1,7 @@
 import { sanitizeHtml, isHtmlContent } from "@/lib/renderHtml";
 
 const htmlStyles =
-  "[&_a]:text-[#c79e40] [&_a]:underline [&_em]:italic [&_li]:my-1 [&_mark]:bg-yellow-100 [&_mark]:px-0.5 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:my-2 [&_s]:line-through [&_strong]:font-semibold [&_u]:underline [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-5";
+  "[&_a]:text-slate-900 [&_a]:underline [&_em]:italic [&_li]:my-1 [&_mark]:bg-slate-100 [&_mark]:px-0.5 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:my-2 [&_s]:line-through [&_strong]:font-semibold [&_u]:underline [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-5";
 
 export function RichText({
   content,

@@ -75,7 +75,7 @@ function ToneBar({
                 isEndPoint
                   ? `h-4 w-4 ${
                       isSelected
-                        ? "bg-[#c79e40] ring-4 ring-[#c79e40]/20"
+                        ? "bg-black ring-4 ring-black/20"
                         : "bg-slate-200"
                     }`
                   : `h-2 w-2 ${hasValue ? "bg-slate-200" : "bg-slate-200"}`

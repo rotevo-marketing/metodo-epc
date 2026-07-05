@@ -33,8 +33,8 @@ const swotQuadrants = [
     key: "ameacas",
     label: "Ameaças",
     description: "Ambiente externo — riscos e impactos negativos",
-    color: "bg-amber-50 ring-amber-200",
-    labelColor: "text-amber-700",
+    color: "bg-slate-50 ring-slate-200",
+    labelColor: "text-slate-600",
   },
 ] as const;
 

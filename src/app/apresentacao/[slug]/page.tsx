@@ -43,7 +43,7 @@ import LinhaTempoPresentation from "@/Components/apresentacao/LinhaTempoPresenta
 import CalendarioConteudoPresentation from "@/Components/apresentacao/CalendarioConteudoPresentation";
 import MetricasIndicadoresPresentation from "@/Components/apresentacao/MetricasIndicadoresPresentation";
 import OrientacoesAdicionaisPresentation from "@/Components/apresentacao/OrientacoesAdicionaisPresentation";
-import { ModuleIcon } from "@/Components/apresentacao/ModuleIcon";
+import { ModuleIcon, ModuleCardIcon } from "@/Components/apresentacao/ModuleIcon";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -182,9 +182,9 @@ function InProducaoMode({
 
       <section className="mx-auto max-w-4xl px-6 py-12 lg:px-10">
         <div className="overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
-          <div className="h-1 bg-[#c79e40]/40" />
+          <div className="h-1 bg-slate-200" />
           <div className="p-8 lg:p-10">
-            <span className="inline-block rounded-full bg-[#c79e40]/10 px-3 py-1 text-xs font-bold text-[#7a5c0a]">
+            <span className="inline-block rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">
               Em produção
             </span>
 
@@ -203,7 +203,7 @@ function InProducaoMode({
             <div className="mt-8 border-t border-slate-100 pt-6">
               <Link
                 href="/cliente"
-                className="inline-flex items-center justify-center rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-[#f4f1ea] hover:text-black hover:ring-1 hover:ring-[#c79e40]/30"
+                className="inline-flex items-center justify-center rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
               >
                 Voltar para minha área
               </Link>
@@ -213,7 +213,7 @@ function InProducaoMode({
 
         {hasSchedule && (
           <div className="mt-6 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
-            <div className="h-1 bg-[#c79e40]/20" />
+            <div className="h-1 bg-slate-200" />
             <div className="p-8 lg:p-10">
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">
                 Cronograma previsto
@@ -375,12 +375,10 @@ function OverviewMode({
                       key={section.slug}
                       type="button"
                       onClick={() => onSelect(section.slug)}
-                      className="group min-h-[150px] cursor-pointer rounded-[1.5rem] bg-white p-6 text-left shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-950/5 hover:ring-slate-300"
+                      className="group rotevo-module-card"
                     >
                       <div className="flex gap-5">
-                        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-[#c79e40]/20 bg-[#c79e40]/10 text-[#c79e40] transition-colors group-hover:border-[#c79e40] group-hover:bg-[#c79e40] group-hover:text-white">
-                          <ModuleIcon slug={section.slug} />
-                        </div>
+                        <ModuleCardIcon slug={section.slug} />
 
                         <div className="flex-1">
                           <div className="flex items-start justify-between gap-2">
@@ -393,7 +391,7 @@ function OverviewMode({
                                   "mt-0.5 shrink-0 rounded-full px-2.5 py-0.5 text-xs font-bold",
                                   section.hasContent
                                     ? "bg-emerald-100 text-emerald-700"
-                                    : "bg-amber-100 text-amber-700"
+                                    : "bg-slate-100 text-slate-600"
                                 )}
                               >
                                 {section.hasContent ? "Preenchido" : "Vazio"}
@@ -451,7 +449,7 @@ function ModulePlaceholder({ section }: { section: PresentationSection }) {
               "rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.12em]",
               section.hasContent
                 ? "bg-emerald-100 text-emerald-700"
-                : "bg-amber-100 text-amber-700"
+                : "bg-slate-100 text-slate-600"
             )}
           >
             {section.hasContent ? "Conteúdo salvo" : "Sem conteúdo"}
@@ -612,7 +610,7 @@ function DetailMode({
                                 "h-2 w-2 rounded-full shrink-0",
                                 section.hasContent
                                   ? "bg-emerald-400"
-                                  : "bg-amber-400"
+                                  : "bg-slate-300"
                               )}
                             />
                           )}
@@ -844,7 +842,7 @@ export default function ApresentacaoDinamicaPage() {
           </p>
           <Link
             href="/cliente"
-            className="mt-6 inline-flex items-center justify-center rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-[#f4f1ea] hover:text-black hover:ring-1 hover:ring-[#c79e40]/30"
+            className="mt-6 inline-flex items-center justify-center rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
           >
             Ir para minha área
           </Link>

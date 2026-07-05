@@ -56,7 +56,7 @@ function isAutomationData(v: unknown): v is AutomationSystemData {
 
 const stepTypeColors: Record<string, string> = {
   Mensagem: "bg-indigo-100 text-indigo-700",
-  Espera: "bg-amber-100 text-amber-700",
+  Espera: "bg-slate-100 text-slate-600",
   Condição: "bg-purple-100 text-purple-700",
   Ação: "bg-emerald-100 text-emerald-700",
   Tag: "bg-slate-100 text-slate-600",

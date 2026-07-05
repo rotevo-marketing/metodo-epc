@@ -28,3 +28,46 @@ h2,
 h3 {
   font-family: var(--font-heading), "Georgia", serif;
 }
+
+/* ── Rotevo presentation — shared visual patterns ────────────────────────── */
+
+/* Icon circle on module cards (normal state: light gray; hover state: black). */
+/* Requires a parent with class="group" — the card button already supplies it. */
+.rotevo-card-icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;     /* 56px — matches h-14 w-14 */
+  height: 3.5rem;
+  border-radius: 9999px;
+  border: 1px solid #e2e8f0;    /* slate-200 */
+  background-color: #f1f5f9;    /* slate-100 */
+  color: #1e293b;                /* slate-800 */
+  transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease;
+}
+
+.group:hover .rotevo-card-icon {
+  border-color: #000000;
+  background-color: #000000;
+  color: #ffffff;
+}
+
+/* Full module card button (add "group" class alongside this). */
+.rotevo-module-card {
+  min-height: 150px;
+  cursor: pointer;
+  border-radius: 1.5rem;
+  background-color: #ffffff;
+  padding: 1.5rem;
+  text-align: left;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05);
+  outline: 1px solid #e2e8f0;   /* ring-1 ring-slate-200 */
+  transition: transform 150ms ease, box-shadow 200ms ease, outline-color 150ms ease;
+}
+
+.rotevo-module-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgb(15 23 42 / 0.05);
+  outline-color: #cbd5e1;        /* slate-300 */
+}

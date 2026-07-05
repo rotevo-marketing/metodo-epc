@@ -42,7 +42,7 @@ function isMetricsData(v: unknown): v is MetricsData {
 const typeColors: Record<string, string> = {
   Primário: "bg-indigo-100 text-indigo-700",
   Secundário: "bg-slate-100 text-slate-600",
-  "De vaidade": "bg-amber-100 text-amber-700",
+  "De vaidade": "bg-slate-100 text-slate-600",
 };
 
 export default function MetricasIndicadoresPresentation({ data }: { data: unknown }) {

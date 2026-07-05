@@ -76,7 +76,7 @@ function CompetitorModal({
           )}
 
           <div className="min-w-0 flex-1">
-            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#c79e40]">
+            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
               Concorrente {index + 1}
             </span>
             <h3
@@ -239,7 +239,7 @@ export default function PesquisaConcorrenciaPresentation({
                         </div>
                       )}
                       <div className="min-w-0">
-                        <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#c79e40]">
+                        <span className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
                           Concorrente {i + 1}
                         </span>
                         <h3 className="mt-0.5 truncate text-base font-semibold tracking-tight text-slate-950">
