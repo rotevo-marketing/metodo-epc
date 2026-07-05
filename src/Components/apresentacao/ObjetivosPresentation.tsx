@@ -173,7 +173,7 @@ export default function ObjetivosPresentation({ data }: { data: unknown }) {
           )}
           <RichText
             content={mainObjective!.description}
-            className="mt-4 max-w-[65ch] text-base leading-[1.75] text-slate-700"
+            className="mt-4 text-base leading-[1.75] text-slate-700"
           />
         </section>
       )}
@@ -253,7 +253,7 @@ export default function ObjetivosPresentation({ data }: { data: unknown }) {
           <PresentationSectionTitle title="Observações estratégicas" />
           <RichText
             content={strategicObservation}
-            className="max-w-[65ch] text-base leading-[1.75] text-slate-700"
+            className="text-base leading-[1.75] text-slate-700"
           />
         </section>
       )}
