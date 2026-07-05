@@ -48,7 +48,7 @@ export function getIconPath(slug: string): string {
 export function ModuleCardIcon({ slug }: { slug: string }) {
   return (
     <div className="rotevo-card-icon">
-      <ModuleIcon slug={slug} />
+      <ModuleIcon slug={slug} size="card" />
     </div>
   );
 }
@@ -61,12 +61,12 @@ export function ModuleIcon({
   hoverDarken = false,
 }: {
   slug: string;
-  size?: "sm" | "lg";
+  size?: "sm" | "card" | "lg";
   inverted?: boolean;
   hoverInvert?: boolean;
   hoverDarken?: boolean;
 }) {
-  const sizeClass = size === "lg" ? "h-10 w-10" : "h-5 w-5";
+  const sizeClass = size === "lg" ? "h-10 w-10" : size === "card" ? "h-6 w-6" : "h-5 w-5";
   const textClass = inverted ? "text-white" : "";
   const hoverTextClass = hoverInvert
     ? "group-hover:text-white"
