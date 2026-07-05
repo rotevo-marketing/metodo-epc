@@ -119,7 +119,7 @@ export default function EspecialistaPresentation({ data }: { data: unknown }) {
           <div className="divide-y divide-slate-100">
             {filledFields.map(([key, label], i) => (
               <div key={key} className={i === 0 ? "pb-6" : "py-6"}>
-                <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.22em] text-slate-500">
+                <p className="mb-3 font-display text-[1.125rem] font-semibold text-slate-900 sm:text-[1.25rem]">
                   {label}
                 </p>
                 <RichText
@@ -138,7 +138,7 @@ export default function EspecialistaPresentation({ data }: { data: unknown }) {
           <SpecialistSectionTitle title="Personalidade do especialista" />
 
           {photo && (
-            <div className="mb-10 flex justify-center">
+            <div className="mb-10 flex justify-start">
               <img
                 src={photo}
                 alt="Especialista"
