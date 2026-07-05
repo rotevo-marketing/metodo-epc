@@ -1,6 +1,8 @@
 import { ModuleIcon } from "./ModuleIcon";
 import { RichText } from "./RichText";
 
+// ─── Types ────────────────────────────────────────────────────────────────────
+
 type SpecialistCharacteristic = { title: string; description: string };
 
 type SpecialistData = {
@@ -25,29 +27,49 @@ const fieldLabels: [string, string][] = [
   ["comoGostariaDeSerVisto", "Como gostaria de ser visto"],
 ];
 
-function Field({ label, value }: { label: string; value: string }) {
-  if (!value?.trim()) return null;
+// ─── Local sub-components ─────────────────────────────────────────────────────
+// Same pattern as ObjetivosPresentation — extractable to a shared file in the future.
 
+function SpecialistSectionTitle({ title }: { title: string }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-6 md:p-7">
-      <p className="mb-4 text-sm font-bold uppercase tracking-[0.18em] text-[#5f6f8a]">
-        {label}
-      </p>
-      <RichText content={value} className="text-base leading-7 text-slate-800" />
+    <p className="mb-6 text-xs font-bold uppercase tracking-[0.25em] text-slate-800">
+      {title}
+    </p>
+  );
+}
+
+function SpecialistPersonalityItem({
+  c,
+  index,
+}: {
+  c: SpecialistCharacteristic;
+  index: number;
+}) {
+  if (!c.title?.trim() && !c.description?.trim()) return null;
+  const num = String(index + 1).padStart(2, "0");
+  return (
+    <div className="flex items-start gap-3">
+      <span className="mt-[0.15rem] shrink-0 rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-bold tabular-nums text-slate-500">
+        {num}
+      </span>
+      <div className="min-w-0 flex-1">
+        {c.title && (
+          <p className="text-[0.9375rem] font-semibold leading-snug text-slate-950">
+            {c.title}
+          </p>
+        )}
+        {c.description?.trim() && (
+          <RichText
+            content={c.description}
+            className="mt-2 text-sm leading-[1.8] text-slate-600"
+          />
+        )}
+      </div>
     </div>
   );
 }
 
-function CharCard({ c }: { c: SpecialistCharacteristic }) {
-  return (
-    <div className="rounded-2xl border border-slate-100 bg-slate-50 p-5 text-center">
-      {c.title && (
-        <p className="text-base font-semibold text-slate-950">{c.title}</p>
-      )}
-      <RichText content={c.description} className="mt-2 text-sm leading-relaxed text-slate-700" />
-    </div>
-  );
-}
+// ─── Main component ───────────────────────────────────────────────────────────
 
 export default function EspecialistaPresentation({ data }: { data: unknown }) {
   const d = isSpecialistData(data) ? data : null;
@@ -56,34 +78,30 @@ export default function EspecialistaPresentation({ data }: { data: unknown }) {
   const characteristics = (d?.characteristics ?? []).filter(
     (c) => c.title?.trim() || c.description?.trim()
   );
-
   const filledFields = fieldLabels.filter(([k]) => fields[k]?.trim());
 
   return (
     <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
-      {/* Header */}
-      <section className="p-8 lg:p-12">
-        <div className="flex items-center gap-5">
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-slate-950">
-            <ModuleIcon slug="dna-do-especialista" size="lg" inverted />
+
+      {/* ── Cabeçalho ───────────────────────────────────────── */}
+      <section className="px-8 py-10 lg:px-12 lg:py-12">
+        <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.35em] text-slate-400">
+          Essência do Projeto
+        </p>
+        <div className="flex items-center gap-4">
+          <div className="rotevo-card-icon shrink-0">
+            <ModuleIcon slug="dna-do-especialista" size="card" />
           </div>
-          <div>
-            <p className="text-xs font-medium uppercase tracking-[0.35em] text-slate-400">
-              Essência do Projeto
-            </p>
-            <h2 className="mt-2 text-5xl font-light tracking-[-0.05em] text-slate-950">
-              Especialista
-            </h2>
-          </div>
+          <h2 className="text-[1.75rem] font-medium leading-tight tracking-[-0.03em] text-slate-950 sm:text-[2rem]">
+            Especialista
+          </h2>
         </div>
       </section>
 
-      {/* Photo standalone — only when no characteristics */}
+      {/* ── Foto standalone (apenas quando não há características) ── */}
       {photo && characteristics.length === 0 && (
-        <section className="p-8 lg:p-12">
-          <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-            Foto do especialista
-          </p>
+        <section className="px-8 py-10 lg:px-12">
+          <SpecialistSectionTitle title="Foto do especialista" />
           <img
             src={photo}
             alt="Especialista"
@@ -92,76 +110,53 @@ export default function EspecialistaPresentation({ data }: { data: unknown }) {
         </section>
       )}
 
-      {/* Fields — each in its own card */}
+      {/* ── Sobre o especialista ─────────────────────────────── */}
       {filledFields.length > 0 && (
-        <section className="p-8 lg:p-12">
-          <h3 className="mb-6 text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl">
+        <section className="px-8 py-10 lg:px-12">
+          <h3 className="mb-8 text-[1.375rem] font-semibold leading-snug tracking-[-0.02em] text-slate-950 sm:text-[1.5rem]">
             Sobre o especialista
           </h3>
-          <div className="space-y-4">
-            {filledFields.map(([key, label]) => (
-              <Field key={key} label={label} value={fields[key] ?? ""} />
+          <div className="divide-y divide-slate-100">
+            {filledFields.map(([key, label], i) => (
+              <div key={key} className={i === 0 ? "pb-6" : "py-6"}>
+                <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.22em] text-slate-500">
+                  {label}
+                </p>
+                <RichText
+                  content={fields[key] ?? ""}
+                  className="text-base leading-[1.75] text-slate-700"
+                />
+              </div>
             ))}
           </div>
         </section>
       )}
 
-      {/* Personalidade do especialista — grid layout */}
+      {/* ── Personalidade do especialista ────────────────────── */}
       {characteristics.length > 0 && (
-        <section className="p-8 lg:p-12">
-          <p className="mb-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
-            Personalidade do especialista
-          </p>
+        <section className="px-8 py-10 lg:px-12">
+          <SpecialistSectionTitle title="Personalidade do especialista" />
 
-          {/* Desktop: cross grid */}
-          <div className="hidden md:grid md:grid-cols-3 md:items-center md:gap-8">
-            <div />
-            <div>{characteristics[0] && <CharCard c={characteristics[0]} />}</div>
-            <div />
-            <div>
-              {characteristics[1] ? <CharCard c={characteristics[1]} /> : <div />}
+          {photo && (
+            <div className="mb-10 flex justify-center">
+              <img
+                src={photo}
+                alt="Especialista"
+                className="h-28 w-28 rounded-full border border-slate-200 object-cover sm:h-32 sm:w-32"
+              />
             </div>
-            <div className="flex justify-center">
-              {photo ? (
-                <img
-                  src={photo}
-                  alt="Especialista"
-                  className="h-40 w-40 rounded-full border-4 border-white object-cover shadow-md"
-                />
-              ) : (
-                <div className="h-40 w-40 rounded-full border-2 border-slate-200 bg-slate-100" />
-              )}
-            </div>
-            <div>
-              {characteristics[2] ? <CharCard c={characteristics[2]} /> : <div />}
-            </div>
-            <div />
-            <div>{characteristics[3] ? <CharCard c={characteristics[3]} /> : <div />}</div>
-            <div />
-          </div>
+          )}
 
-          {/* Mobile: stacked */}
-          <div className="md:hidden">
-            {photo && (
-              <div className="mb-8 flex justify-center">
-                <img
-                  src={photo}
-                  alt="Especialista"
-                  className="h-32 w-32 rounded-full border-4 border-white object-cover shadow-md"
-                />
-              </div>
-            )}
-            <div className="space-y-4">
-              {characteristics.slice(0, 4).map((c, i) => (
-                <CharCard key={i} c={c} />
-              ))}
-            </div>
+          <div className="grid gap-7 sm:grid-cols-2">
+            {characteristics.slice(0, 4).map((c, i) => (
+              <SpecialistPersonalityItem key={i} c={c} index={i} />
+            ))}
           </div>
 
           {characteristics.length > 4 && (
-            <div className="mt-8 grid gap-4 sm:grid-cols-2">
+            <div className="mt-7 grid gap-7 border-t border-slate-100 pt-7 sm:grid-cols-2">
               {characteristics.slice(4).map((c, i) => (
-                <CharCard key={i} c={c} />
+                <SpecialistPersonalityItem key={i} c={c} index={i + 4} />
               ))}
             </div>
           )}
