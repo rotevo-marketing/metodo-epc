@@ -1,8 +1,8 @@
+import { PresentationHeader } from "./PresentationHeader";
 import {
   ExternalRefList,
   FieldBlock,
   SectionCard,
-  ModuleHeader,
   EmptyState,
 } from "./ChannelPresentationShared";
 
@@ -54,11 +54,10 @@ export default function MetricasIndicadoresPresentation({ data }: { data: unknow
 
   return (
     <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
-      <ModuleHeader
-        slug="metricas-e-indicadores"
-        group="Execução, Acompanhamento e Gestão"
+      <PresentationHeader
+        area="Execução, Acompanhamento e Gestão"
         title="Métricas e Indicadores"
-        description="Sistema de acompanhamento de resultados: indicadores, métricas por jornada e canal, ferramentas e rotina de análise."
+        slug="metricas-e-indicadores"
       />
 
       {d?.mainIndicators && (

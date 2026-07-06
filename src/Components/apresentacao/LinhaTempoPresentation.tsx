@@ -1,8 +1,8 @@
+import { PresentationHeader } from "./PresentationHeader";
 import {
   ExternalRefList,
   FieldBlock,
   SectionCard,
-  ModuleHeader,
   EmptyState,
 } from "./ChannelPresentationShared";
 import { RichText } from "./RichText";
@@ -61,11 +61,10 @@ export default function LinhaTempoPresentation({ data }: { data: unknown }) {
 
   return (
     <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
-      <ModuleHeader
-        slug="linha-do-tempo"
-        group="Execução, Acompanhamento e Gestão"
+      <PresentationHeader
+        area="Execução, Acompanhamento e Gestão"
         title="Linha do Tempo"
-        description="Planejamento temporal da execução: eventos, fases, sprints, marcos e riscos."
+        slug="linha-do-tempo"
       />
 
       {(d?.macroVision || d?.firstMilestone || d?.secondMilestone || d?.thirdMilestone) && (

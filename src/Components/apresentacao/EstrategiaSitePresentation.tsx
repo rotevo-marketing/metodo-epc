@@ -1,6 +1,6 @@
+import { PresentationHeader } from "./PresentationHeader";
 import {
   SectionCard,
-  ModuleHeader,
   EmptyState,
   FieldBlock,
 } from "./ChannelPresentationShared";
@@ -32,11 +32,10 @@ export default function EstrategiaSitePresentation({ data }: { data: unknown }) 
 
   return (
     <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
-      <ModuleHeader
-        slug="estrategia-do-site"
-        group="Estratégia Editorial e Canais"
+      <PresentationHeader
+        area="Estratégia Editorial e Distribuição de Conteúdo"
         title="Estratégia do Site"
-        description="Estratégia do site: identidade visual, páginas essenciais, funcionalidades e integrações."
+        slug="estrategia-do-site"
       />
 
       {d?.visualIdentity && (

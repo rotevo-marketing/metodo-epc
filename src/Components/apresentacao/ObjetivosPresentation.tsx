@@ -1,4 +1,4 @@
-import { ModuleIcon } from "./ModuleIcon";
+import { PresentationHeader } from "./PresentationHeader";
 import { RichText } from "./RichText";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -146,19 +146,11 @@ export default function ObjetivosPresentation({ data }: { data: unknown }) {
     <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
 
       {/* ── Cabeçalho ───────────────────────────────────────── */}
-      <section className="px-8 py-10 lg:px-12 lg:py-12">
-        <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.35em] text-slate-400">
-          Fundamentos Estratégicos
-        </p>
-        <div className="flex items-center gap-4">
-          <div className="rotevo-card-icon shrink-0">
-            <ModuleIcon slug="objetivos" size="card" />
-          </div>
-          <h2 className="text-[1.75rem] font-medium leading-tight tracking-[-0.03em] text-slate-950 sm:text-[2rem]">
-            Objetivos do Projeto
-          </h2>
-        </div>
-      </section>
+      <PresentationHeader
+        area="Fundamentos Estratégicos"
+        title="Objetivos do Projeto"
+        slug="objetivos"
+      />
 
       {/* ── Objetivo principal ──────────────────────────────── */}
       {hasMainObjective && (

@@ -1,8 +1,8 @@
+import { PresentationHeader } from "./PresentationHeader";
 import {
   ExternalRefList,
   FieldBlock,
   SectionCard,
-  ModuleHeader,
   EmptyState,
   ExtRef,
 } from "./ChannelPresentationShared";
@@ -40,11 +40,10 @@ export default function MapaSitePresentation({ data }: { data: unknown }) {
 
   return (
     <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
-      <ModuleHeader
-        slug="mapa-do-site"
-        group="Estratégia Editorial e Canais"
+      <PresentationHeader
+        area="Estratégia Editorial e Distribuição de Conteúdo"
         title="Mapa do Site"
-        description="Mapeamento das páginas do site: tipo, objetivo, seções e CTA de cada página."
+        slug="mapa-do-site"
       />
 
       {filledPages.length > 0 && (

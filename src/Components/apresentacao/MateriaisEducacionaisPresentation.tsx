@@ -1,8 +1,8 @@
+import { PresentationHeader } from "./PresentationHeader";
 import {
   ExternalRefList,
   FieldBlock,
   SectionCard,
-  ModuleHeader,
   EmptyState,
   ExtRef,
 } from "./ChannelPresentationShared";
@@ -35,11 +35,10 @@ export default function MateriaisEducacionaisPresentation({ data }: { data: unkn
 
   return (
     <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
-      <ModuleHeader
-        slug="materiais-educacionais"
-        group="Estratégia Editorial e Canais"
+      <PresentationHeader
+        area="Estratégia Editorial e Distribuição de Conteúdo"
         title="Materiais Educacionais"
-        description="Estratégia para materiais educacionais: e-books, guias, templates e outros conteúdos de valor."
+        slug="materiais-educacionais"
       />
 
       {d?.strategy && (

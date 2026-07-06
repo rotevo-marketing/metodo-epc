@@ -1,4 +1,4 @@
-import { ModuleIcon } from "./ModuleIcon";
+import { PresentationHeader } from "./PresentationHeader";
 import { RichText } from "./RichText";
 
 type ColorItem = { name: string; color: string; code: string };
@@ -52,22 +52,12 @@ export default function IdentidadeVisualPresentation({ data }: { data: unknown }
 
   return (
     <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
-      {/* Header */}
-      <section className="p-8 lg:p-12">
-        <div className="flex items-center gap-5">
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-slate-950">
-            <ModuleIcon slug="identidade-visual" size="lg" inverted />
-          </div>
-          <div>
-            <p className="text-xs font-medium uppercase tracking-[0.35em] text-slate-400">
-              Essência do Projeto
-            </p>
-            <h2 className="mt-2 text-5xl font-light tracking-[-0.05em] text-slate-950">
-              Identidade Visual
-            </h2>
-          </div>
-        </div>
-      </section>
+      {/* Cabeçalho */}
+      <PresentationHeader
+        area="Essência do Projeto"
+        title="Identidade Visual"
+        slug="identidade-visual"
+      />
 
       {/* Colors */}
       {colors.length > 0 && (

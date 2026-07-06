@@ -1,8 +1,8 @@
+import { PresentationHeader } from "./PresentationHeader";
 import {
   ExternalRefList,
   FieldBlock,
   SectionCard,
-  ModuleHeader,
   EmptyState,
 } from "./ChannelPresentationShared";
 
@@ -41,11 +41,10 @@ export default function CalendarioConteudoPresentation({ data }: { data: unknown
 
   return (
     <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
-      <ModuleHeader
-        slug="calendario-de-conteudo"
-        group="Execução, Acompanhamento e Gestão"
+      <PresentationHeader
+        area="Execução, Acompanhamento e Gestão"
         title="Calendário de Conteúdo"
-        description="Estrutura operacional do calendário editorial: plataforma, acesso, fluxo de aprovação e organização no Drive."
+        slug="calendario-de-conteudo"
       />
 
       {(d?.calendarTitle || d?.platform || d?.calendarLink || d?.calendarFunction) && (

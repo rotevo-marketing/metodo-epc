@@ -1,4 +1,4 @@
-import { ModuleIcon } from "./ModuleIcon";
+import { PresentationHeader } from "./PresentationHeader";
 import { RichText } from "./RichText";
 
 type ChannelItem = { nome: string; descricao: string; link: string };
@@ -41,22 +41,12 @@ export default function CanaisDigitaisPresentation({ data }: { data: unknown }) 
 
   return (
     <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
-      {/* Header */}
-      <section className="p-8 lg:p-12">
-        <div className="flex items-center gap-5">
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-slate-950">
-            <ModuleIcon slug="canais-digitais-atuais" size="lg" inverted />
-          </div>
-          <div>
-            <p className="text-xs font-medium uppercase tracking-[0.35em] text-slate-400">
-              Fundamentos Estratégicos
-            </p>
-            <h2 className="mt-2 text-5xl font-light tracking-[-0.05em] text-slate-950">
-              Canais Digitais Atuais
-            </h2>
-          </div>
-        </div>
-      </section>
+      {/* Cabeçalho */}
+      <PresentationHeader
+        area="Fundamentos Estratégicos"
+        title="Canais Digitais Atuais"
+        slug="canais-digitais-atuais"
+      />
 
       {/* Channels */}
       {channels.length > 0 && (

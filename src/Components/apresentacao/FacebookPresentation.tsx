@@ -1,3 +1,4 @@
+import { PresentationHeader } from "./PresentationHeader";
 import {
   FrequencyTable,
   TextList,
@@ -5,7 +6,6 @@ import {
   ExternalRefList,
   FieldBlock,
   SectionCard,
-  ModuleHeader,
   EmptyState,
   FreqItem,
   TextItem,
@@ -41,11 +41,10 @@ export default function FacebookPresentation({ data }: { data: unknown }) {
 
   return (
     <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
-      <ModuleHeader
-        slug="facebook"
-        group="Estratégia Editorial e Canais"
+      <PresentationHeader
+        area="Estratégia Editorial e Distribuição de Conteúdo"
         title="Facebook"
-        description="Estratégia para o Facebook: frequência, objetivos, linguagem, conteúdos e configuração da página."
+        slug="facebook"
       />
 
       {d?.frequencyItems?.some((i) => i.quantity?.trim()) && (

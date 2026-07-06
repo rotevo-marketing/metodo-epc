@@ -1,7 +1,7 @@
+import { PresentationHeader } from "./PresentationHeader";
 import {
   ExternalRefList,
   FieldBlock,
-  ModuleHeader,
   EmptyState,
   SectionCard,
 } from "./ChannelPresentationShared";
@@ -49,11 +49,10 @@ export default function LinhasEditoriaisPresentation({ data }: { data: unknown }
 
   return (
     <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
-      <ModuleHeader
-        slug="linhas-editoriais"
-        group="Estratégia Editorial"
+      <PresentationHeader
+        area="Estratégia Editorial e Distribuição de Conteúdo"
         title="Linhas Editoriais"
-        description="As grandes linhas temáticas que organizam e dão identidade ao conteúdo do projeto, cada uma com objetivo, público, formatos e frequência específicos."
+        slug="linhas-editoriais"
       />
 
       {lines.map((line, i) => {

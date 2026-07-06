@@ -1,8 +1,8 @@
+import { PresentationHeader } from "./PresentationHeader";
 import {
   ExternalRefList,
   FieldBlock,
   SectionCard,
-  ModuleHeader,
   EmptyState,
 } from "./ChannelPresentationShared";
 
@@ -55,11 +55,10 @@ export default function CampanhaDistribuicaoConteudoPresentation({ data }: { dat
 
   return (
     <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
-      <ModuleHeader
-        slug="campanha-distribuicao-de-conteudo"
-        group="Campanhas, Automações e Conversão"
+      <PresentationHeader
+        area="Campanhas, Automações e Conversão"
         title="Campanha de Distribuição de Conteúdo"
-        description="Estratégia de mídia paga para distribuição de conteúdo: alcance, aquecimento de audiência, reaproveitamento e sequência de distribuição."
+        slug="campanha-distribuicao-de-conteudo"
       />
 
       {(d?.campaignType || d?.campaignPhase || d?.mediaObjective || d?.audienceTemperature) && (

@@ -1,21 +1,4 @@
-﻿function GuideIcon() {
-  return (
-    <svg viewBox="0 0 64 64" aria-hidden="true" className="h-9 w-9" fill="none">
-      <path
-        d="M18 18h28v28H18V18Z"
-        stroke="currentColor"
-        strokeWidth="3.4"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M24 28h16M24 36h10"
-        stroke="currentColor"
-        strokeWidth="3.4"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
+﻿import { PresentationHeader } from "./PresentationHeader";
 
 function WhatsAppIcon() {
   return (
@@ -61,24 +44,11 @@ function EmailIcon() {
 
 export default function ResumoEstrategico() {
   return (
-    <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
-      <div className="flex items-center gap-5">
-        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-slate-950 text-white">
-          <GuideIcon />
-        </div>
+    <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
+      <PresentationHeader area="Apresentação" title="Comece por aqui" slug="resumo-estrategico" />
 
-        <div>
-          <p className="text-xs font-medium uppercase tracking-[0.35em] text-slate-400">
-            Apresentação
-          </p>
-
-          <h2 className="mt-2 text-5xl font-light tracking-[-0.05em] text-slate-950">
-            Comece por aqui
-          </h2>
-        </div>
-      </div>
-
-      <div className="mt-8 space-y-6 text-base leading-8 text-slate-600">
+      <div className="px-8 py-10 lg:px-12 lg:py-12">
+      <div className="space-y-6 text-base leading-8 text-slate-600">
         <p>
           Este é o ambiente estratégico do seu projeto. Ele foi criado para
           organizar, com profundidade, tudo o que sustenta o seu marketing:
@@ -241,6 +211,7 @@ export default function ResumoEstrategico() {
           </div>
         </section>
       </div>
-    </section>
+      </div>
+    </article>
   );
 }

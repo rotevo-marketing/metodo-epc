@@ -1,3 +1,4 @@
+import { PresentationHeader } from "./PresentationHeader";
 import {
   FrequencyTable,
   TextList,
@@ -5,7 +6,6 @@ import {
   ExternalRefList,
   FieldBlock,
   SectionCard,
-  ModuleHeader,
   EmptyState,
   FreqItem,
   TextItem,
@@ -37,11 +37,10 @@ export default function PinterestPresentation({ data }: { data: unknown }) {
 
   return (
     <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
-      <ModuleHeader
-        slug="pinterest"
-        group="Estratégia Editorial e Canais"
+      <PresentationHeader
+        area="Estratégia Editorial e Distribuição de Conteúdo"
         title="Pinterest"
-        description="Estratégia para o Pinterest: frequência, pastas, temas visuais, palavras-chave e links de destino."
+        slug="pinterest"
       />
 
       {d?.frequencyItems?.some((i) => i.quantity?.trim()) && (

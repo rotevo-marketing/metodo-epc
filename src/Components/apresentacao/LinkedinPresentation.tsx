@@ -1,3 +1,4 @@
+import { PresentationHeader } from "./PresentationHeader";
 import {
   FrequencyTable,
   TextList,
@@ -5,7 +6,6 @@ import {
   ExternalRefList,
   FieldBlock,
   SectionCard,
-  ModuleHeader,
   EmptyState,
   FreqItem,
   TextItem,
@@ -38,11 +38,10 @@ export default function LinkedinPresentation({ data }: { data: unknown }) {
 
   return (
     <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
-      <ModuleHeader
-        slug="linkedin"
-        group="Estratégia Editorial e Canais"
+      <PresentationHeader
+        area="Estratégia Editorial e Distribuição de Conteúdo"
         title="LinkedIn"
-        description="Estratégia para o LinkedIn: frequência, objetivos, linguagem, conteúdos de autoridade e configuração do perfil profissional."
+        slug="linkedin"
       />
 
       {d?.frequencyItems?.some((i) => i.quantity?.trim()) && (

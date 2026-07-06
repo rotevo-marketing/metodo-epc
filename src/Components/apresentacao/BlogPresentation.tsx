@@ -1,3 +1,4 @@
+import { PresentationHeader } from "./PresentationHeader";
 import {
   FrequencyTable,
   TextList,
@@ -5,7 +6,6 @@ import {
   ExternalRefList,
   FieldBlock,
   SectionCard,
-  ModuleHeader,
   EmptyState,
   FreqItem,
   TextItem,
@@ -39,11 +39,10 @@ export default function BlogPresentation({ data }: { data: unknown }) {
 
   return (
     <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
-      <ModuleHeader
-        slug="blog"
-        group="Estratégia Editorial e Canais"
+      <PresentationHeader
+        area="Estratégia Editorial e Distribuição de Conteúdo"
         title="Blog"
-        description="Estratégia para o blog: frequência, objetivos, SEO, palavras-chave e pauta de artigos."
+        slug="blog"
       />
 
       {d?.frequencyItems?.some((i) => i.quantity?.trim()) && (

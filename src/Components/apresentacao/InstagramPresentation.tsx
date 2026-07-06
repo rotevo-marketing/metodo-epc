@@ -1,3 +1,4 @@
+import { PresentationHeader } from "./PresentationHeader";
 import {
   FrequencyTable,
   TextList,
@@ -5,7 +6,6 @@ import {
   ExternalRefList,
   FieldBlock,
   SectionCard,
-  ModuleHeader,
   EmptyState,
   FreqItem,
   TextItem,
@@ -42,11 +42,10 @@ export default function InstagramPresentation({ data }: { data: unknown }) {
 
   return (
     <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
-      <ModuleHeader
-        slug="instagram"
-        group="Estratégia Editorial e Canais"
+      <PresentationHeader
+        area="Estratégia Editorial e Distribuição de Conteúdo"
         title="Instagram"
-        description="Estratégia completa para o Instagram: frequência de publicação, objetivos, linguagem, conteúdos, referências visuais e configuração do perfil."
+        slug="instagram"
       />
 
       {d?.frequencyItems?.some((i) => i.quantity?.trim()) && (

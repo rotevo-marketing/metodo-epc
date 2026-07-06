@@ -1,3 +1,4 @@
+import { PresentationHeader } from "./PresentationHeader";
 import {
   FrequencyTable,
   TextList,
@@ -5,7 +6,6 @@ import {
   ExternalRefList,
   FieldBlock,
   SectionCard,
-  ModuleHeader,
   EmptyState,
   FreqItem,
   TextItem,
@@ -40,11 +40,10 @@ export default function WhatsappPresentation({ data }: { data: unknown }) {
 
   return (
     <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
-      <ModuleHeader
-        slug="whatsapp"
-        group="Estratégia Editorial e Canais"
+      <PresentationHeader
+        area="Estratégia Editorial e Distribuição de Conteúdo"
         title="WhatsApp"
-        description="Estratégia para o WhatsApp: frequência, objetivos, fluxos de relacionamento e configuração do canal de atendimento."
+        slug="whatsapp"
       />
 
       {d?.frequencyItems?.some((i) => i.quantity?.trim()) && (

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ModuleIcon } from "./ModuleIcon";
+import { PresentationHeader } from "./PresentationHeader";
 import { RichText } from "./RichText";
 
 type KeywordItem = { keyword: string; volume: string; observation: string };
@@ -119,28 +119,18 @@ export default function PalavrasChavePresentation({
   return (
     <>
       <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
-        {/* Header */}
-        <section className="p-8 lg:p-12">
-          <div className="flex items-center gap-5">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-slate-950">
-              <ModuleIcon slug="palavras-chave" size="lg" inverted />
-            </div>
-            <div>
-              <p className="text-xs font-medium uppercase tracking-[0.35em] text-slate-400">
-                Fundamentos Estratégicos
-              </p>
-              <h2 className="mt-2 text-5xl font-light tracking-[-0.05em] text-slate-950">
-                Palavras-chave
-              </h2>
-            </div>
-          </div>
-
+        {/* Cabeçalho */}
+        <PresentationHeader
+          area="Fundamentos Estratégicos"
+          title="Palavras-chave"
+          slug="palavras-chave"
+        >
           <p className="mt-6 max-w-2xl text-base leading-8 text-slate-600">
             Termos prioritários para orientar SEO, conteúdos, campanhas e
             oportunidades de posicionamento. Clique em uma palavra-chave para
             ver volume de buscas e observações estratégicas.
           </p>
-        </section>
+        </PresentationHeader>
 
         {/* Keyword chips */}
         {!d ? (

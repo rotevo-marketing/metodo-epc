@@ -1,6 +1,6 @@
+import { PresentationHeader } from "./PresentationHeader";
 import {
   ExternalRefList,
-  ModuleHeader,
   EmptyState,
   SectionCard,
 } from "./ChannelPresentationShared";
@@ -90,11 +90,10 @@ export default function FunilConteudoPresentation({ data }: { data: unknown }) {
 
   return (
     <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
-      <ModuleHeader
-        slug="funil-de-conteudo"
-        group="Estratégia Editorial"
+      <PresentationHeader
+        area="Estratégia Editorial e Distribuição de Conteúdo"
         title="Funil de Conteúdo"
-        description="A estrutura estratégica que organiza o conteúdo por etapa do relacionamento: atração, conexão, vinculação e venda."
+        slug="funil-de-conteudo"
       />
 
       {overview && (

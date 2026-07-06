@@ -1,8 +1,8 @@
+import { PresentationHeader } from "./PresentationHeader";
 import {
   ExternalRefList,
   FieldBlock,
   SectionCard,
-  ModuleHeader,
   EmptyState,
 } from "./ChannelPresentationShared";
 import { RichText } from "./RichText";
@@ -74,11 +74,10 @@ export default function FluxoAutomacaoPresentation({ data }: { data: unknown }) 
 
   return (
     <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
-      <ModuleHeader
-        slug="fluxo-de-automacao"
-        group="Campanhas, Automações e Conversão"
+      <PresentationHeader
+        area="Campanhas, Automações e Conversão"
         title="Fluxo de Automação"
-        description="Sistema de automação de relacionamento: visão estratégica, arquitetura dos fluxos, gatilhos, tags, cadências e plataformas."
+        slug="fluxo-de-automacao"
       />
 
       {(d?.strategicVision || d?.centralPrinciple || d?.systemFunction || d?.successCondition || d?.failureRisk) && (

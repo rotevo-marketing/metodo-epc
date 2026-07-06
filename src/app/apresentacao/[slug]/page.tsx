@@ -44,6 +44,7 @@ import CalendarioConteudoPresentation from "@/Components/apresentacao/Calendario
 import MetricasIndicadoresPresentation from "@/Components/apresentacao/MetricasIndicadoresPresentation";
 import OrientacoesAdicionaisPresentation from "@/Components/apresentacao/OrientacoesAdicionaisPresentation";
 import { ModuleIcon, ModuleCardIcon } from "@/Components/apresentacao/ModuleIcon";
+import { PresentationHeader } from "@/Components/apresentacao/PresentationHeader";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -422,46 +423,39 @@ function OverviewMode({
 
 function ModulePlaceholder({ section }: { section: PresentationSection }) {
   return (
-    <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200 lg:p-12">
-      <div className="flex items-center gap-5">
-        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-slate-950">
-          <ModuleIcon slug={section.slug} size="lg" inverted />
-        </div>
+    <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
+      <PresentationHeader
+        area={section.category}
+        title={displayTitle(section)}
+        slug={section.slug}
+      />
 
-        <div>
-          <p className="text-xs font-medium uppercase tracking-[0.35em] text-slate-400">
-            {section.category}
-          </p>
-          <h2 className="mt-2 text-4xl font-light tracking-[-0.05em] text-slate-950">
-            {displayTitle(section)}
-          </h2>
-        </div>
-      </div>
+      <div className="px-8 py-10 lg:px-12">
+        <p className="max-w-2xl text-base leading-8 text-slate-600">
+          {section.description}
+        </p>
 
-      <p className="mt-6 max-w-2xl text-base leading-8 text-slate-600">
-        {section.description}
-      </p>
-
-      <div className="mt-8 rounded-2xl bg-slate-50 px-6 py-5 ring-1 ring-slate-200">
-        <div className="flex items-center gap-3">
-          <span
-            className={cx(
-              "rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.12em]",
-              section.hasContent
-                ? "bg-emerald-100 text-emerald-700"
-                : "bg-slate-100 text-slate-600"
-            )}
-          >
-            {section.hasContent ? "Conteúdo salvo" : "Sem conteúdo"}
-          </span>
-          <p className="text-sm text-slate-500">
-            {section.hasContent
-              ? "Este módulo possui dados preenchidos no planejamento."
-              : "Este módulo ainda não foi preenchido no planejamento."}
-          </p>
+        <div className="mt-8 rounded-2xl bg-slate-50 px-6 py-5 ring-1 ring-slate-200">
+          <div className="flex items-center gap-3">
+            <span
+              className={cx(
+                "rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.12em]",
+                section.hasContent
+                  ? "bg-emerald-100 text-emerald-700"
+                  : "bg-slate-100 text-slate-600"
+              )}
+            >
+              {section.hasContent ? "Conteúdo salvo" : "Sem conteúdo"}
+            </span>
+            <p className="text-sm text-slate-500">
+              {section.hasContent
+                ? "Este módulo possui dados preenchidos no planejamento."
+                : "Este módulo ainda não foi preenchido no planejamento."}
+            </p>
+          </div>
         </div>
       </div>
-    </section>
+    </article>
   );
 }
 

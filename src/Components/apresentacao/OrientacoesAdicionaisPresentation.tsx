@@ -1,8 +1,8 @@
+import { PresentationHeader } from "./PresentationHeader";
 import {
   ExternalRefList,
   FieldBlock,
   SectionCard,
-  ModuleHeader,
   EmptyState,
 } from "./ChannelPresentationShared";
 
@@ -59,11 +59,10 @@ export default function OrientacoesAdicionaisPresentation({ data }: { data: unkn
 
   return (
     <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
-      <ModuleHeader
-        slug="orientacoes-adicionais"
-        group="Execução, Acompanhamento e Gestão"
+      <PresentationHeader
+        area="Execução, Acompanhamento e Gestão"
         title="Orientações Adicionais"
-        description="Diretrizes finais de execução, pontos de atenção, itens pendentes, próximos passos e recomendações para o time."
+        slug="orientacoes-adicionais"
       />
 
       {(d?.executionGuidelines || d?.attentionPoints) && (
