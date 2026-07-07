@@ -275,15 +275,15 @@ export default function PersonasPresentation({ data }: { data: unknown }) {
                   className="overflow-hidden rounded-2xl ring-1 ring-slate-200"
                 >
                   {/* Card header */}
-                  <div className="flex items-center gap-4 border-b border-slate-100 bg-slate-50/60 p-5">
+                  <div className="flex items-center gap-4 sm:gap-5 border-b border-slate-100 bg-slate-50/60 p-5">
                     {persona.photo ? (
                       <img
                         src={persona.photo}
                         alt={persona.name || "Persona"}
-                        className="h-14 w-14 shrink-0 rounded-full object-cover ring-1 ring-slate-200"
+                        className="h-16 w-16 sm:h-20 sm:w-20 shrink-0 rounded-full object-cover object-center ring-1 ring-slate-200"
                       />
                     ) : (
-                      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xl font-bold text-slate-400 ring-1 ring-slate-200">
+                      <div className="flex h-16 w-16 sm:h-20 sm:w-20 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xl font-bold text-slate-400 ring-1 ring-slate-200">
                         {(persona.name || "P").charAt(0).toUpperCase()}
                       </div>
                     )}
@@ -297,7 +297,7 @@ export default function PersonasPresentation({ data }: { data: unknown }) {
                         </h3>
                       )}
                       {metaItems.length > 0 && (
-                        <p className="mt-0.5 text-xs text-slate-500">
+                        <p className="mt-1 text-[0.875rem] leading-snug text-slate-500">
                           {metaItems.join(" · ")}
                         </p>
                       )}
@@ -305,11 +305,11 @@ export default function PersonasPresentation({ data }: { data: unknown }) {
                   </div>
 
                   {/* Card body */}
-                  <div className="space-y-4 p-5">
-                    {/* Behaviors */}
+                  <div className="p-6">
+                    {/* Comportamento de consumo */}
                     {activeBehaviors.length > 0 && (
-                      <div>
-                        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                      <div className={filledSummary.length > 0 ? "mb-5" : ""}>
+                        <p className="mb-3 font-display text-[1.125rem] font-semibold text-slate-900 sm:text-[1.25rem]">
                           Comportamento de consumo
                         </p>
                         <div className="flex flex-wrap gap-2">
@@ -325,30 +325,64 @@ export default function PersonasPresentation({ data }: { data: unknown }) {
                       </div>
                     )}
 
-                    {/* Summary grid */}
+                    {/* Objetivo / Desafio / Objeção / Jornada — editorial, sem caixa */}
                     {filledSummary.length > 0 && (
-                      <div className="grid gap-3 rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200 sm:grid-cols-2">
-                        {filledSummary.map((f) => (
-                          <div key={f.key}>
-                            <p className="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
-                              {f.label}
-                            </p>
-                            <RichText
-                              content={persona[f.key] as string}
-                              className="text-sm leading-6 text-slate-700"
-                            />
+                      <div className={activeBehaviors.length > 0 ? "border-t border-slate-100" : ""}>
+                        {/* Linha 1: Objetivo + Desafio */}
+                        <div className="sm:grid sm:grid-cols-2">
+                          {filledSummary.slice(0, 2).map((f, k) => (
+                            <div
+                              key={f.key}
+                              className={
+                                k === 0
+                                  ? "pt-5 pb-5 sm:pr-5"
+                                  : "border-t border-slate-100 pt-5 pb-5 sm:border-t-0 sm:border-l sm:border-slate-100 sm:pl-5"
+                              }
+                            >
+                              <p className="mb-1.5 font-display text-[1.125rem] font-semibold text-slate-900 sm:text-[1.25rem]">
+                                {f.label}
+                              </p>
+                              <RichText
+                                content={persona[f.key] as string}
+                                className="text-sm leading-[1.75] text-slate-700"
+                              />
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Linha 2: Objeção + Jornada */}
+                        {filledSummary.slice(2).length > 0 && (
+                          <div className="border-t border-slate-100 sm:grid sm:grid-cols-2">
+                            {filledSummary.slice(2, 4).map((f, k) => (
+                              <div
+                                key={f.key}
+                                className={
+                                  k === 0
+                                    ? "pt-5 pb-5 sm:pr-5"
+                                    : "border-t border-slate-100 pt-5 pb-5 sm:border-t-0 sm:border-l sm:border-slate-100 sm:pl-5"
+                                }
+                              >
+                                <p className="mb-1.5 font-display text-[1.125rem] font-semibold text-slate-900 sm:text-[1.25rem]">
+                                  {f.label}
+                                </p>
+                                <RichText
+                                  content={persona[f.key] as string}
+                                  className="text-sm leading-[1.75] text-slate-700"
+                                />
+                              </div>
+                            ))}
                           </div>
-                        ))}
+                        )}
                       </div>
                     )}
                   </div>
 
                   {/* Card footer */}
-                  <div className="border-t border-slate-100 p-5">
+                  <div className="border-t border-slate-100 p-6">
                     <button
                       type="button"
                       onClick={() => setSelectedIndex(i)}
-                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-950"
+                      className="w-full cursor-pointer rounded-xl bg-slate-950 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2"
                     >
                       Ver análise completa →
                     </button>
