@@ -1,18 +1,6 @@
 import { PresentationHeader } from "./PresentationHeader";
 import { RichText } from "./RichText";
-
-function isUrl(value: string): boolean {
-  return /^(https?:\/\/|www\.|[a-z0-9-]+\.[a-z]{2,})/i.test(value.trim());
-}
-
-function normalizeUrl(value: string): string {
-  const trimmed = value.trim();
-  return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
-}
-
-type ChannelKey =
-  | "site" | "instagram" | "tiktok" | "youtube" | "facebook"
-  | "linkedin" | "whatsapp" | "blog" | "pinterest" | "podcast";
+import { ChannelIconList, ChannelKey, channelLabels, isUrl } from "./ChannelIconList";
 
 type AnalysisItem = { title: string; description: string };
 
@@ -29,19 +17,6 @@ function isReferencesData(v: unknown): v is ReferencesCompetitorsData {
   return typeof v === "object" && v !== null && "items" in v;
 }
 
-const channelLabels: { key: ChannelKey; label: string; icon: string }[] = [
-  { key: "site", label: "Site", icon: "/icons/29-estrategia-do-site.svg" },
-  { key: "instagram", label: "Instagram", icon: "/icons/18-instagram.svg" },
-  { key: "tiktok", label: "TikTok", icon: "/icons/19-tik-tok.svg" },
-  { key: "youtube", label: "YouTube", icon: "/icons/20-youtube.svg" },
-  { key: "facebook", label: "Facebook", icon: "/icons/21-facebook.svg" },
-  { key: "linkedin", label: "LinkedIn", icon: "/icons/22-linkedin.svg" },
-  { key: "whatsapp", label: "WhatsApp", icon: "/icons/23-whatsaap.svg" },
-  { key: "blog", label: "Blog", icon: "/icons/24-blog.svg" },
-  { key: "pinterest", label: "Pinterest", icon: "/icons/25-pinterest.svg" },
-  { key: "podcast", label: "Podcast", icon: "/icons/26-podcast.svg" },
-];
-
 export default function ReferenciasConcorrentesPresentation({
   data,
 }: {
@@ -54,14 +29,12 @@ export default function ReferenciasConcorrentesPresentation({
 
   return (
     <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
-      {/* Cabeçalho */}
       <PresentationHeader
         area="Fundamentos Estratégicos"
         title="Referências e Concorrentes"
         slug="referencias-e-concorrentes"
       />
 
-      {/* Item cards */}
       {!d ? (
         <section className="p-8">
           <p className="text-slate-500">
@@ -78,7 +51,7 @@ export default function ReferenciasConcorrentesPresentation({
         <section className="space-y-5 p-6 lg:p-8">
           {items.map((item, i) => {
             const filledChannels = channelLabels.filter(
-              (c) => item.channels?.[c.key]?.trim()
+              (c) => item.channels?.[c.key]?.trim() && isUrl(item.channels[c.key])
             );
             const analyses = (item.analyses ?? []).filter(
               (a) => a.title?.trim() || a.description?.trim()
@@ -89,7 +62,7 @@ export default function ReferenciasConcorrentesPresentation({
                 key={i}
                 className="overflow-hidden rounded-2xl ring-1 ring-slate-200"
               >
-                {/* Card header */}
+                {/* Identificação do concorrente */}
                 <div className="flex items-center gap-4 border-b border-slate-100 bg-slate-50/60 p-5">
                   {item.image ? (
                     <img
@@ -114,71 +87,35 @@ export default function ReferenciasConcorrentesPresentation({
                   </div>
                 </div>
 
-                {/* Card body */}
-                <div className="space-y-6 p-5">
-                  {/* Channels — side by side with wrap */}
+                {/* Conteúdo interno editorial */}
+                <div className="p-5">
+                  {/* Presença nos canais */}
                   {filledChannels.length > 0 && (
-                    <div>
-                      <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                    <div className={analyses.length > 0 ? "mb-7" : ""}>
+                      <p className="mb-3 font-display text-[1.125rem] font-semibold text-slate-900 sm:text-[1.25rem]">
                         Presença nos canais
                       </p>
-                      <div className="flex flex-wrap gap-3">
-                        {filledChannels.map((ch) => (
-                          <div
-                            key={ch.key}
-                            className="flex min-w-[200px] flex-[1_1_200px] items-start gap-3 rounded-xl bg-slate-50 p-4 ring-1 ring-slate-200"
-                          >
-                            <img
-                              src={ch.icon}
-                              alt={ch.label}
-                              className="mt-0.5 h-4 w-4 shrink-0 object-contain opacity-50"
-                            />
-                            <div className="min-w-0">
-                              <span className="text-xs font-semibold text-slate-500">
-                                {ch.label}
-                              </span>
-                              {isUrl(item.channels[ch.key]) ? (
-                                <a
-                                  href={normalizeUrl(item.channels[ch.key])}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="mt-0.5 block break-all text-xs text-blue-700 underline underline-offset-2 transition hover:text-blue-800"
-                                >
-                                  {item.channels[ch.key]}
-                                </a>
-                              ) : (
-                                <RichText
-                                  content={item.channels[ch.key]}
-                                  className="text-sm leading-6 text-slate-700"
-                                />
-                              )}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+                      <ChannelIconList channels={item.channels ?? {}} />
                     </div>
                   )}
 
-                  {/* Analyses */}
+                  {/* Análise */}
                   {analyses.length > 0 && (
                     <div>
-                      <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                        Análises
+                      <p className="mb-4 font-display text-[1.125rem] font-semibold text-slate-900 sm:text-[1.25rem]">
+                        Análise
                       </p>
-                      <div className="space-y-3">
+                      <div className="divide-y divide-slate-100">
                         {analyses.map((a, j) => (
-                          <div
-                            key={j}
-                            className="rounded-2xl bg-slate-50 p-5 ring-1 ring-slate-200"
-                          >
+                          <div key={j} className={j === 0 ? "pb-5" : "py-5"}>
                             {a.title && (
-                              <p className="text-sm font-semibold text-slate-950">
+                              <p className="mb-2 text-[0.9375rem] font-semibold leading-snug text-slate-950">
                                 {a.title}
                               </p>
                             )}
                             <RichText
                               content={a.description}
-                              className="mt-1.5 text-sm leading-7 text-slate-600"
+                              className="text-sm leading-[1.8] text-slate-600"
                             />
                           </div>
                         ))}
