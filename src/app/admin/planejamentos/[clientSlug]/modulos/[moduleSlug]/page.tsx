@@ -353,6 +353,9 @@ const [isPreparingPersonas, setIsPreparingPersonas] = useState(false);
 const [preparePersonasError, setPreparePersonasError] = useState("");
 const [isSavingPersonaJourneys, setIsSavingPersonaJourneys] = useState(false);
 const [personaJourneysSaveError, setPersonaJourneysSaveError] = useState("");
+const [journeyPersonasSource, setJourneyPersonasSource] = useState<
+  "loading" | "ready" | "missing" | "invalid"
+>("loading");
 const [selectedLegacyPersonaId, setSelectedLegacyPersonaId] = useState("");
   const [currentChannelsData, setCurrentChannelsData] =
   useState<CurrentChannelsData>(initialCurrentChannelsData);
@@ -504,6 +507,7 @@ const [selectedLegacyPersonaId, setSelectedLegacyPersonaId] = useState("");
       setIsLoading(true);
       setErrorMessage("");
       setSuccessMessage("");
+      setJourneyPersonasSource("loading");
 
       const { data: userData, error: userError } = await supabase.auth.getUser();
 
@@ -786,26 +790,33 @@ if (isBuyingJourneyModule && isBuyingJourneyData(savedContent)) {
 }
 
 if (isBuyingJourneyModule) {
-  // Load personas so the journey module can detect missing ids and orphaned journeys
+  // Load personas from the persisted source; never fall back to initialPersonasData
   const rawPersonasContent =
-    foundProject.data?.moduleContent?.["personas"] ?? null;
-  if (isPersonasData(rawPersonasContent)) {
-    setPersonasData({
-      personas:
-        Array.isArray(rawPersonasContent.personas) &&
-        rawPersonasContent.personas.length
-          ? rawPersonasContent.personas.map((persona) => ({
-              ...createEmptyPersona(),
-              ...persona,
-              // Preserve the stored id exactly; do not generate one during load
-              id: persona.id?.trim() || undefined,
-              behaviors: {
-                ...createEmptyPersona().behaviors,
-                ...(persona.behaviors || {}),
-              },
-            }))
-          : initialPersonasData.personas,
-    });
+    foundProject.data?.moduleContent?.["personas"];
+
+  if (rawPersonasContent == null) {
+    setPersonasData({ personas: [] });
+    setJourneyPersonasSource("missing");
+  } else if (!isPersonasData(rawPersonasContent)) {
+    setPersonasData({ personas: [] });
+    setJourneyPersonasSource("invalid");
+  } else {
+    const loadedPersonas =
+      Array.isArray(rawPersonasContent.personas) &&
+      rawPersonasContent.personas.length > 0
+        ? rawPersonasContent.personas.map((persona) => ({
+            ...createEmptyPersona(),
+            ...persona,
+            // Preserve the stored id exactly; do not generate one during load
+            id: persona.id?.trim() || undefined,
+            behaviors: {
+              ...createEmptyPersona().behaviors,
+              ...(persona.behaviors || {}),
+            },
+          }))
+        : [];
+    setPersonasData({ personas: loadedPersonas });
+    setJourneyPersonasSource("ready");
   }
 
   // Load per-persona journeys from the new key
@@ -2616,15 +2627,23 @@ function isProjectObjectivesData(
 
     // Build mutation context exclusively from fresh Supabase data
     const rawPersonasContent = freshData.moduleContent?.["personas"];
-    const freshPersonas: PersonaData[] =
-      rawPersonasContent &&
+    const personasStructureValid =
+      rawPersonasContent != null &&
       typeof rawPersonasContent === "object" &&
       !Array.isArray(rawPersonasContent) &&
-      Array.isArray(
-        (rawPersonasContent as { personas?: unknown }).personas
-      )
-        ? (rawPersonasContent as { personas: PersonaData[] }).personas
-        : [];
+      Array.isArray((rawPersonasContent as { personas?: unknown }).personas);
+
+    if (!personasStructureValid) {
+      setPersonaJourneysSaveError(
+        "O módulo Personas ainda não possui dados válidos salvos. Salve as personas antes de criar uma Jornada de Compra."
+      );
+      setIsSavingPersonaJourneys(false);
+      return false;
+    }
+
+    const freshPersonas: PersonaData[] = (
+      rawPersonasContent as { personas: PersonaData[] }
+    ).personas;
 
     const freshLegacyJourney: BuyingJourneyData | null =
       legacyJourneyContent &&
@@ -2949,6 +2968,13 @@ function isProjectObjectivesData(
     personaId: string
   ): BuyingJourneyData | null {
     setPersonaJourneysSaveError("");
+
+    if (journeyPersonasSource !== "ready") {
+      setPersonaJourneysSaveError(
+        "O módulo Personas ainda não possui dados válidos salvos. Salve as personas antes de criar uma Jornada de Compra."
+      );
+      return null;
+    }
 
     if (!personaId.trim()) {
       setPersonaJourneysSaveError("ID da persona não pode ser vazio.");
@@ -3393,7 +3419,34 @@ function isProjectObjectivesData(
   />
 
   ) : isBuyingJourneyModule ? (
-  needsPersonaPreparation ? (
+  journeyPersonasSource === "missing" ||
+  (journeyPersonasSource === "ready" && personasData.personas.length === 0) ? (
+    <div className="mt-8 overflow-hidden rounded-2xl bg-white ring-1 ring-slate-200">
+      <div className="border-b border-slate-100 bg-slate-50/60 px-6 py-5 sm:px-8 sm:py-6">
+        <h2 className="font-display text-xl font-semibold tracking-tight text-slate-950 sm:text-2xl">
+          Cadastrar personas antes das jornadas
+        </h2>
+      </div>
+      <div className="px-6 py-6 sm:px-8 sm:py-8">
+        <p className="text-sm leading-7 text-slate-700 sm:text-base">
+          Este planejamento ainda não possui personas salvas. Cadastre e salve ao menos uma persona antes de criar Jornadas de Compra específicas.
+        </p>
+      </div>
+    </div>
+  ) : journeyPersonasSource === "invalid" ? (
+    <div className="mt-8 overflow-hidden rounded-2xl bg-white ring-1 ring-slate-200">
+      <div className="border-b border-slate-100 bg-slate-50/60 px-6 py-5 sm:px-8 sm:py-6">
+        <h2 className="font-display text-xl font-semibold tracking-tight text-slate-950 sm:text-2xl">
+          Personas com dados inválidos
+        </h2>
+      </div>
+      <div className="px-6 py-6 sm:px-8 sm:py-8">
+        <p className="text-sm leading-7 text-slate-700 sm:text-base">
+          Não foi possível carregar corretamente as personas deste planejamento. Revise e salve novamente o módulo Personas antes de continuar.
+        </p>
+      </div>
+    </div>
+  ) : needsPersonaPreparation ? (
     <div className="mt-8 overflow-hidden rounded-2xl bg-white ring-1 ring-slate-200">
       <div className="border-b border-slate-100 bg-slate-50/60 px-6 py-5 sm:px-8 sm:py-6">
         <h2 className="font-display text-xl font-semibold tracking-tight text-slate-950 sm:text-2xl">
