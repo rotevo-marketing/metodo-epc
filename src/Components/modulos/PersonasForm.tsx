@@ -13,6 +13,7 @@ export type BehaviorKey =
   | "outros";
 
 export type PersonaData = {
+  id?: string;
   photo: string;
   name: string;
   age: string;
@@ -72,6 +73,7 @@ const behaviorOptions: {
 
 export function createEmptyPersona(): PersonaData {
   return {
+    id: crypto.randomUUID(),
     photo: "",
     name: "",
     age: "",
@@ -109,6 +111,16 @@ export function createEmptyPersona(): PersonaData {
 export const initialPersonasData: PersonasData = {
   personas: [createEmptyPersona()],
 };
+
+export function getPersonasWithoutStableId(personas: PersonaData[]): PersonaData[] {
+  return personas.filter((p) => !p.id?.trim());
+}
+
+export function createPersonasWithStableIds(personas: PersonaData[]): PersonaData[] {
+  return personas.map((p) =>
+    p.id?.trim() ? p : { ...p, id: crypto.randomUUID() }
+  );
+}
 
 const questionFields: {
   key: keyof PersonaData;

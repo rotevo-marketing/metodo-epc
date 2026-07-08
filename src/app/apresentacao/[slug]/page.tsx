@@ -645,7 +645,11 @@ function DetailMode({
             ) : activeSection.slug === "personas" ? (
               <PersonasPresentation data={moduleContent["personas"]} />
             ) : activeSection.slug === "jornada-de-compra" ? (
-              <JornadaCompraPresentation data={moduleContent["jornada-de-compra"]} />
+              <JornadaCompraPresentation
+                legacyData={moduleContent["jornada-de-compra"]}
+                personaJourneysData={moduleContent["jornadas-por-persona"]}
+                personasData={moduleContent["personas"]}
+              />
             ) : activeSection.slug === "canais-digitais-atuais" ? (
               <CanaisDigitaisPresentation data={moduleContent["canais-digitais-atuais"]} />
             ) : activeSection.slug === "funil-de-conteudo" ? (

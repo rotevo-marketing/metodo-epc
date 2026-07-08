@@ -49,16 +49,26 @@ import PalavrasChaveForm, {
 } from "@/Components/modulos/PalavrasChaveForm";
 import PersonasForm, {
   createEmptyPersona,
+  createPersonasWithStableIds,
+  getPersonasWithoutStableId,
   initialPersonasData,
+  PersonaData,
   PersonasData,
 } from "@/Components/modulos/PersonasForm";
 
 import JornadaCompraForm, {
   awarenessLevels,
+  buildInitialPersonaJourneysData,
   BuyingJourneyData,
+  createEmptyBuyingJourneyData,
+  getOrphanedPersonaJourneys,
+  hasMeaningfulJourneyContent,
   initialBuyingJourneyData,
   journeyStages,
+  LegacyMigrationState,
+  PersonaJourneysData,
 } from "@/Components/modulos/JornadaCompraForm";
+import JornadaPorPersonaForm from "@/Components/modulos/JornadaPorPersonaForm";
 
 import CanaisDigitaisAtuaisForm, {
   CurrentChannelsData,
@@ -238,6 +248,12 @@ type PlanningProject = {
   clients: ClientRecord | ClientRecord[] | null;
 };
 
+type PersonaJourneysMutationContext = {
+  personas: PersonaData[];
+  legacyJourneyData: BuyingJourneyData | null;
+  hasMeaningfulLegacyJourney: boolean;
+};
+
 function getProjectClient(project: PlanningProject) {
   if (Array.isArray(project.clients)) {
     return project.clients[0] ?? null;
@@ -331,6 +347,13 @@ const [toneVoiceData, setToneVoiceData] =
   useState<PersonasData>(initialPersonasData);
   const [buyingJourneyData, setBuyingJourneyData] =
   useState<BuyingJourneyData>(initialBuyingJourneyData);
+const [personaJourneysData, setPersonaJourneysData] =
+  useState<PersonaJourneysData>(buildInitialPersonaJourneysData(false));
+const [isPreparingPersonas, setIsPreparingPersonas] = useState(false);
+const [preparePersonasError, setPreparePersonasError] = useState("");
+const [isSavingPersonaJourneys, setIsSavingPersonaJourneys] = useState(false);
+const [personaJourneysSaveError, setPersonaJourneysSaveError] = useState("");
+const [selectedLegacyPersonaId, setSelectedLegacyPersonaId] = useState("");
   const [currentChannelsData, setCurrentChannelsData] =
   useState<CurrentChannelsData>(initialCurrentChannelsData);
   const [contentFunnelData, setContentFunnelData] =
@@ -440,6 +463,41 @@ const [toneVoiceData, setToneVoiceData] =
         selectedModules.includes(item.slug)
     );
   }, [module?.category, selectedModules]);
+
+  const needsPersonaPreparation = useMemo(
+    () =>
+      isBuyingJourneyModule
+        ? getPersonasWithoutStableId(personasData.personas).length > 0
+        : false,
+    [isBuyingJourneyModule, personasData.personas]
+  );
+
+  const orphanedPersonaJourneys = useMemo(
+    () =>
+      isBuyingJourneyModule
+        ? getOrphanedPersonaJourneys(
+            personasData.personas,
+            personaJourneysData.journeys
+          )
+        : {},
+    [isBuyingJourneyModule, personasData.personas, personaJourneysData.journeys]
+  );
+
+  const eligiblePersonasForLegacyMigration = useMemo(
+    () =>
+      isBuyingJourneyModule &&
+      personaJourneysData.legacyMigration.status === "pending"
+        ? personasData.personas.filter(
+            (p) => p.id?.trim() && !personaJourneysData.journeys[p.id]
+          )
+        : [],
+    [
+      isBuyingJourneyModule,
+      personaJourneysData.legacyMigration.status,
+      personaJourneysData.journeys,
+      personasData.personas,
+    ]
+  );
 
   useEffect(() => {
     async function loadModuleData() {
@@ -725,6 +783,139 @@ if (isBuyingJourneyModule && isBuyingJourneyData(savedContent)) {
           }))
         : initialBuyingJourneyData.references,
   });
+}
+
+if (isBuyingJourneyModule) {
+  // Load personas so the journey module can detect missing ids and orphaned journeys
+  const rawPersonasContent =
+    foundProject.data?.moduleContent?.["personas"] ?? null;
+  if (isPersonasData(rawPersonasContent)) {
+    setPersonasData({
+      personas:
+        Array.isArray(rawPersonasContent.personas) &&
+        rawPersonasContent.personas.length
+          ? rawPersonasContent.personas.map((persona) => ({
+              ...createEmptyPersona(),
+              ...persona,
+              // Preserve the stored id exactly; do not generate one during load
+              id: persona.id?.trim() || undefined,
+              behaviors: {
+                ...createEmptyPersona().behaviors,
+                ...(persona.behaviors || {}),
+              },
+            }))
+          : initialPersonasData.personas,
+    });
+  }
+
+  // Load per-persona journeys from the new key
+  const rawPersonaJourneys =
+    foundProject.data?.moduleContent?.["jornadas-por-persona"] ?? null;
+
+  if (
+    !rawPersonaJourneys ||
+    typeof rawPersonaJourneys !== "object" ||
+    Array.isArray(rawPersonaJourneys)
+  ) {
+    // Key does not exist yet — build initial state; detect legacy content
+    setPersonaJourneysData(
+      buildInitialPersonaJourneysData(hasMeaningfulJourneyContent(savedContent))
+    );
+  } else {
+    const raw = rawPersonaJourneys as Record<string, unknown>;
+
+    // Normalize journeys map — preserve every valid entry, skip nothing silently
+    const normalizedJourneys: Record<string, BuyingJourneyData> = {};
+    if (
+      raw.journeys &&
+      typeof raw.journeys === "object" &&
+      !Array.isArray(raw.journeys)
+    ) {
+      for (const [personaId, entry] of Object.entries(
+        raw.journeys as Record<string, unknown>
+      )) {
+        if (isBuyingJourneyData(entry)) {
+          normalizedJourneys[personaId] = {
+            overview: entry.overview || "",
+            stages:
+              Array.isArray(entry.stages) && entry.stages.length
+                ? journeyStages.map((_, i) => ({
+                    awarenessLevel:
+                      entry.stages[i]?.awarenessLevel || awarenessLevels[0],
+                    thoughts: entry.stages[i]?.thoughts || "",
+                    pains: entry.stages[i]?.pains || "",
+                    recommendedContent:
+                      entry.stages[i]?.recommendedContent || "",
+                    recommendedChannels:
+                      entry.stages[i]?.recommendedChannels || "",
+                    desiredNextStep: entry.stages[i]?.desiredNextStep || "",
+                    conversionPoint: entry.stages[i]?.conversionPoint || "",
+                  }))
+                : initialBuyingJourneyData.stages,
+            turningPoints: {
+              discoveryToPain: entry.turningPoints?.discoveryToPain || "",
+              painToSolution: entry.turningPoints?.painToSolution || "",
+              solutionToComparison:
+                entry.turningPoints?.solutionToComparison || "",
+              comparisonToDecision:
+                entry.turningPoints?.comparisonToDecision || "",
+            },
+            objections: {
+              beginning: entry.objections?.beginning || "",
+              middle: entry.objections?.middle || "",
+              end: entry.objections?.end || "",
+            },
+            advancementTriggers: entry.advancementTriggers || "",
+            essentialContent: {
+              awareness: entry.essentialContent?.awareness || "",
+              decision: entry.essentialContent?.decision || "",
+            },
+            funnelCampaignsAutomation: entry.funnelCampaignsAutomation || "",
+            references:
+              Array.isArray(entry.references) && entry.references.length
+                ? entry.references.map(
+                    (r: { title?: string; link?: string }) => ({
+                      title: r.title || "",
+                      link: r.link || "",
+                    })
+                  )
+                : initialBuyingJourneyData.references,
+          };
+        }
+      }
+    }
+
+    // Normalize legacyMigration — recover status; fill gaps without discarding data
+    const rawMigration = raw.legacyMigration as
+      | Record<string, unknown>
+      | undefined;
+    const validStatuses = ["not-required", "pending", "completed"] as const;
+    const migrationStatus: LegacyMigrationState["status"] =
+      rawMigration?.status &&
+      validStatuses.includes(
+        rawMigration.status as (typeof validStatuses)[number]
+      )
+        ? (rawMigration.status as LegacyMigrationState["status"])
+        : hasMeaningfulJourneyContent(savedContent)
+        ? "pending"
+        : "not-required";
+
+    setPersonaJourneysData({
+      version: 2,
+      journeys: normalizedJourneys,
+      legacyMigration: {
+        status: migrationStatus,
+        assignedPersonaId:
+          typeof rawMigration?.assignedPersonaId === "string"
+            ? rawMigration.assignedPersonaId
+            : undefined,
+        migratedAt:
+          typeof rawMigration?.migratedAt === "string"
+            ? rawMigration.migratedAt
+            : undefined,
+      },
+    });
+  }
 }
 
 if (isCurrentChannelsModule && isCurrentChannelsData(savedContent)) {
@@ -2289,6 +2480,659 @@ function isProjectObjectivesData(
     }, 2800);
   }
 
+  async function preparePersonasForJourneys() {
+    if (!project) return;
+
+    setIsPreparingPersonas(true);
+    setPreparePersonasError("");
+
+    const { data: freshRow, error: fetchError } = await supabase
+      .from("planning_projects")
+      .select("data")
+      .eq("id", project.id)
+      .single();
+
+    if (fetchError || !freshRow) {
+      setPreparePersonasError(
+        fetchError?.message || "Não foi possível buscar os dados atuais do planejamento."
+      );
+      setIsPreparingPersonas(false);
+      return;
+    }
+
+    const freshData = (freshRow.data ?? {}) as ProjectData;
+    const freshPersonasRaw = freshData.moduleContent?.["personas"];
+
+    if (
+      !freshPersonasRaw ||
+      typeof freshPersonasRaw !== "object" ||
+      !Array.isArray((freshPersonasRaw as { personas?: unknown }).personas)
+    ) {
+      setPreparePersonasError(
+        "Módulo de personas não encontrado nos dados atuais. Salve o módulo de personas antes de preparar as jornadas."
+      );
+      setIsPreparingPersonas(false);
+      return;
+    }
+
+    const freshPersonas = (
+      freshPersonasRaw as { personas: PersonaData[] }
+    ).personas;
+
+    const currentPersonas = personasData.personas;
+
+    if (freshPersonas.length !== currentPersonas.length) {
+      setPreparePersonasError(
+        "Os dados de personas foram alterados por outra sessão. Recarregue a página e tente novamente."
+      );
+      setIsPreparingPersonas(false);
+      return;
+    }
+
+    const preparedPersonas = createPersonasWithStableIds(freshPersonas);
+
+    const allHaveIds = preparedPersonas.every((p) => p.id?.trim());
+    if (!allHaveIds) {
+      setPreparePersonasError(
+        "Não foi possível atribuir IDs estáveis a todas as personas. Tente novamente."
+      );
+      setIsPreparingPersonas(false);
+      return;
+    }
+
+    const ids = preparedPersonas.map((p) => p.id as string);
+    const uniqueIds = new Set(ids);
+    if (uniqueIds.size !== ids.length) {
+      setPreparePersonasError(
+        "IDs duplicados detectados após a preparação. Tente novamente."
+      );
+      setIsPreparingPersonas(false);
+      return;
+    }
+
+    const nextData: ProjectData = {
+      ...freshData,
+      moduleContent: {
+        ...(freshData.moduleContent ?? {}),
+        ["personas"]: { personas: preparedPersonas },
+      },
+    };
+
+    const { error: saveError } = await supabase
+      .from("planning_projects")
+      .update({
+        data: nextData,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", project.id);
+
+    if (saveError) {
+      setPreparePersonasError(
+        saveError.message || "Não foi possível salvar as personas preparadas."
+      );
+      setIsPreparingPersonas(false);
+      return;
+    }
+
+    setPersonasData({ personas: preparedPersonas });
+    setProject({ ...project, data: nextData });
+    setIsPreparingPersonas(false);
+  }
+
+  async function mutatePersonaJourneysData(
+    mutator: (
+      current: PersonaJourneysData,
+      context: PersonaJourneysMutationContext
+    ) => {
+      data: PersonaJourneysData;
+      removeJourneyIds?: string[];
+    }
+  ): Promise<boolean> {
+    if (!project || isSavingPersonaJourneys) return false;
+
+    setIsSavingPersonaJourneys(true);
+    setPersonaJourneysSaveError("");
+
+    const { data: freshRow, error: fetchError } = await supabase
+      .from("planning_projects")
+      .select("data")
+      .eq("id", project.id)
+      .single();
+
+    if (fetchError || !freshRow) {
+      setPersonaJourneysSaveError(
+        fetchError?.message ||
+          "Não foi possível buscar os dados atuais do planejamento."
+      );
+      setIsSavingPersonaJourneys(false);
+      return false;
+    }
+
+    const freshData = (freshRow.data ?? {}) as ProjectData;
+    const legacyJourneyContent = freshData.moduleContent?.["jornada-de-compra"];
+    const hasLegacy = hasMeaningfulJourneyContent(legacyJourneyContent);
+    const rawPersonaJourneys =
+      freshData.moduleContent?.["jornadas-por-persona"];
+
+    // Build mutation context exclusively from fresh Supabase data
+    const rawPersonasContent = freshData.moduleContent?.["personas"];
+    const freshPersonas: PersonaData[] =
+      rawPersonasContent &&
+      typeof rawPersonasContent === "object" &&
+      !Array.isArray(rawPersonasContent) &&
+      Array.isArray(
+        (rawPersonasContent as { personas?: unknown }).personas
+      )
+        ? (rawPersonasContent as { personas: PersonaData[] }).personas
+        : [];
+
+    const freshLegacyJourney: BuyingJourneyData | null =
+      legacyJourneyContent &&
+      typeof legacyJourneyContent === "object" &&
+      !Array.isArray(legacyJourneyContent)
+        ? (legacyJourneyContent as BuyingJourneyData)
+        : null;
+
+    const mutationContext: PersonaJourneysMutationContext = {
+      personas: freshPersonas,
+      legacyJourneyData: freshLegacyJourney,
+      hasMeaningfulLegacyJourney: hasLegacy,
+    };
+
+    let normalized: PersonaJourneysData;
+    let rawRoot: Record<string, unknown> | undefined;
+    let rawJourneys: Record<string, unknown> | undefined;
+
+    if (
+      !rawPersonaJourneys ||
+      typeof rawPersonaJourneys !== "object" ||
+      Array.isArray(rawPersonaJourneys)
+    ) {
+      normalized = buildInitialPersonaJourneysData(hasLegacy);
+    } else {
+      const raw = rawPersonaJourneys as Record<string, unknown>;
+      rawRoot = raw;
+
+      const normalizedJourneys: Record<string, BuyingJourneyData> = {};
+      if (
+        raw.journeys &&
+        typeof raw.journeys === "object" &&
+        !Array.isArray(raw.journeys)
+      ) {
+        rawJourneys = raw.journeys as Record<string, unknown>;
+        for (const [pid, entry] of Object.entries(rawJourneys)) {
+          if (entry && typeof entry === "object" && !Array.isArray(entry)) {
+            const e = entry as BuyingJourneyData;
+            normalizedJourneys[pid] = {
+              overview: e.overview || "",
+              stages:
+                Array.isArray(e.stages) && e.stages.length
+                  ? journeyStages.map((_, i) => ({
+                      awarenessLevel:
+                        e.stages[i]?.awarenessLevel || awarenessLevels[0],
+                      thoughts: e.stages[i]?.thoughts || "",
+                      pains: e.stages[i]?.pains || "",
+                      recommendedContent:
+                        e.stages[i]?.recommendedContent || "",
+                      recommendedChannels:
+                        e.stages[i]?.recommendedChannels || "",
+                      desiredNextStep: e.stages[i]?.desiredNextStep || "",
+                      conversionPoint: e.stages[i]?.conversionPoint || "",
+                    }))
+                  : initialBuyingJourneyData.stages,
+              turningPoints: {
+                discoveryToPain: e.turningPoints?.discoveryToPain || "",
+                painToSolution: e.turningPoints?.painToSolution || "",
+                solutionToComparison:
+                  e.turningPoints?.solutionToComparison || "",
+                comparisonToDecision:
+                  e.turningPoints?.comparisonToDecision || "",
+              },
+              objections: {
+                beginning: e.objections?.beginning || "",
+                middle: e.objections?.middle || "",
+                end: e.objections?.end || "",
+              },
+              advancementTriggers: e.advancementTriggers || "",
+              essentialContent: {
+                awareness: e.essentialContent?.awareness || "",
+                decision: e.essentialContent?.decision || "",
+              },
+              funnelCampaignsAutomation: e.funnelCampaignsAutomation || "",
+              references:
+                Array.isArray(e.references) && e.references.length
+                  ? e.references.map(
+                      (r: { title?: string; link?: string }) => ({
+                        title: r.title || "",
+                        link: r.link || "",
+                      })
+                    )
+                  : initialBuyingJourneyData.references,
+            };
+          }
+        }
+      }
+
+      const rawMigration = raw.legacyMigration as
+        | Record<string, unknown>
+        | undefined;
+      const legacyStatuses = [
+        "not-required",
+        "pending",
+        "completed",
+      ] as const;
+      const migrationStatus: LegacyMigrationState["status"] =
+        rawMigration?.status &&
+        legacyStatuses.includes(
+          rawMigration.status as (typeof legacyStatuses)[number]
+        )
+          ? (rawMigration.status as LegacyMigrationState["status"])
+          : hasLegacy
+          ? "pending"
+          : "not-required";
+
+      normalized = {
+        version: 2,
+        journeys: normalizedJourneys,
+        legacyMigration: {
+          status: migrationStatus,
+          assignedPersonaId:
+            typeof rawMigration?.assignedPersonaId === "string"
+              ? rawMigration.assignedPersonaId
+              : undefined,
+          migratedAt:
+            typeof rawMigration?.migratedAt === "string"
+              ? rawMigration.migratedAt
+              : undefined,
+        },
+      };
+    }
+
+    let mutatorResult: {
+      data: PersonaJourneysData;
+      removeJourneyIds?: string[];
+    };
+    try {
+      mutatorResult = mutator(normalized, mutationContext);
+    } catch (err) {
+      setPersonaJourneysSaveError(
+        err instanceof Error
+          ? err.message
+          : "Erro inesperado ao processar a mutação."
+      );
+      setIsSavingPersonaJourneys(false);
+      return false;
+    }
+
+    const { data: mutated, removeJourneyIds = [] } = mutatorResult;
+
+    // Validate mutator result
+    if (mutated.version !== 2) {
+      setPersonaJourneysSaveError("Resultado inválido: version deve ser 2.");
+      setIsSavingPersonaJourneys(false);
+      return false;
+    }
+    if (
+      !mutated.journeys ||
+      typeof mutated.journeys !== "object" ||
+      Array.isArray(mutated.journeys)
+    ) {
+      setPersonaJourneysSaveError(
+        "Resultado inválido: journeys deve ser um objeto."
+      );
+      setIsSavingPersonaJourneys(false);
+      return false;
+    }
+    const mutatorStatuses = [
+      "not-required",
+      "pending",
+      "completed",
+    ] as const;
+    if (
+      !mutatorStatuses.includes(
+        mutated.legacyMigration?.status as (typeof mutatorStatuses)[number]
+      )
+    ) {
+      setPersonaJourneysSaveError(
+        "Resultado inválido: legacyMigration.status inválido."
+      );
+      setIsSavingPersonaJourneys(false);
+      return false;
+    }
+    if (Object.keys(mutated.journeys).some((k) => !k.trim())) {
+      setPersonaJourneysSaveError(
+        "Resultado inválido: nenhuma chave de jornada pode ser vazia."
+      );
+      setIsSavingPersonaJourneys(false);
+      return false;
+    }
+    if (removeJourneyIds.some((id) => !id.trim())) {
+      setPersonaJourneysSaveError(
+        "Resultado inválido: removeJourneyIds contém strings vazias."
+      );
+      setIsSavingPersonaJourneys(false);
+      return false;
+    }
+
+    // Preserve unknown journey entries from raw; merge known entries over their raw base
+    const mergedJourneys: Record<string, unknown> = { ...(rawJourneys ?? {}) };
+    for (const [id, journeyData] of Object.entries(mutated.journeys)) {
+      const existingRaw = rawJourneys?.[id];
+      mergedJourneys[id] =
+        existingRaw &&
+        typeof existingRaw === "object" &&
+        !Array.isArray(existingRaw)
+          ? { ...existingRaw, ...journeyData }
+          : journeyData;
+    }
+    for (const id of removeJourneyIds) {
+      delete mergedJourneys[id];
+    }
+
+    // Preserve unknown root properties of the existing jornadas-por-persona record
+    const nextPersonaJourneysValue: Record<string, unknown> = {
+      ...(rawRoot ?? {}),
+      version: 2,
+      journeys: mergedJourneys,
+      legacyMigration: mutated.legacyMigration,
+    };
+
+    // Build full JSONB — only jornadas-por-persona changes; everything else is preserved
+    const nextData: ProjectData = {
+      ...freshData,
+      moduleContent: {
+        ...(freshData.moduleContent ?? {}),
+        ["jornadas-por-persona"]: nextPersonaJourneysValue,
+      },
+    };
+
+    const { error: saveError } = await supabase
+      .from("planning_projects")
+      .update({
+        data: nextData,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", project.id);
+
+    if (saveError) {
+      setPersonaJourneysSaveError(
+        saveError.message ||
+          "Não foi possível salvar as jornadas por persona."
+      );
+      setIsSavingPersonaJourneys(false);
+      return false;
+    }
+
+    setPersonaJourneysData(mutated);
+    setProject({ ...project, data: nextData });
+    setPersonaJourneysSaveError("");
+    setIsSavingPersonaJourneys(false);
+    return true;
+  }
+
+  async function migrateLegacyJourneyToPersona(
+    personaId: string
+  ): Promise<boolean> {
+    return mutatePersonaJourneysData((current, context) => {
+      if (!personaId.trim()) {
+        throw new Error("ID da persona não pode ser vazio.");
+      }
+      const persona = context.personas.find((p) => p.id === personaId);
+      if (!persona) {
+        throw new Error(
+          "Persona com este ID não encontrada nos dados atuais."
+        );
+      }
+      if (!persona.id?.trim()) {
+        throw new Error("A persona não possui um identificador estável.");
+      }
+      if (!context.hasMeaningfulLegacyJourney) {
+        throw new Error(
+          "A jornada legada não possui conteúdo real para migrar."
+        );
+      }
+      if (!context.legacyJourneyData) {
+        throw new Error("Jornada legada não encontrada nos dados atuais.");
+      }
+      if (current.legacyMigration.status === "completed") {
+        throw new Error(
+          "A migração da jornada legada já foi concluída e não pode ser repetida."
+        );
+      }
+      if (current.legacyMigration.status !== "pending") {
+        throw new Error("A migração não está no estado pendente.");
+      }
+      if (current.journeys[personaId]) {
+        throw new Error(
+          "Esta persona já possui uma jornada de compra. Não é possível sobrescrever."
+        );
+      }
+
+      const legacy = context.legacyJourneyData;
+
+      // Safe deep copy — never hold a mutable reference to the original object
+      const legacyCopy: BuyingJourneyData = {
+        overview: legacy.overview || "",
+        stages:
+          Array.isArray(legacy.stages) && legacy.stages.length
+            ? legacy.stages.map((s) => ({ ...s }))
+            : initialBuyingJourneyData.stages.map((s) => ({ ...s })),
+        turningPoints: { ...legacy.turningPoints },
+        objections: { ...legacy.objections },
+        advancementTriggers: legacy.advancementTriggers || "",
+        essentialContent: { ...legacy.essentialContent },
+        funnelCampaignsAutomation: legacy.funnelCampaignsAutomation || "",
+        references: Array.isArray(legacy.references)
+          ? legacy.references.map((r) => ({ ...r }))
+          : [],
+      };
+
+      return {
+        data: {
+          ...current,
+          version: 2,
+          journeys: {
+            ...current.journeys,
+            [personaId]: legacyCopy,
+          },
+          legacyMigration: {
+            status: "completed",
+            assignedPersonaId: personaId,
+            migratedAt: new Date().toISOString(),
+          },
+        },
+      };
+    });
+  }
+
+  function createPersonaJourneyDraft(
+    personaId: string
+  ): BuyingJourneyData | null {
+    setPersonaJourneysSaveError("");
+
+    if (!personaId.trim()) {
+      setPersonaJourneysSaveError("ID da persona não pode ser vazio.");
+      return null;
+    }
+    const persona = personasData.personas.find((p) => p.id === personaId);
+    if (!persona) {
+      setPersonaJourneysSaveError(
+        "Persona com este ID não encontrada nos dados atuais."
+      );
+      return null;
+    }
+    if (!persona.id?.trim()) {
+      setPersonaJourneysSaveError(
+        "A persona não possui um identificador estável."
+      );
+      return null;
+    }
+    if (personaJourneysData.journeys[personaId]) {
+      setPersonaJourneysSaveError(
+        "Esta persona já possui uma jornada. Use o modo de edição para atualizar."
+      );
+      return null;
+    }
+
+    return createEmptyBuyingJourneyData();
+  }
+
+  async function savePersonaJourney(
+    personaId: string,
+    journeyData: BuyingJourneyData,
+    mode: "create" | "update"
+  ): Promise<boolean> {
+    return mutatePersonaJourneysData((current, context) => {
+      if (!personaId.trim()) {
+        throw new Error("ID da persona não pode ser vazio.");
+      }
+      const persona = context.personas.find((p) => p.id === personaId);
+      if (!persona) {
+        throw new Error(
+          "Persona com este ID não encontrada nos dados atuais."
+        );
+      }
+      if (!persona.id?.trim()) {
+        throw new Error("A persona não possui um identificador estável.");
+      }
+      if (
+        !journeyData ||
+        typeof journeyData !== "object" ||
+        !Array.isArray(journeyData.stages)
+      ) {
+        throw new Error("Dados da jornada inválidos.");
+      }
+      if (mode !== "create" && mode !== "update") {
+        throw new Error("Modo de salvamento inválido.");
+      }
+      if (mode === "create" && current.journeys[personaId]) {
+        throw new Error(
+          "Esta persona já possui uma jornada. Use o modo de edição para atualizar."
+        );
+      }
+      if (mode === "update" && !current.journeys[personaId]) {
+        throw new Error(
+          "Não é possível atualizar uma jornada inexistente. Use o modo de criação."
+        );
+      }
+
+      const journeyCopy: BuyingJourneyData = structuredClone(journeyData);
+
+      return {
+        data: {
+          ...current,
+          version: 2,
+          journeys: {
+            ...current.journeys,
+            [personaId]: journeyCopy,
+          },
+        },
+      };
+    });
+  }
+
+  async function reassignOrphanedPersonaJourney(
+    orphanedPersonaId: string,
+    targetPersonaId: string
+  ): Promise<boolean> {
+    return mutatePersonaJourneysData((current, context) => {
+      if (!orphanedPersonaId.trim()) {
+        throw new Error("ID da jornada órfã não pode ser vazio.");
+      }
+      if (!targetPersonaId.trim()) {
+        throw new Error("ID da persona de destino não pode ser vazio.");
+      }
+      if (orphanedPersonaId === targetPersonaId) {
+        throw new Error(
+          "O ID de origem e o de destino não podem ser iguais."
+        );
+      }
+
+      const orphanJourney = current.journeys[orphanedPersonaId];
+      if (!orphanJourney) {
+        throw new Error(
+          "A jornada de origem não existe ou já foi removida. Recarregue a página para ver o estado atual."
+        );
+      }
+
+      // A origem deve continuar sem persona correspondente nos dados recentes.
+      const sourceStillActive = context.personas.some(
+        (p) => p.id === orphanedPersonaId
+      );
+      if (sourceStillActive) {
+        throw new Error(
+          "A jornada de origem não é mais órfã: uma persona com esse ID foi encontrada nos dados atuais. Revise os dados antes de continuar."
+        );
+      }
+
+      const targetPersona = context.personas.find(
+        (p) => p.id === targetPersonaId
+      );
+      if (!targetPersona) {
+        throw new Error(
+          "A persona de destino não foi encontrada nos dados atuais."
+        );
+      }
+      if (!targetPersona.id?.trim()) {
+        throw new Error(
+          "A persona de destino não possui um identificador estável."
+        );
+      }
+
+      if (current.journeys[targetPersonaId]) {
+        throw new Error(
+          "A persona de destino já possui uma jornada de compra. A reassociação não é permitida para evitar sobrescrita."
+        );
+      }
+
+      const journeyCopy: BuyingJourneyData = structuredClone(orphanJourney);
+
+      return {
+        data: {
+          ...current,
+          version: 2,
+          journeys: {
+            ...current.journeys,
+            [targetPersonaId]: journeyCopy,
+          },
+        },
+        removeJourneyIds: [orphanedPersonaId],
+      };
+    });
+  }
+
+  async function deleteOrphanedPersonaJourney(
+    orphanedPersonaId: string
+  ): Promise<boolean> {
+    return mutatePersonaJourneysData((current, context) => {
+      if (!orphanedPersonaId.trim()) {
+        throw new Error("ID da jornada órfã não pode ser vazio.");
+      }
+
+      const orphanJourney = current.journeys[orphanedPersonaId];
+      if (!orphanJourney) {
+        throw new Error(
+          "A jornada de origem não existe ou já foi removida. Nenhuma alteração foi feita."
+        );
+      }
+
+      // Rejeita exclusão se o id voltou a corresponder a uma persona ativa.
+      const stillActive = context.personas.some(
+        (p) => p.id === orphanedPersonaId
+      );
+      if (stillActive) {
+        throw new Error(
+          "A jornada não é mais órfã: uma persona com esse ID existe nos dados atuais. A exclusão foi cancelada para proteger dados ativos."
+        );
+      }
+
+      return {
+        data: current,
+        removeJourneyIds: [orphanedPersonaId],
+      };
+    });
+  }
+
   return (
     <main className="min-h-screen bg-slate-100 text-slate-950">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-8 lg:px-10">
@@ -2549,15 +3393,289 @@ function isProjectObjectivesData(
   />
 
   ) : isBuyingJourneyModule ? (
-  <JornadaCompraForm
-    data={buyingJourneyData}
-    setData={setBuyingJourneyData}
-    clientSlug={clientSlug}
-    presentationHref={`/apresentacao/${project.slug}`}
-    isSaving={isSaving}
-    isDisabled={!isModuleSelected}
-    onSave={() => saveModule()}
-  />
+  needsPersonaPreparation ? (
+    <div className="mt-8 overflow-hidden rounded-2xl bg-white ring-1 ring-slate-200">
+      <div className="border-b border-slate-100 bg-slate-50/60 px-6 py-5 sm:px-8 sm:py-6">
+        <h2 className="font-display text-xl font-semibold tracking-tight text-slate-950 sm:text-2xl">
+          Preparar personas para jornadas
+        </h2>
+      </div>
+
+      <div className="px-6 py-6 sm:px-8 sm:py-8">
+        <p className="text-sm leading-7 text-slate-700 sm:text-base">
+          Algumas personas deste planejamento ainda não possuem um identificador
+          estável. Essa preparação é necessária para vincular cada Jornada de
+          Compra à persona correta.
+        </p>
+
+        <ul
+          className="mt-4 space-y-1.5 text-sm leading-7 text-slate-600"
+          aria-label="O que será feito nesta preparação"
+        >
+          <li className="flex items-start gap-2">
+            <span className="mt-1 block h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" aria-hidden="true" />
+            nenhum conteúdo das personas será alterado
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="mt-1 block h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" aria-hidden="true" />
+            serão adicionados apenas identificadores internos
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="mt-1 block h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" aria-hidden="true" />
+            após a preparação, será possível criar uma jornada específica para cada persona
+          </li>
+        </ul>
+
+        {preparePersonasError ? (
+          <div
+            className="mt-6 rounded-2xl bg-red-50 px-5 py-4 text-sm font-medium text-red-700"
+            role="alert"
+            id="prepare-personas-error"
+          >
+            {preparePersonasError}
+          </div>
+        ) : null}
+
+        <div className="mt-6">
+          <button
+            type="button"
+            onClick={preparePersonasForJourneys}
+            disabled={isPreparingPersonas}
+            aria-busy={isPreparingPersonas}
+            aria-describedby={preparePersonasError ? "prepare-personas-error" : undefined}
+            className="rounded-xl bg-slate-950 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 sm:px-8"
+          >
+            {isPreparingPersonas ? "Preparando personas..." : "Preparar personas"}
+          </button>
+        </div>
+      </div>
+    </div>
+  ) : personaJourneysData.legacyMigration.status === "pending" ? (
+    <div className="mt-8 overflow-hidden rounded-2xl bg-white ring-1 ring-slate-200">
+      <div className="border-b border-slate-100 bg-slate-50/60 px-6 py-5 sm:px-8 sm:py-6">
+        <h2 className="font-display text-xl font-semibold tracking-tight text-slate-950 sm:text-2xl">
+          Vincular jornada existente
+        </h2>
+      </div>
+
+      <div className="px-6 py-6 sm:px-8 sm:py-8">
+        <p className="text-sm leading-7 text-slate-700 sm:text-base">
+          Uma Jornada de Compra criada anteriormente foi encontrada neste
+          planejamento. Para preservar esse conteúdo e permitir uma jornada
+          específica para cada persona, confirme a qual persona essa jornada
+          pertence.
+        </p>
+
+        <ul
+          className="mt-4 space-y-1.5 text-sm leading-7 text-slate-600"
+          aria-label="Informações sobre a vinculação"
+        >
+          <li className="flex items-start gap-2">
+            <span className="mt-1 block h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" aria-hidden="true" />
+            a jornada existente será copiada
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="mt-1 block h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" aria-hidden="true" />
+            nenhum conteúdo antigo será apagado
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="mt-1 block h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" aria-hidden="true" />
+            a jornada original continuará preservada
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="mt-1 block h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" aria-hidden="true" />
+            a vinculação não poderá sobrescrever uma jornada já criada para a persona
+          </li>
+        </ul>
+
+        {/* Cenário 1: nenhuma persona cadastrada */}
+        {personasData.personas.length === 0 ? (
+          <p className="mt-6 text-sm leading-7 text-slate-600">
+            Cadastre ao menos uma persona antes de vincular a Jornada de Compra
+            existente.
+          </p>
+        ) : eligiblePersonasForLegacyMigration.length === 0 ? (
+          /* Todas as personas já possuem jornada */
+          <p className="mt-6 text-sm leading-7 text-slate-600">
+            Nenhuma persona está disponível para receber a jornada existente,
+            pois todas já possuem uma jornada vinculada.
+          </p>
+        ) : eligiblePersonasForLegacyMigration.length === 1 ? (
+          /* Cenário 2: uma persona elegível */
+          <div className="mt-6">
+            <p className="mb-3 text-sm font-medium text-slate-700">
+              Persona disponível para receber a jornada:
+            </p>
+            <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50/60 px-4 py-3">
+              {eligiblePersonasForLegacyMigration[0]?.photo ? (
+                <img
+                  src={eligiblePersonasForLegacyMigration[0].photo}
+                  alt={eligiblePersonasForLegacyMigration[0].name || "Persona"}
+                  className="h-10 w-10 shrink-0 rounded-full object-cover ring-1 ring-slate-200"
+                />
+              ) : (
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-sm font-bold text-slate-400 ring-1 ring-slate-200">
+                  {(eligiblePersonasForLegacyMigration[0]?.name || "P")
+                    .charAt(0)
+                    .toUpperCase()}
+                </div>
+              )}
+              <span className="text-sm font-medium text-slate-900">
+                {eligiblePersonasForLegacyMigration[0]?.name || "Persona sem nome"}
+              </span>
+            </div>
+
+            {personaJourneysSaveError ? (
+              <div
+                className="mt-4 rounded-2xl bg-red-50 px-5 py-4 text-sm font-medium text-red-700"
+                role="alert"
+                id="legacy-migration-error"
+              >
+                {personaJourneysSaveError}
+              </div>
+            ) : null}
+
+            <div className="mt-5">
+              <button
+                type="button"
+                disabled={isSavingPersonaJourneys}
+                aria-busy={isSavingPersonaJourneys}
+                aria-describedby={
+                  personaJourneysSaveError ? "legacy-migration-error" : undefined
+                }
+                onClick={async () => {
+                  const personaId =
+                    eligiblePersonasForLegacyMigration[0]?.id ?? "";
+                  const success =
+                    await migrateLegacyJourneyToPersona(personaId);
+                  if (success) setSelectedLegacyPersonaId("");
+                }}
+                className="rounded-xl bg-slate-950 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 sm:w-full sm:px-8"
+              >
+                {isSavingPersonaJourneys
+                  ? "Vinculando jornada..."
+                  : "Vincular jornada a esta persona"}
+              </button>
+            </div>
+          </div>
+        ) : (
+          /* Cenário 3: múltiplas personas elegíveis */
+          <div className="mt-6">
+            <fieldset>
+              <legend className="mb-3 text-sm font-medium text-slate-700">
+                Selecione a persona para receber a jornada existente:
+              </legend>
+              <div className="space-y-2">
+                {eligiblePersonasForLegacyMigration.map((p) => {
+                  const isSelected = selectedLegacyPersonaId === p.id;
+                  return (
+                    <label
+                      key={p.id}
+                      className={`flex cursor-pointer items-center gap-4 rounded-2xl border px-4 py-3 transition-colors ${
+                        isSelected
+                          ? "border-slate-950 bg-slate-950/[0.04]"
+                          : "border-slate-200 bg-white hover:border-slate-300"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="legacy-persona-selection"
+                        value={p.id}
+                        checked={isSelected}
+                        onChange={() =>
+                          setSelectedLegacyPersonaId(p.id ?? "")
+                        }
+                        className="sr-only"
+                      />
+                      {p.photo ? (
+                        <img
+                          src={p.photo}
+                          alt={p.name || "Persona"}
+                          className="h-10 w-10 shrink-0 rounded-full object-cover ring-1 ring-slate-200"
+                        />
+                      ) : (
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-sm font-bold text-slate-400 ring-1 ring-slate-200">
+                          {(p.name || "P").charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <span className="text-sm font-medium text-slate-900">
+                        {p.name || "Persona sem nome"}
+                      </span>
+                      <span
+                        className={`ml-auto flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
+                          isSelected
+                            ? "border-slate-950 bg-slate-950"
+                            : "border-slate-300"
+                        }`}
+                        aria-hidden="true"
+                      >
+                        {isSelected && (
+                          <span className="h-2 w-2 rounded-full bg-white" />
+                        )}
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+
+              {personasData.personas.some(
+                (p) => p.id?.trim() && personaJourneysData.journeys[p.id]
+              ) && (
+                <p className="mt-3 text-xs text-slate-400">
+                  Personas com jornada existente não estão disponíveis para
+                  seleção.
+                </p>
+              )}
+            </fieldset>
+
+            {personaJourneysSaveError ? (
+              <div
+                className="mt-4 rounded-2xl bg-red-50 px-5 py-4 text-sm font-medium text-red-700"
+                role="alert"
+                id="legacy-migration-error"
+              >
+                {personaJourneysSaveError}
+              </div>
+            ) : null}
+
+            <div className="mt-5">
+              <button
+                type="button"
+                disabled={!selectedLegacyPersonaId || isSavingPersonaJourneys}
+                aria-busy={isSavingPersonaJourneys}
+                aria-describedby={
+                  personaJourneysSaveError ? "legacy-migration-error" : undefined
+                }
+                onClick={async () => {
+                  const success = await migrateLegacyJourneyToPersona(
+                    selectedLegacyPersonaId
+                  );
+                  if (success) setSelectedLegacyPersonaId("");
+                }}
+                className="rounded-xl bg-slate-950 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 sm:w-full sm:px-8"
+              >
+                {isSavingPersonaJourneys
+                  ? "Vinculando jornada..."
+                  : "Vincular jornada à persona selecionada"}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  ) : (
+    <JornadaPorPersonaForm
+      personas={personasData.personas}
+      journeysData={personaJourneysData}
+      isSaving={isSavingPersonaJourneys}
+      saveError={personaJourneysSaveError}
+      createDraft={createPersonaJourneyDraft}
+      saveJourney={savePersonaJourney}
+      orphanedJourneys={orphanedPersonaJourneys}
+      reassignOrphanedJourney={reassignOrphanedPersonaJourney}
+      deleteOrphanedJourney={deleteOrphanedPersonaJourney}
+    />
+  )
 
   ) : isCurrentChannelsModule ? (
   <CanaisDigitaisAtuaisForm

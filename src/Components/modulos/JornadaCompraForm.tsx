@@ -189,6 +189,115 @@ export const initialBuyingJourneyData: BuyingJourneyData = {
   ],
 };
 
+export function createEmptyBuyingJourneyData(): BuyingJourneyData {
+  return {
+    overview: "",
+    stages: journeyStages.map(() => createEmptyStage()),
+    turningPoints: {
+      discoveryToPain: "",
+      painToSolution: "",
+      solutionToComparison: "",
+      comparisonToDecision: "",
+    },
+    objections: {
+      beginning: "",
+      middle: "",
+      end: "",
+    },
+    advancementTriggers: "",
+    essentialContent: {
+      awareness: "",
+      decision: "",
+    },
+    funnelCampaignsAutomation: "",
+    references: [{ title: "", link: "" }],
+  };
+}
+
+export type LegacyMigrationState = {
+  status: "not-required" | "pending" | "completed";
+  assignedPersonaId?: string;
+  migratedAt?: string;
+};
+
+export type PersonaJourneysData = {
+  version: 2;
+  journeys: Record<string, BuyingJourneyData>;
+  legacyMigration: LegacyMigrationState;
+};
+
+export function buildInitialPersonaJourneysData(
+  hasLegacyData: boolean
+): PersonaJourneysData {
+  return {
+    version: 2,
+    journeys: {},
+    legacyMigration: {
+      status: hasLegacyData ? "pending" : "not-required",
+    },
+  };
+}
+
+function hasText(value: string): boolean {
+  return value.replace(/<[^>]*>/g, "").trim().length > 0;
+}
+
+function hasTextInAnyValue(obj: Record<string, string>): boolean {
+  return Object.values(obj).some(hasText);
+}
+
+export function hasMeaningfulJourneyContent(data: unknown): boolean {
+  if (!data || typeof data !== "object") return false;
+  const d = data as Partial<BuyingJourneyData>;
+
+  if (hasText(d.overview ?? "")) return true;
+
+  if (Array.isArray(d.stages)) {
+    for (const stage of d.stages) {
+      if (
+        hasText(stage.thoughts ?? "") ||
+        hasText(stage.pains ?? "") ||
+        hasText(stage.recommendedContent ?? "") ||
+        hasText(stage.recommendedChannels ?? "") ||
+        hasText(stage.desiredNextStep ?? "") ||
+        hasText(stage.conversionPoint ?? "")
+      )
+        return true;
+    }
+  }
+
+  if (d.turningPoints && hasTextInAnyValue(d.turningPoints as Record<string, string>))
+    return true;
+  if (d.objections && hasTextInAnyValue(d.objections as Record<string, string>))
+    return true;
+  if (hasText(d.advancementTriggers ?? "")) return true;
+  if (d.essentialContent && hasTextInAnyValue(d.essentialContent as Record<string, string>))
+    return true;
+  if (hasText(d.funnelCampaignsAutomation ?? "")) return true;
+
+  if (Array.isArray(d.references)) {
+    for (const ref of d.references) {
+      if (hasText(ref.title ?? "") || hasText(ref.link ?? "")) return true;
+    }
+  }
+
+  return false;
+}
+
+export function getOrphanedPersonaJourneys(
+  personas: Array<{ id?: string }>,
+  journeys: Record<string, BuyingJourneyData>
+): Record<string, BuyingJourneyData> {
+  const activeIds = new Set(
+    personas
+      .map((p) => p.id)
+      .filter((id): id is string => !!id?.trim())
+  );
+  return Object.fromEntries(
+    Object.entries(journeys).filter(([id]) => !activeIds.has(id))
+  );
+}
+
 function SectionCard({
   title,
   description,
@@ -219,19 +328,21 @@ function TextAreaInput({
   placeholder,
   rows: _rows,
   onChange,
+  readOnly = false,
 }: {
   label: string;
   value: string;
   placeholder: string;
   rows?: number;
   onChange: (value: string) => void;
+  readOnly?: boolean;
 }) {
   return (
     <div>
       <label className="mb-2 block text-sm font-semibold text-slate-600">
         {label}
       </label>
-      <RichTextEditor value={value} onChange={onChange} placeholder={placeholder} />
+      <RichTextEditor value={value} onChange={onChange} placeholder={placeholder} readOnly={readOnly} />
     </div>
   );
 }
@@ -239,21 +350,25 @@ function TextAreaInput({
 type JornadaCompraFormProps = {
   data: BuyingJourneyData;
   setData: Dispatch<SetStateAction<BuyingJourneyData>>;
-  clientSlug: string;
-  presentationHref: string;
-  isSaving: boolean;
-  isDisabled: boolean;
-  onSave: () => void;
+  clientSlug?: string;
+  presentationHref?: string;
+  isSaving?: boolean;
+  isDisabled?: boolean;
+  onSave?: () => void;
+  hideFooter?: boolean;
+  readOnly?: boolean;
 };
 
 export default function JornadaCompraForm({
   data,
   setData,
-  clientSlug,
-  presentationHref,
-  isSaving,
-  isDisabled,
-  onSave,
+  clientSlug = "",
+  presentationHref = "#",
+  isSaving = false,
+  isDisabled = false,
+  onSave = () => {},
+  hideFooter = false,
+  readOnly = false,
 }: JornadaCompraFormProps) {
   function updateOverview(value: string) {
     setData((current) => ({
@@ -379,6 +494,7 @@ export default function JornadaCompraForm({
           value={data.overview}
           onChange={updateOverview}
           placeholder="Ex: O público começa sentindo dificuldade para gerar demanda, depois entende que falta estratégia, busca soluções, compara métodos e finalmente decide contratar quando percebe clareza, prova e segurança."
+          readOnly={readOnly}
         />
       </SectionCard>
 
@@ -416,7 +532,8 @@ export default function JornadaCompraForm({
                   onChange={(event) =>
                     updateStage(index, "awarenessLevel", event.target.value)
                   }
-                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                  disabled={readOnly}
+                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100 disabled:cursor-default disabled:opacity-100"
                 >
                   {awarenessLevels.map((level) => (
                     <option key={level} value={level}>
@@ -433,6 +550,7 @@ export default function JornadaCompraForm({
                 value={stageData.thoughts}
                 placeholder={stage.thoughtsPlaceholder}
                 onChange={(value) => updateStage(index, "thoughts", value)}
+                readOnly={readOnly}
               />
 
               <TextAreaInput
@@ -440,6 +558,7 @@ export default function JornadaCompraForm({
                 value={stageData.pains}
                 placeholder={stage.painsPlaceholder}
                 onChange={(value) => updateStage(index, "pains", value)}
+                readOnly={readOnly}
               />
             </div>
 
@@ -451,6 +570,7 @@ export default function JornadaCompraForm({
                 onChange={(value) =>
                   updateStage(index, "recommendedContent", value)
                 }
+                readOnly={readOnly}
               />
 
               <TextAreaInput
@@ -460,6 +580,7 @@ export default function JornadaCompraForm({
                 onChange={(value) =>
                   updateStage(index, "recommendedChannels", value)
                 }
+                readOnly={readOnly}
               />
             </div>
 
@@ -472,6 +593,7 @@ export default function JornadaCompraForm({
                 onChange={(value) =>
                   updateStage(index, "desiredNextStep", value)
                 }
+                readOnly={readOnly}
               />
 
               <TextAreaInput
@@ -482,6 +604,7 @@ export default function JornadaCompraForm({
                 onChange={(value) =>
                   updateStage(index, "conversionPoint", value)
                 }
+                readOnly={readOnly}
               />
             </div>
           </SectionCard>
@@ -498,6 +621,7 @@ export default function JornadaCompraForm({
             value={data.turningPoints.discoveryToPain}
             placeholder="O que faz a pessoa perceber que o problema é real?"
             onChange={(value) => updateTurningPoint("discoveryToPain", value)}
+            readOnly={readOnly}
           />
 
           <TextAreaInput
@@ -505,6 +629,7 @@ export default function JornadaCompraForm({
             value={data.turningPoints.painToSolution}
             placeholder="O que faz a pessoa querer resolver?"
             onChange={(value) => updateTurningPoint("painToSolution", value)}
+            readOnly={readOnly}
           />
 
           <TextAreaInput
@@ -514,6 +639,7 @@ export default function JornadaCompraForm({
             onChange={(value) =>
               updateTurningPoint("solutionToComparison", value)
             }
+            readOnly={readOnly}
           />
 
           <TextAreaInput
@@ -523,6 +649,7 @@ export default function JornadaCompraForm({
             onChange={(value) =>
               updateTurningPoint("comparisonToDecision", value)
             }
+            readOnly={readOnly}
           />
         </div>
       </SectionCard>
@@ -537,6 +664,7 @@ export default function JornadaCompraForm({
             value={data.objections.beginning}
             placeholder="Objeções, dúvidas e resistências iniciais."
             onChange={(value) => updateObjection("beginning", value)}
+            readOnly={readOnly}
           />
 
           <TextAreaInput
@@ -544,6 +672,7 @@ export default function JornadaCompraForm({
             value={data.objections.middle}
             placeholder="Dúvidas sobre método, solução, tempo, investimento ou prioridade."
             onChange={(value) => updateObjection("middle", value)}
+            readOnly={readOnly}
           />
 
           <TextAreaInput
@@ -551,6 +680,7 @@ export default function JornadaCompraForm({
             value={data.objections.end}
             placeholder="Objeções antes da compra, inseguranças, comparação e necessidade de prova."
             onChange={(value) => updateObjection("end", value)}
+            readOnly={readOnly}
           />
         </div>
       </SectionCard>
@@ -565,6 +695,7 @@ export default function JornadaCompraForm({
             setData((current) => ({ ...current, advancementTriggers: value }))
           }
           placeholder="Ex: Mostrar sintomas do problema, apresentar consequências, oferecer um diagnóstico, entregar prova social, mostrar bastidores da solução, quebrar objeções, criar urgência e direcionar para conversa comercial."
+          readOnly={readOnly}
         />
       </SectionCard>
 
@@ -578,6 +709,7 @@ export default function JornadaCompraForm({
             value={data.essentialContent.awareness}
             placeholder="Ex: Erros comuns, sinais do problema, conteúdos educativos, diagnósticos, comparações e conteúdos de clareza."
             onChange={(value) => updateEssentialContent("awareness", value)}
+            readOnly={readOnly}
           />
 
           <TextAreaInput
@@ -585,6 +717,7 @@ export default function JornadaCompraForm({
             value={data.essentialContent.decision}
             placeholder="Ex: Provas sociais, estudos de caso, oferta, perguntas frequentes, bastidores da entrega, depoimentos e chamada para ação."
             onChange={(value) => updateEssentialContent("decision", value)}
+            readOnly={readOnly}
           />
         </div>
       </SectionCard>
@@ -599,6 +732,7 @@ export default function JornadaCompraForm({
             setData((current) => ({ ...current, funnelCampaignsAutomation: value }))
           }
           placeholder="Ex: A etapa de descoberta orienta conteúdos de atração. A etapa de busca por solução orienta materiais educativos e captação de leads. A comparação orienta remarketing e provas sociais. A decisão orienta campanhas de conversão e mensagens comerciais. O pós-compra orienta automações de onboarding e fidelização."
+          readOnly={readOnly}
         />
       </SectionCard>
 
@@ -620,7 +754,8 @@ export default function JornadaCompraForm({
                 <button
                   type="button"
                   onClick={() => removeReference(index)}
-                  className="cursor-pointer rounded-full px-4 py-2 text-sm font-semibold text-red-500 transition hover:bg-red-50"
+                  disabled={readOnly}
+                  className="cursor-pointer rounded-full px-4 py-2 text-sm font-semibold text-red-500 transition hover:bg-red-50 disabled:cursor-default disabled:opacity-40"
                 >
                   Excluir
                 </button>
@@ -638,6 +773,7 @@ export default function JornadaCompraForm({
                     onChange={(event) =>
                       updateReference(index, "title", event.target.value)
                     }
+                    readOnly={readOnly}
                     placeholder="Ex: Jornada, pesquisa, referência, mapa, aula, documento ou exemplo"
                     className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
                   />
@@ -654,6 +790,7 @@ export default function JornadaCompraForm({
                     onChange={(event) =>
                       updateReference(index, "link", event.target.value)
                     }
+                    readOnly={readOnly}
                     placeholder="https://..."
                     className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
                   />
@@ -666,38 +803,41 @@ export default function JornadaCompraForm({
         <button
           type="button"
           onClick={addReference}
-          className="mt-4 cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-950 hover:border-slate-950 hover:text-white"
+          disabled={readOnly}
+          className="mt-4 cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-950 hover:border-slate-950 hover:text-white disabled:cursor-default disabled:opacity-40"
         >
           + Nova referência
         </button>
       </SectionCard>
 
-      <div className="sticky bottom-0 rounded-[1.5rem] border border-slate-200 bg-white/95 p-5 shadow-sm backdrop-blur">
-        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-          <Link
-            href={`/admin/planejamentos/${clientSlug}`}
-            className="rounded-full border border-slate-200 bg-white px-6 py-3 text-center text-sm font-semibold text-slate-700 hover:bg-slate-50"
-          >
-            Voltar para módulos
-          </Link>
+      {!hideFooter && (
+        <div className="sticky bottom-0 rounded-[1.5rem] border border-slate-200 bg-white/95 p-5 shadow-sm backdrop-blur">
+          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <Link
+              href={`/admin/planejamentos/${clientSlug}`}
+              className="rounded-full border border-slate-200 bg-white px-6 py-3 text-center text-sm font-semibold text-slate-700 hover:bg-slate-50"
+            >
+              Voltar para módulos
+            </Link>
 
-          <Link
-            href={presentationHref}
-            className="rounded-full border border-slate-200 bg-white px-6 py-3 text-center text-sm font-semibold text-slate-700 hover:bg-slate-50"
-          >
-            Ver apresentação
-          </Link>
+            <Link
+              href={presentationHref}
+              className="rounded-full border border-slate-200 bg-white px-6 py-3 text-center text-sm font-semibold text-slate-700 hover:bg-slate-50"
+            >
+              Ver apresentação
+            </Link>
 
-          <button
-            type="button"
-            onClick={onSave}
-            disabled={isSaving || isDisabled}
-            className="cursor-pointer rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {isSaving ? "Salvando..." : "Salvar módulo"}
-          </button>
+            <button
+              type="button"
+              onClick={onSave}
+              disabled={isSaving || isDisabled}
+              className="cursor-pointer rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isSaving ? "Salvando..." : "Salvar módulo"}
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

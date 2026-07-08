@@ -45,11 +45,13 @@ export default function RichTextEditor({
   onChange,
   placeholder = "Escreva aqui...",
   minHeight = 180,
+  readOnly = false,
 }: {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
   minHeight?: number;
+  readOnly?: boolean;
 }) {
   const editor = useEditor({
     extensions: [
@@ -70,7 +72,9 @@ export default function RichTextEditor({
       }),
     ],
     content: value || "",
+    editable: !readOnly,
     onUpdate: ({ editor }) => {
+      if (readOnly) return;
       const html = editor.getHTML();
       onChange(html === "<p></p>" ? "" : html);
     },
@@ -91,6 +95,12 @@ export default function RichTextEditor({
     }
   }, [value]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Sync readOnly changes after creation
+  useEffect(() => {
+    if (!editor) return;
+    editor.setEditable(!readOnly);
+  }, [editor, readOnly]);
+
   const addLink = useCallback(() => {
     if (!editor) return;
     const url = window.prompt("URL do link:");
@@ -110,8 +120,8 @@ export default function RichTextEditor({
 
   return (
     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white focus-within:ring-2 focus-within:ring-black/10">
-      {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-0.5 border-b border-slate-200 bg-slate-50 px-3 py-2">
+      {/* Toolbar — hidden in readOnly mode */}
+      {!readOnly && <div className="flex flex-wrap items-center gap-0.5 border-b border-slate-200 bg-slate-50 px-3 py-2">
         <ToolbarBtn
           onClick={() => editor.chain().focus().toggleBold().run()}
           isActive={editor.isActive("bold")}
@@ -196,7 +206,7 @@ export default function RichTextEditor({
             <path d="M3 13l10-10M8 3l5 5M3 8l5 5" strokeLinecap="round" />
           </svg>
         </ToolbarBtn>
-      </div>
+      </div>}
 
       {/* Editor */}
       <EditorContent editor={editor} />
