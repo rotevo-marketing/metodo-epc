@@ -267,8 +267,8 @@ export default function InstagramForm({
 
   const [uploadingProfilePhoto, setUploadingProfilePhoto] = useState(false);
   const [profilePhotoError, setProfilePhotoError] = useState("");
-  const [uploadingRefIndex, setUploadingRefIndex] = useState<number | null>(null);
-  const [refUploadErrors, setRefUploadErrors] = useState<Record<number, string>>({});
+  const [uploadingRefId, setUploadingRefId] = useState<string | null>(null);
+  const [refUploadErrors, setRefUploadErrors] = useState<Record<string, string>>({});
   const [uploadingHighlightId, setUploadingHighlightId] = useState<string | null>(null);
   const [highlightUploadErrors, setHighlightUploadErrors] = useState<Record<string, string>>({});
 
@@ -640,17 +640,43 @@ export default function InstagramForm({
 
   // ─── Visual reference handlers ────────────────────────────────────────────────
 
+  function updateVisualDirection(
+    key: Exclude<keyof InstagramData["visualDirection"], "references">,
+    value: string
+  ) {
+    setData((current) => ({
+      ...current,
+      visualDirection: { ...current.visualDirection, [key]: value },
+    }));
+  }
+
+  function updateVisualReference(
+    id: string,
+    key: "title" | "description",
+    value: string
+  ) {
+    setData((current) => ({
+      ...current,
+      visualDirection: {
+        ...current.visualDirection,
+        references: current.visualDirection.references.map((ref) =>
+          ref.id === id ? { ...ref, [key]: value } : ref
+        ),
+      },
+    }));
+  }
+
   async function uploadVisualReference(
-    index: number,
+    id: string,
     event: ChangeEvent<HTMLInputElement>
   ) {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    setUploadingRefIndex(index);
+    setUploadingRefId(id);
     setRefUploadErrors((current) => {
       const next = { ...current };
-      delete next[index];
+      delete next[id];
       return next;
     });
 
@@ -661,48 +687,70 @@ export default function InstagramForm({
         category: "references",
       });
 
-      setData((current) => {
-        const nextRefs = [...current.visualDirection.references];
-        nextRefs[index] = { ...nextRefs[index], url };
-        return {
-          ...current,
-          visualDirection: { ...current.visualDirection, references: nextRefs },
-        };
-      });
+      setData((current) => ({
+        ...current,
+        visualDirection: {
+          ...current.visualDirection,
+          references: current.visualDirection.references.map((ref) =>
+            ref.id === id ? { ...ref, url } : ref
+          ),
+        },
+      }));
     } catch (err) {
       setRefUploadErrors((current) => ({
         ...current,
-        [index]: err instanceof Error ? err.message : "Erro ao enviar imagem.",
+        [id]: err instanceof Error ? err.message : "Erro ao enviar imagem.",
       }));
     } finally {
-      setUploadingRefIndex(null);
+      setUploadingRefId(null);
       event.target.value = "";
     }
   }
 
-  function removeVisualReference(index: number) {
-    setData((current) => ({
-      ...current,
-      visualDirection: {
-        ...current.visualDirection,
-        references: current.visualDirection.references.filter(
-          (_, i) => i !== index
-        ),
-      },
-    }));
+  function removeVisualReference(id: string) {
+    setData((current) => {
+      const reordered = current.visualDirection.references
+        .filter((ref) => ref.id !== id)
+        .map((ref, i) => ({ ...ref, order: i }));
+      return {
+        ...current,
+        visualDirection: { ...current.visualDirection, references: reordered },
+      };
+    });
   }
 
   function addVisualReferenceSlot() {
-    setData((current) => ({
-      ...current,
-      visualDirection: {
-        ...current.visualDirection,
-        references: [
-          ...current.visualDirection.references,
-          createEmptyInstagramImageReference(),
-        ],
-      },
-    }));
+    setData((current) => {
+      const newRef = {
+        ...createEmptyInstagramImageReference(),
+        order: current.visualDirection.references.length,
+      };
+      return {
+        ...current,
+        visualDirection: {
+          ...current.visualDirection,
+          references: [...current.visualDirection.references, newRef],
+        },
+      };
+    });
+  }
+
+  function moveVisualReference(id: string, direction: "up" | "down") {
+    setData((current) => {
+      const sorted = [...current.visualDirection.references].sort(
+        (a, b) => a.order - b.order
+      );
+      const index = sorted.findIndex((ref) => ref.id === id);
+      if (index === -1) return current;
+      const targetIndex = direction === "up" ? index - 1 : index + 1;
+      if (targetIndex < 0 || targetIndex >= sorted.length) return current;
+      [sorted[index], sorted[targetIndex]] = [sorted[targetIndex], sorted[index]];
+      const reordered = sorted.map((ref, i) => ({ ...ref, order: i }));
+      return {
+        ...current,
+        visualDirection: { ...current.visualDirection, references: reordered },
+      };
+    });
   }
 
   // ─── Bio photo handlers ───────────────────────────────────────────────────────
@@ -2511,91 +2559,382 @@ export default function InstagramForm({
         title="Direção visual"
         description="Defina a aparência, as referências e a sensação transmitida pelo perfil."
       >
-        <div>
-          <label className="mb-2 block text-sm font-semibold text-slate-600">
-            Estratégia visual
-          </label>
-
-          <RichTextEditor
-            value={data.visualDirection.generalStrategy}
-            onChange={(value) =>
-              setData((current) => ({
-                ...current,
-                visualDirection: {
-                  ...current.visualDirection,
-                  generalStrategy: value,
-                },
-              }))
-            }
-            placeholder="Explique a direção visual do Instagram: estilo dos posts, cores, fundos, fotos, vídeos, ritmo, estética e referências."
-          />
-        </div>
-
-        {data.visualDirection.references.length > 0 && (
-          <div className="grid gap-4 md:grid-cols-3">
-            {data.visualDirection.references.map((reference, index) => (
-              <div
-                key={reference.id}
-                className="overflow-hidden rounded-2xl border border-dashed border-slate-300 bg-slate-50"
-              >
-                <label className="flex aspect-[4/3] cursor-pointer items-center justify-center text-center text-sm font-semibold text-slate-500 transition hover:bg-slate-100">
-                  {uploadingRefIndex === index ? (
-                    <span>Enviando...</span>
-                  ) : reference.url ? (
-                    <img
-                      src={reference.url}
-                      alt={`Referência ${index + 1}`}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <span>
-                      +<br />
-                      Adicionar referência
-                    </span>
-                  )}
-
-                  <input
-                    type="file"
-                    accept="image/png,image/jpeg,image/webp"
-                    onChange={(event) => uploadVisualReference(index, event)}
-                    disabled={uploadingRefIndex !== null}
-                    className="hidden"
-                  />
-                </label>
-
-                <div className="p-3">
-                  {refUploadErrors[index] && (
-                    <p className="mb-2 text-xs text-red-500">
-                      {refUploadErrors[index]}
-                    </p>
-                  )}
-
-                  <button
-                    type="button"
-                    onClick={() => removeVisualReference(index)}
-                    className="cursor-pointer rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-600 transition hover:bg-slate-100"
-                  >
-                    Remover
-                  </button>
-                </div>
-              </div>
-            ))}
+        {/* SubSection 1: Estratégia visual geral */}
+        <SubSection
+          title="Estratégia visual geral"
+          description="Descreva a lógica visual que deve orientar o perfil e os conteúdos do Instagram."
+        >
+          <div>
+            <label className="mb-1 block text-sm font-semibold text-slate-600">
+              Estratégia visual do canal
+            </label>
+            <p className="mb-2 text-sm leading-5 text-slate-500">
+              Descreva a lógica visual que deve orientar o perfil e os conteúdos do Instagram.
+            </p>
+            <RichTextEditor
+              value={data.visualDirection.generalStrategy}
+              onChange={(value) => updateVisualDirection("generalStrategy", value)}
+              placeholder="Explique a direção visual do Instagram: estilo dos posts, cores, fundos, fotos, vídeos, ritmo, estética e referências."
+            />
           </div>
-        )}
+        </SubSection>
 
-        <div className="flex items-center gap-4">
-          <button
-            type="button"
-            onClick={addVisualReferenceSlot}
-            className="cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-950 hover:border-slate-950 hover:text-white"
-          >
-            + Adicionar referência
-          </button>
+        {/* SubSection 2: Presença e construção de autoridade */}
+        <SubSection
+          title="Presença e construção de autoridade"
+          description="Oriente como o especialista, os bastidores e as provas devem aparecer nos conteúdos."
+        >
+          <div className="space-y-6">
+            <div className="grid gap-6 md:grid-cols-2">
+              <div>
+                <label className="mb-1 block text-sm font-semibold text-slate-600">
+                  Presença humana
+                </label>
+                <p className="mb-2 text-xs leading-5 text-slate-500">
+                  Defina com que frequência e de que forma o especialista deve aparecer em fotos, vídeos e bastidores.
+                </p>
+                <textarea
+                  value={data.visualDirection.humanPresence}
+                  onChange={(event) =>
+                    updateVisualDirection("humanPresence", event.target.value)
+                  }
+                  rows={4}
+                  className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-semibold text-slate-600">
+                  Papel visual do especialista
+                </label>
+                <p className="mb-2 text-xs leading-5 text-slate-500">
+                  Explique como o especialista deve funcionar visualmente como protagonista, referência ou condutor da comunicação.
+                </p>
+                <textarea
+                  value={data.visualDirection.specialistRole}
+                  onChange={(event) =>
+                    updateVisualDirection("specialistRole", event.target.value)
+                  }
+                  rows={4}
+                  className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                />
+              </div>
+            </div>
 
-          <p className="text-xs text-slate-500">
-            Tamanho recomendado para imagem de feed: 1080x1350px.
-          </p>
-        </div>
+            <div className="grid gap-6 md:grid-cols-2">
+              <div>
+                <label className="mb-1 block text-sm font-semibold text-slate-600">
+                  Bastidores
+                </label>
+                <p className="mb-2 text-xs leading-5 text-slate-500">
+                  Registre quais processos, análises, ambientes ou momentos de trabalho podem ser mostrados sem expor informações confidenciais.
+                </p>
+                <textarea
+                  value={data.visualDirection.backstage}
+                  onChange={(event) =>
+                    updateVisualDirection("backstage", event.target.value)
+                  }
+                  rows={4}
+                  className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-semibold text-slate-600">
+                  Provas e depoimentos
+                </label>
+                <p className="mb-2 text-xs leading-5 text-slate-500">
+                  Defina como depoimentos, resultados, casos e evidências devem ser incorporados visualmente aos conteúdos.
+                </p>
+                <textarea
+                  value={data.visualDirection.socialProof}
+                  onChange={(event) =>
+                    updateVisualDirection("socialProof", event.target.value)
+                  }
+                  rows={4}
+                  className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-semibold text-slate-600">
+                Uso de dados
+              </label>
+              <p className="mb-2 text-xs leading-5 text-slate-500">
+                Oriente como números, pesquisas, indicadores e informações técnicas devem aparecer sem gerar promessas indevidas.
+              </p>
+              <textarea
+                value={data.visualDirection.dataUsage}
+                onChange={(event) =>
+                  updateVisualDirection("dataUsage", event.target.value)
+                }
+                rows={4}
+                className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+              />
+            </div>
+          </div>
+        </SubSection>
+
+        {/* SubSection 3: Organização visual dos conteúdos */}
+        <SubSection
+          title="Organização visual dos conteúdos"
+          description="Defina como a informação é estruturada visualmente em cada peça."
+        >
+          <div className="space-y-6">
+            <div className="grid gap-6 md:grid-cols-2">
+              <div>
+                <label className="mb-1 block text-sm font-semibold text-slate-600">
+                  Hierarquia da informação
+                </label>
+                <p className="mb-2 text-xs leading-5 text-slate-500">
+                  Defina como títulos, mensagens principais, explicações e chamadas devem ser organizados visualmente.
+                </p>
+                <textarea
+                  value={data.visualDirection.informationHierarchy}
+                  onChange={(event) =>
+                    updateVisualDirection("informationHierarchy", event.target.value)
+                  }
+                  rows={4}
+                  className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-semibold text-slate-600">
+                  Densidade visual
+                </label>
+                <p className="mb-2 text-xs leading-5 text-slate-500">
+                  Registre o nível adequado de texto, imagens e elementos por peça para evitar excesso ou superficialidade.
+                </p>
+                <textarea
+                  value={data.visualDirection.visualDensity}
+                  onChange={(event) =>
+                    updateVisualDirection("visualDensity", event.target.value)
+                  }
+                  rows={4}
+                  className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-semibold text-slate-600">
+                Sensação desejada
+              </label>
+              <p className="mb-2 text-xs leading-5 text-slate-500">
+                Descreva a percepção que o perfil e os conteúdos devem transmitir ao público.
+              </p>
+              <textarea
+                value={data.visualDirection.desiredFeeling}
+                onChange={(event) =>
+                  updateVisualDirection("desiredFeeling", event.target.value)
+                }
+                rows={3}
+                placeholder="Ex.: clareza, análise, controle, proximidade e segurança"
+                className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-semibold text-slate-600">
+                O que evitar
+              </label>
+              <p className="mb-2 text-xs leading-5 text-slate-500">
+                Registre estilos, recursos, efeitos e abordagens que contradizem o posicionamento visual do canal.
+              </p>
+              <textarea
+                value={data.visualDirection.avoid}
+                onChange={(event) =>
+                  updateVisualDirection("avoid", event.target.value)
+                }
+                rows={3}
+                className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+              />
+            </div>
+          </div>
+        </SubSection>
+
+        {/* SubSection 4: Consistência e adaptação */}
+        <SubSection
+          title="Consistência e adaptação"
+          description="Oriente como a identidade visual se mantém e se adapta entre formatos e etapas."
+        >
+          <div className="grid gap-6 md:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-sm font-semibold text-slate-600">
+                Consistência entre formatos
+              </label>
+              <p className="mb-2 text-xs leading-5 text-slate-500">
+                Explique quais elementos devem permanecer reconhecíveis entre Reels, carrosséis, Stories, lives e outros formatos.
+              </p>
+              <textarea
+                value={data.visualDirection.formatConsistency}
+                onChange={(event) =>
+                  updateVisualDirection("formatConsistency", event.target.value)
+                }
+                rows={4}
+                className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-semibold text-slate-600">
+                Adaptação visual à jornada
+              </label>
+              <p className="mb-2 text-xs leading-5 text-slate-500">
+                Defina como a aparência e a densidade dos conteúdos devem variar conforme descoberta, aprofundamento, relacionamento ou decisão.
+              </p>
+              <textarea
+                value={data.visualDirection.journeyAdaptation}
+                onChange={(event) =>
+                  updateVisualDirection("journeyAdaptation", event.target.value)
+                }
+                rows={4}
+                className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+              />
+            </div>
+          </div>
+        </SubSection>
+
+        {/* SubSection 5: Referências visuais */}
+        <SubSection
+          title="Referências visuais"
+          description="Adicione imagens que inspirem a direção visual do canal."
+        >
+          {data.visualDirection.references.length === 0 ? (
+            <div className="space-y-3">
+              <p className="text-sm text-slate-400">Nenhuma referência visual cadastrada.</p>
+              <button
+                type="button"
+                onClick={addVisualReferenceSlot}
+                className="cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-950 hover:bg-slate-950 hover:text-white"
+              >
+                + Adicionar referência visual
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {[...data.visualDirection.references]
+                .sort((a, b) => a.order - b.order)
+                .map((reference, index, sorted) => (
+                  <div
+                    key={reference.id}
+                    className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+                  >
+                    <div className="grid gap-4 md:grid-cols-[200px_1fr]">
+                      {/* Image preview + upload */}
+                      <div className="flex flex-col gap-3">
+                        <label className="flex aspect-[4/3] cursor-pointer items-center justify-center overflow-hidden rounded-xl border border-dashed border-slate-300 bg-white text-center text-sm font-semibold text-slate-500 transition hover:bg-slate-100">
+                          {uploadingRefId === reference.id ? (
+                            <span className="text-xs">Enviando...</span>
+                          ) : reference.url ? (
+                            <img
+                              src={reference.url}
+                              alt={reference.title || "Referência visual"}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <span className="text-xs">
+                              +<br />
+                              Enviar imagem
+                            </span>
+                          )}
+                          <input
+                            type="file"
+                            accept="image/png,image/jpeg,image/webp"
+                            onChange={(event) =>
+                              uploadVisualReference(reference.id, event)
+                            }
+                            disabled={uploadingRefId !== null}
+                            className="hidden"
+                          />
+                        </label>
+                        {refUploadErrors[reference.id] && (
+                          <p className="text-xs text-red-500">
+                            {refUploadErrors[reference.id]}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Fields + actions */}
+                      <div className="flex flex-col gap-4">
+                        <div className="flex items-start gap-2">
+                          <div className="flex-1">
+                            <label className="mb-2 block text-sm font-semibold text-slate-600">
+                              Título da referência
+                            </label>
+                            <input
+                              type="text"
+                              value={reference.title ?? ""}
+                              onChange={(event) =>
+                                updateVisualReference(reference.id, "title", event.target.value)
+                              }
+                              placeholder="Ex.: Perfil de referência, post inspirador..."
+                              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                            />
+                          </div>
+                          <div className="flex flex-shrink-0 items-center gap-1 pt-8">
+                            <button
+                              type="button"
+                              onClick={() => moveVisualReference(reference.id, "up")}
+                              disabled={index === 0}
+                              aria-label="Mover referência para cima"
+                              className="cursor-pointer rounded-full px-3 py-1.5 text-xs font-semibold text-slate-500 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-40"
+                            >
+                              ↑
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => moveVisualReference(reference.id, "down")}
+                              disabled={index === sorted.length - 1}
+                              aria-label="Mover referência para baixo"
+                              className="cursor-pointer rounded-full px-3 py-1.5 text-xs font-semibold text-slate-500 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-40"
+                            >
+                              ↓
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => removeVisualReference(reference.id)}
+                              className="cursor-pointer rounded-full px-3 py-1.5 text-xs font-semibold text-red-500 transition hover:bg-red-50"
+                            >
+                              Excluir
+                            </button>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="mb-1 block text-sm font-semibold text-slate-600">
+                            Descrição da referência
+                          </label>
+                          <p className="mb-2 text-xs leading-5 text-slate-500">
+                            Explique o que deve ser observado ou aproveitado nesta referência.
+                          </p>
+                          <textarea
+                            value={reference.description ?? ""}
+                            onChange={(event) =>
+                              updateVisualReference(reference.id, "description", event.target.value)
+                            }
+                            rows={3}
+                            className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+              <div className="flex items-center gap-4">
+                <button
+                  type="button"
+                  onClick={addVisualReferenceSlot}
+                  className="cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-950 hover:bg-slate-950 hover:text-white"
+                >
+                  + Adicionar referência visual
+                </button>
+                <p className="text-xs text-slate-500">
+                  Formatos aceitos: JPEG, PNG ou WebP. Limite de 5 MB.
+                </p>
+              </div>
+            </div>
+          )}
+        </SubSection>
       </FormSection>
 
       {/* ── 6. Referências externas ── */}
