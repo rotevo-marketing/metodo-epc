@@ -74,24 +74,36 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
       hasText(item.deadline)
   );
 
-  // ─── Stories ────────────────────────────────────────────────────────────────
-  // Fallback: name → description when name is empty
-  // name (v2) ← stories[].value (v1 legacy)
-  const stories: TextItem[] = d.contentArchitecture.stories.map((item) => ({
-    value: item.name?.trim() || item.description?.trim() || "",
-  }));
-
-  // ─── Formatos (Reels) ───────────────────────────────────────────────────────
-  // name (v2) ← reels[].value (v1 legacy)
-  const reels: TextItem[] = d.contentArchitecture.formats.map((item) => ({
-    value: item.name,
-  }));
-
-  // ─── Diretrizes gerais de conteúdo ──────────────────────────────────────────
-  // generalContentGuidelines (v2) ← contents[].value (v1 legacy)
-  const contents: TextItem[] = d.contentArchitecture.generalContentGuidelines.map(
-    (s) => ({ value: s })
+  // ─── Formatos de conteúdo ───────────────────────────────────────────────────
+  // name (v2) ← reels[].value (v1 legacy) via normalization
+  const contentFormats = d.contentArchitecture.formats.filter(
+    (item) =>
+      hasText(item.name) ||
+      hasText(item.structure) ||
+      hasText(item.duration) ||
+      hasText(item.journeyRole) ||
+      hasText(item.purpose) ||
+      hasText(item.cta) ||
+      hasText(item.notes)
   );
+
+  // ─── Stories estratégicos ───────────────────────────────────────────────────
+  // name (v2) ← stories[].value (v1 legacy) via normalization
+  const strategicStories = d.contentArchitecture.stories.filter(
+    (item) =>
+      hasText(item.name) ||
+      hasText(item.frequency) ||
+      hasText(item.journeyStage) ||
+      hasText(item.purpose) ||
+      hasText(item.cta) ||
+      hasText(item.description)
+  );
+
+  // ─── Diretrizes editoriais ──────────────────────────────────────────────────
+  // generalContentGuidelines (v2) ← contents[].value (v1 legacy) via normalization
+  const editorialGuidelines: TextItem[] = filterFilledStrings(
+    d.contentArchitecture.generalContentGuidelines
+  ).map((s) => ({ value: s }));
 
   // ─── Estruturas de linguagem ────────────────────────────────────────────────
   // Fallback: howItAppears → name when howItAppears is empty
@@ -163,10 +175,10 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
 
   const hasContentAndLanguageSection =
     objectiveItems.length > 0 ||
+    contentFormats.length > 0 ||
+    strategicStories.length > 0 ||
+    editorialGuidelines.length > 0 ||
     languageStructures.some((i) => hasText(i.value)) ||
-    contents.some((i) => hasText(i.value)) ||
-    stories.some((i) => hasText(i.value)) ||
-    reels.some((i) => hasText(i.value)) ||
     hashtags.some((i) => hasText(i.value)) ||
     hasText(visualStrategy);
 
@@ -313,10 +325,58 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
               </div>
             </div>
           )}
+
+          {contentFormats.length > 0 && (
+            <div>
+              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                Formatos de conteúdo
+              </p>
+              <div className="divide-y divide-slate-100">
+                {contentFormats.map((item) => (
+                  <div key={item.id} className="py-6 first:pt-0">
+                    <PlainTextField label="Nome do formato" value={item.name} />
+                    <PlainTextField label="Estrutura" value={item.structure} />
+                    <div className="grid gap-x-8 sm:grid-cols-2">
+                      <PlainTextField label="Duração ou extensão" value={item.duration} />
+                      <PlainTextField label="Papel na jornada" value={item.journeyRole} />
+                    </div>
+                    <PlainTextField label="Finalidade estratégica" value={item.purpose} />
+                    <div className="grid gap-x-8 sm:grid-cols-2">
+                      <PlainTextField label="CTA recomendado" value={item.cta} />
+                      <PlainTextField label="Observações" value={item.notes} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {strategicStories.length > 0 && (
+            <div>
+              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                Stories estratégicos
+              </p>
+              <div className="divide-y divide-slate-100">
+                {strategicStories.map((item) => (
+                  <div key={item.id} className="py-6 first:pt-0">
+                    <PlainTextField label="Nome do Story estratégico" value={item.name} />
+                    <div className="grid gap-x-8 sm:grid-cols-2">
+                      <PlainTextField label="Frequência" value={item.frequency} />
+                      <PlainTextField label="Etapa da jornada" value={item.journeyStage} />
+                    </div>
+                    <PlainTextField label="Finalidade estratégica" value={item.purpose} />
+                    <div className="grid gap-x-8 sm:grid-cols-2">
+                      <PlainTextField label="CTA" value={item.cta} />
+                      <PlainTextField label="Descrição" value={item.description} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <TextList items={editorialGuidelines} label="Diretrizes editoriais" />
           <TextList items={languageStructures} label="Estruturas de linguagem" />
-          <TextList items={contents} label="Tipos de conteúdo" />
-          <TextList items={stories} label="Stories" />
-          <TextList items={reels} label="Reels" />
           <TextList items={hashtags} label="Hashtags" />
           <FieldBlock label="Estratégia visual" value={visualStrategy} />
         </SectionCard>
