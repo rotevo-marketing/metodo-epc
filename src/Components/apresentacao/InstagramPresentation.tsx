@@ -5,12 +5,10 @@ import {
 import { PresentationHeader } from "./PresentationHeader";
 import {
   TextList,
-  ExternalRefList,
   FieldBlock,
   SectionCard,
   EmptyState,
   TextItem,
-  ExtRef,
 } from "./ChannelPresentationShared";
 
 type InstagramPresentationProps = {
@@ -115,10 +113,12 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
   );
 
   // ─── Hashtags ───────────────────────────────────────────────────────────────
-  // Flatten all categories; category name not shown in current presentation
-  // hashtags (v2) ← legacy hashtags grouped under single category
-  const hashtags: TextItem[] = d.hashtags.flatMap((cat) =>
-    filterFilledStrings(cat.hashtags).map((h) => ({ value: h }))
+  // hashtags (v2) ← legacy hashtags grouped under single category via normalization
+  const hashtagCategories = d.hashtags.filter(
+    (cat) =>
+      hasText(cat.name) ||
+      hasText(cat.notes) ||
+      filterFilledStrings(cat.hashtags).length > 0
   );
 
   // ─── Direção visual ─────────────────────────────────────────────────────────
@@ -178,12 +178,10 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
     .filter((item) => hasText(item.title) || hasText(item.purpose) || hasText(item.imageUrl));
 
   // ─── Referências externas ───────────────────────────────────────────────────
-  // Adapter: externalReferences[].url → ExtRef.link
   // url (v2) ← references[].link (v1 legacy)
-  const externalRefs: ExtRef[] = d.externalReferences.map((ref) => ({
-    title: ref.title,
-    link: ref.url,
-  }));
+  const externalReferenceItems = d.externalReferences.filter(
+    (ref) => hasText(ref.title) || hasText(ref.url) || hasText(ref.notes)
+  );
 
   // ─── Condições de seção ─────────────────────────────────────────────────────
 
@@ -209,7 +207,7 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
     strategicStories.length > 0 ||
     editorialGuidelines.length > 0 ||
     languageStructureItems.length > 0 ||
-    hashtags.some((i) => hasText(i.value));
+    hashtagCategories.length > 0;
 
   const hasVisualDirectionSection =
     hasText(visualStrategy) ||
@@ -267,11 +265,15 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
     hasText(d.integration.ecosystemRole) ||
     hasText(d.integration.contentRepurposing);
 
+  const hasExternalReferencesSection = externalReferenceItems.length > 0;
+
   const hasVisibleInstagramContent =
     hasMeaningfulInstagramContent(d) ||
     hasConversionSection ||
     hasMeasurementSection ||
-    hasIntegrationSection;
+    hasIntegrationSection ||
+    hasContentAndLanguageSection ||
+    hasExternalReferencesSection;
 
   // profile.enabled intentionally not used — section shows based on content presence
   const hasProfileSection =
@@ -282,10 +284,6 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
     hasText(bioLink) ||
     profileLinkItems.length > 0 ||
     profileHighlights.length > 0;
-
-  const hasExternalReferencesSection = externalRefs.some(
-    (r) => hasText(r.title) || hasText(r.link)
-  );
 
   // ─── Render ─────────────────────────────────────────────────────────────────
 
@@ -487,7 +485,33 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
             </div>
           )}
 
-          <TextList items={hashtags} label="Hashtags" />
+          {hashtagCategories.length > 0 && (
+            <div>
+              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                Hashtags
+              </p>
+              <div className="divide-y divide-slate-100">
+                {hashtagCategories.map((cat) => {
+                  const filledHashtags: TextItem[] = filterFilledStrings(cat.hashtags).map(
+                    (h) => ({ value: h })
+                  );
+                  return (
+                    <div key={cat.id} className="py-6 first:pt-0">
+                      <PlainTextField label="Categoria" value={cat.name} />
+                      {filledHashtags.length > 0 && (
+                        <TextList items={filledHashtags} label="Hashtags da categoria" />
+                      )}
+                      <PlainTextField label="Observações" value={cat.notes} />
+                      <PlainTextField
+                        label="Status de validação"
+                        value={VALIDATION_STATUS_LABELS[cat.validationStatus]}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </SectionCard>
       )}
 
@@ -858,7 +882,26 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
 
       {hasExternalReferencesSection && (
         <SectionCard title="Referências externas">
-          <ExternalRefList refs={externalRefs} />
+          <div className="divide-y divide-slate-100">
+            {externalReferenceItems.map((ref) => (
+              <div key={ref.id} className="py-5">
+                {hasText(ref.title) && (
+                  <p className="text-sm font-medium text-slate-950">{ref.title}</p>
+                )}
+                {hasText(ref.url) && (
+                  <a
+                    href={ref.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-1 block break-all text-xs text-slate-500 hover:text-slate-950"
+                  >
+                    {ref.url}
+                  </a>
+                )}
+                <PlainTextField label="Observações" value={ref.notes} />
+              </div>
+            ))}
+          </div>
         </SectionCard>
       )}
 
