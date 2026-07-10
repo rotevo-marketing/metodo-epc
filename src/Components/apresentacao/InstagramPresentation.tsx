@@ -106,11 +106,15 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
   ).map((s) => ({ value: s }));
 
   // ─── Estruturas de linguagem ────────────────────────────────────────────────
-  // Fallback: howItAppears → name when howItAppears is empty
   // howItAppears (v2) ← languageStructures[].value (v1 legacy)
-  const languageStructures: TextItem[] = d.languageStructures
-    .map((item) => ({ value: item.howItAppears?.trim() || item.name?.trim() || "" }))
-    .filter((item) => item.value);
+  const languageStructureItems = d.languageStructures.filter(
+    (item) =>
+      hasText(item.name) ||
+      hasText(item.howItAppears) ||
+      hasText(item.journeyRelation) ||
+      hasText(item.avoid) ||
+      hasText(item.example)
+  );
 
   // ─── Hashtags ───────────────────────────────────────────────────────────────
   // Flatten all categories; category name not shown in current presentation
@@ -178,7 +182,7 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
     contentFormats.length > 0 ||
     strategicStories.length > 0 ||
     editorialGuidelines.length > 0 ||
-    languageStructures.some((i) => hasText(i.value)) ||
+    languageStructureItems.length > 0 ||
     hashtags.some((i) => hasText(i.value)) ||
     hasText(visualStrategy);
 
@@ -376,7 +380,28 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
           )}
 
           <TextList items={editorialGuidelines} label="Diretrizes editoriais" />
-          <TextList items={languageStructures} label="Estruturas de linguagem" />
+
+          {languageStructureItems.length > 0 && (
+            <div>
+              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                Estruturas de linguagem
+              </p>
+              <div className="divide-y divide-slate-100">
+                {languageStructureItems.map((item) => (
+                  <div key={item.id} className="py-6 first:pt-0">
+                    <PlainTextField label="Nome da estrutura" value={item.name} />
+                    <PlainTextField label="Como aparece na comunicação" value={item.howItAppears} />
+                    <PlainTextField label="Relação com a jornada" value={item.journeyRelation} />
+                    <div className="grid gap-x-8 sm:grid-cols-2">
+                      <PlainTextField label="O que evitar" value={item.avoid} />
+                      <PlainTextField label="Exemplo aplicado" value={item.example} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <TextList items={hashtags} label="Hashtags" />
           <FieldBlock label="Estratégia visual" value={visualStrategy} />
         </SectionCard>
