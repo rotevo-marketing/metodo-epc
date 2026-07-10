@@ -133,6 +133,20 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
       (ref) => hasText(ref.url) || hasText(ref.title) || hasText(ref.description)
     );
 
+  // ─── Indicadores e mensuração ───────────────────────────────────────────────
+  const primaryIndicators: TextItem[] = filterFilledStrings(
+    d.measurement.primaryIndicators
+  ).map((s) => ({ value: s }));
+  const secondaryIndicators: TextItem[] = filterFilledStrings(
+    d.measurement.secondaryIndicators
+  ).map((s) => ({ value: s }));
+  const vanityMetrics: TextItem[] = filterFilledStrings(d.measurement.vanityMetrics).map(
+    (s) => ({ value: s })
+  );
+  const measurementHypotheses: TextItem[] = filterFilledStrings(d.measurement.hypotheses).map(
+    (s) => ({ value: s })
+  );
+
   // ─── Perfil ─────────────────────────────────────────────────────────────────
   const profilePhotoUrl = d.profile.photoUrl;
   const profileHandle = d.profile.handle;
@@ -219,7 +233,20 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
     hasText(d.conversion.commercialChannel) ||
     hasText(d.conversion.crmIntegration);
 
-  const hasVisibleInstagramContent = hasMeaningfulInstagramContent(d) || hasConversionSection;
+  const hasMeasurementSection =
+    primaryIndicators.length > 0 ||
+    secondaryIndicators.length > 0 ||
+    vanityMetrics.length > 0 ||
+    measurementHypotheses.length > 0 ||
+    hasText(d.measurement.weeklyReview) ||
+    hasText(d.measurement.monthlyReview) ||
+    hasText(d.measurement.keepCriterion) ||
+    hasText(d.measurement.adjustCriterion) ||
+    hasText(d.measurement.stopCriterion) ||
+    hasText(d.measurement.baseline);
+
+  const hasVisibleInstagramContent =
+    hasMeaningfulInstagramContent(d) || hasConversionSection || hasMeasurementSection;
 
   // profile.enabled intentionally not used — section shows based on content presence
   const hasProfileSection =
@@ -590,6 +617,60 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
                 <PlainTextField label="Canal comercial" value={d.conversion.commercialChannel} />
               </div>
               <PlainTextField label="Integração com CRM" value={d.conversion.crmIntegration} />
+            </div>
+          )}
+        </SectionCard>
+      )}
+
+      {hasMeasurementSection && (
+        <SectionCard title="Indicadores e mensuração">
+          {(primaryIndicators.length > 0 ||
+            secondaryIndicators.length > 0 ||
+            vanityMetrics.length > 0) && (
+            <div>
+              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                Indicadores de desempenho
+              </p>
+              <TextList items={primaryIndicators} label="Indicadores principais" />
+              <TextList items={secondaryIndicators} label="Indicadores secundários" />
+              <TextList items={vanityMetrics} label="Métricas de vaidade" />
+            </div>
+          )}
+
+          {(hasText(d.measurement.weeklyReview) || hasText(d.measurement.monthlyReview)) && (
+            <div>
+              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                Rotina de análise
+              </p>
+              <div className="grid gap-x-8 sm:grid-cols-2">
+                <PlainTextField label="Revisão semanal" value={d.measurement.weeklyReview} />
+                <PlainTextField label="Revisão mensal" value={d.measurement.monthlyReview} />
+              </div>
+            </div>
+          )}
+
+          {(hasText(d.measurement.keepCriterion) ||
+            hasText(d.measurement.adjustCriterion) ||
+            hasText(d.measurement.stopCriterion)) && (
+            <div>
+              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                Critérios de decisão
+              </p>
+              <div className="grid gap-x-8 sm:grid-cols-2 lg:grid-cols-3">
+                <PlainTextField label="Critério para manter" value={d.measurement.keepCriterion} />
+                <PlainTextField label="Critério para ajustar" value={d.measurement.adjustCriterion} />
+                <PlainTextField label="Critério para interromper" value={d.measurement.stopCriterion} />
+              </div>
+            </div>
+          )}
+
+          {(hasText(d.measurement.baseline) || measurementHypotheses.length > 0) && (
+            <div>
+              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                Linha de base e hipóteses
+              </p>
+              <PlainTextField label="Linha de base" value={d.measurement.baseline} />
+              <TextList items={measurementHypotheses} label="Hipóteses a testar" />
             </div>
           )}
         </SectionCard>
