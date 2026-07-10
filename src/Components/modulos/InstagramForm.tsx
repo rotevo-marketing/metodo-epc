@@ -18,9 +18,48 @@ import {
 } from "@/lib/normalizeInstagramData";
 import { uploadPlanningMedia } from "@/lib/uploadPlanningMedia";
 
-// ─── Inner components ─────────────────────────────────────────────────────────
+// ─── Navigation ───────────────────────────────────────────────────────────────
 
-function SectionCard({
+const NAV_ITEMS = [
+  { label: "Perfil", id: "instagram-profile" },
+  { label: "Frequência e objetivos", id: "instagram-frequency-objectives" },
+  { label: "Conteúdo", id: "instagram-content" },
+  { label: "Linguagem", id: "instagram-language" },
+  { label: "Direção visual", id: "instagram-visual" },
+  { label: "Referências", id: "instagram-references" },
+];
+
+// ─── FormSection ──────────────────────────────────────────────────────────────
+
+function FormSection({
+  id,
+  title,
+  description,
+  children,
+}: {
+  id: string;
+  title: string;
+  description: string;
+  children: ReactNode;
+}) {
+  return (
+    <section id={id} className="scroll-mt-8 border-t border-slate-100 py-12">
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold tracking-tight text-slate-950">
+          {title}
+        </h2>
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+          {description}
+        </p>
+      </div>
+      <div className="space-y-10">{children}</div>
+    </section>
+  );
+}
+
+// ─── SubSection ───────────────────────────────────────────────────────────────
+
+function SubSection({
   title,
   description,
   children,
@@ -30,19 +69,13 @@ function SectionCard({
   children: ReactNode;
 }) {
   return (
-    <section className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
-      <div>
-        <h2 className="text-base font-semibold text-slate-950">{title}</h2>
-
-        {description ? (
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500">
-            {description}
-          </p>
-        ) : null}
-      </div>
-
-      <div className="mt-6">{children}</div>
-    </section>
+    <div>
+      <h3 className="text-sm font-semibold text-slate-800">{title}</h3>
+      {description && (
+        <p className="mt-1 text-sm leading-6 text-slate-500">{description}</p>
+      )}
+      <div className="mt-4">{children}</div>
+    </div>
   );
 }
 
@@ -553,11 +586,9 @@ export default function InstagramForm({
     });
   }
 
-  // ─── TextListSection ──────────────────────────────────────────────────────────
+  // ─── InlineList ───────────────────────────────────────────────────────────────
 
-  function TextListSection({
-    title,
-    description,
+  function InlineList({
     items,
     onChangeItem,
     onAddItem,
@@ -565,8 +596,6 @@ export default function InstagramForm({
     placeholder,
     buttonLabel,
   }: {
-    title: string;
-    description: string;
     items: string[];
     onChangeItem: (index: number, value: string) => void;
     onAddItem: () => void;
@@ -575,7 +604,7 @@ export default function InstagramForm({
     buttonLabel: string;
   }) {
     return (
-      <SectionCard title={title} description={description}>
+      <div>
         <div className="space-y-3">
           {items.map((item, index) => (
             <div key={index} className="flex gap-3">
@@ -605,11 +634,11 @@ export default function InstagramForm({
         >
           + {buttonLabel}
         </button>
-      </SectionCard>
+      </div>
     );
   }
 
-  // Derived flat lists for TextListSection
+  // Derived flat lists
   const objectiveItems = data.objectives.map((o) => o.objective);
   const storyItems = data.contentArchitecture.stories.map((s) => s.name);
   const reelItems = data.contentArchitecture.formats.map((f) => f.name);
@@ -619,11 +648,30 @@ export default function InstagramForm({
   // ─── JSX ─────────────────────────────────────────────────────────────────────
 
   return (
-    <div className="mt-6 space-y-6">
-      {/* Bio do Instagram */}
-      <SectionCard
-        title="Bio do Instagram"
-        description="Defina os principais elementos da bio do Instagram: arroba, nome do perfil, conteúdo da bio, link, destaques e foto do perfil."
+    <div className="mt-6">
+      {/* ── Navegação interna ── */}
+      <nav className="flex flex-wrap gap-2 rounded-2xl border border-slate-200 bg-white p-3">
+        {NAV_ITEMS.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() =>
+              document
+                .getElementById(item.id)
+                ?.scrollIntoView({ behavior: "smooth" })
+            }
+            className="cursor-pointer rounded-xl px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+          >
+            {item.label}
+          </button>
+        ))}
+      </nav>
+
+      {/* ── 1. Perfil do Instagram ── */}
+      <FormSection
+        id="instagram-profile"
+        title="Perfil do Instagram"
+        description="Configure como o perfil será apresentado visualmente ao público."
       >
         <div className="mb-6 flex justify-end">
           <label className="flex cursor-pointer items-center gap-3 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700">
@@ -777,183 +825,211 @@ export default function InstagramForm({
             </div>
           </div>
         </div>
-      </SectionCard>
+      </FormSection>
 
-      {/* Frequência */}
-      <SectionCard
-        title="Frequência"
-        description="Defina a frequência por formato de conteúdo. Use quantidade e período para deixar a orientação mais clara."
+      {/* ── 2. Frequência e objetivos ── */}
+      <FormSection
+        id="instagram-frequency-objectives"
+        title="Frequência e objetivos"
+        description="Defina a cadência de publicação e os resultados esperados para o canal."
       >
-        <div className="space-y-4">
-          {data.publishing.frequencyItems.map((item, index) => (
-            <div
-              key={item.id}
-              className="grid gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 md:grid-cols-[1fr_160px_180px_1fr_auto]"
-            >
-              <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-600">
-                  Formato
-                </label>
-
-                <input
-                  type="text"
-                  value={item.format}
-                  onChange={(event) =>
-                    updateFrequencyItem(index, "format", event.target.value)
-                  }
-                  placeholder="Ex: Reels"
-                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
-                />
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-600">
-                  Quantidade
-                </label>
-
-                <input
-                  type="text"
-                  value={item.quantity}
-                  onChange={(event) =>
-                    updateFrequencyItem(index, "quantity", event.target.value)
-                  }
-                  placeholder="Ex: 3"
-                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
-                />
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-600">
-                  Período
-                </label>
-
-                <select
-                  value={item.period}
-                  onChange={(event) =>
-                    updateFrequencyItem(index, "period", event.target.value)
-                  }
-                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
-                >
-                  <option value="por dia">por dia</option>
-                  <option value="por semana">por semana</option>
-                  <option value="por mês">por mês</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-600">
-                  Observação
-                </label>
-
-                <input
-                  type="text"
-                  value={item.notes}
-                  onChange={(event) =>
-                    updateFrequencyItem(index, "notes", event.target.value)
-                  }
-                  placeholder="Ex: Priorizar conteúdos de autoridade."
-                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
-                />
-              </div>
-
-              <div className="flex items-end">
-                <button
-                  type="button"
-                  onClick={() => removeFrequencyItem(index)}
-                  className="cursor-pointer rounded-full px-4 py-3 text-sm font-semibold text-red-500 transition hover:bg-red-50"
-                >
-                  Excluir
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <button
-          type="button"
-          onClick={addFrequencyItem}
-          className="mt-5 cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-950 hover:border-slate-950 hover:text-white"
+        <SubSection
+          title="Frequência de publicações"
+          description="Defina a frequência por formato de conteúdo. Use quantidade e período para deixar a orientação mais clara."
         >
-          + Novo formato
-        </button>
-      </SectionCard>
+          <div className="space-y-4">
+            {data.publishing.frequencyItems.map((item, index) => (
+              <div
+                key={item.id}
+                className="grid gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 md:grid-cols-[1fr_160px_180px_1fr_auto]"
+              >
+                <div>
+                  <label className="mb-2 block text-sm font-semibold text-slate-600">
+                    Formato
+                  </label>
 
-      {/* Objetivos */}
-      <TextListSection
-        title="Objetivos"
-        description="Defina os objetivos específicos do conteúdo para o Instagram."
-        items={objectiveItems}
-        onChangeItem={updateObjective}
-        onAddItem={addObjective}
-        onRemoveItem={removeObjective}
-        placeholder="Ex: Aumentar autoridade, gerar leads, fortalecer comunidade..."
-        buttonLabel="Novo objetivo"
-      />
+                  <input
+                    type="text"
+                    value={item.format}
+                    onChange={(event) =>
+                      updateFrequencyItem(index, "format", event.target.value)
+                    }
+                    placeholder="Ex: Reels"
+                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                  />
+                </div>
 
-      {/* Stories */}
-      <TextListSection
-        title="Stories"
-        description="Liste ideias, quadros, formatos e orientações para stories."
-        items={storyItems}
-        onChangeItem={updateStory}
-        onAddItem={addStory}
-        onRemoveItem={removeStory}
-        placeholder="Ex: Bastidores, rotina, perguntas, enquetes, provas sociais..."
-        buttonLabel="Novo story"
-      />
+                <div>
+                  <label className="mb-2 block text-sm font-semibold text-slate-600">
+                    Quantidade
+                  </label>
 
-      {/* Hashtags */}
-      <TextListSection
-        title="Hashtags"
-        description="Registre hashtags importantes para descoberta, nicho, localização, autoridade e temas recorrentes."
-        items={flatHashtags}
-        onChangeItem={updateHashtag}
-        onAddItem={addHashtag}
-        onRemoveItem={removeHashtag}
-        placeholder="Ex: #marketingdigital, #estrategiadeconteudo..."
-        buttonLabel="Nova hashtag"
-      />
+                  <input
+                    type="text"
+                    value={item.quantity}
+                    onChange={(event) =>
+                      updateFrequencyItem(index, "quantity", event.target.value)
+                    }
+                    placeholder="Ex: 3"
+                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                  />
+                </div>
 
-      {/* Reels */}
-      <TextListSection
-        title="Reels"
-        description="Liste ideias, formatos, séries e abordagens para vídeos curtos."
-        items={reelItems}
-        onChangeItem={updateReel}
-        onAddItem={addReel}
-        onRemoveItem={removeReel}
-        placeholder="Ex: Dicas rápidas, mitos e verdades, bastidores, tutoriais..."
-        buttonLabel="Novo Reels"
-      />
+                <div>
+                  <label className="mb-2 block text-sm font-semibold text-slate-600">
+                    Período
+                  </label>
 
-      {/* Estruturas de linguagem */}
-      <TextListSection
-        title="Estruturas de linguagem"
-        description="Descreva estruturas de linguagem adequadas para que o conteúdo do Instagram cumpra seu papel na estratégia."
-        items={languageItems}
-        onChangeItem={updateLanguageStructure}
-        onAddItem={addLanguageStructure}
-        onRemoveItem={removeLanguageStructure}
-        placeholder="Ex: Gancho forte, explicação simples, exemplo prático, chamada final..."
-        buttonLabel="Nova estrutura de linguagem"
-      />
+                  <select
+                    value={item.period}
+                    onChange={(event) =>
+                      updateFrequencyItem(index, "period", event.target.value)
+                    }
+                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                  >
+                    <option value="por dia">por dia</option>
+                    <option value="por semana">por semana</option>
+                    <option value="por mês">por mês</option>
+                  </select>
+                </div>
 
-      {/* Conteúdos */}
-      <TextListSection
-        title="Conteúdos"
-        description="Liste formatos, temas e ideias de conteúdos que podem ser usados no Instagram."
-        items={contentItems}
-        onChangeItem={updateContent}
-        onAddItem={addContent}
-        onRemoveItem={removeContent}
-        placeholder="Ex: Carrosséis educativos, reels de autoridade, posts de prova social..."
-        buttonLabel="Novo conteúdo"
-      />
+                <div>
+                  <label className="mb-2 block text-sm font-semibold text-slate-600">
+                    Observação
+                  </label>
 
-      {/* Identidade visual */}
-      <SectionCard
-        title="Identidade visual"
-        description="Defina o estilo visual do perfil no Instagram, tanto nas imagens quanto nos vídeos e stories. Você pode carregar imagens de referência para exemplificar."
+                  <input
+                    type="text"
+                    value={item.notes}
+                    onChange={(event) =>
+                      updateFrequencyItem(index, "notes", event.target.value)
+                    }
+                    placeholder="Ex: Priorizar conteúdos de autoridade."
+                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                  />
+                </div>
+
+                <div className="flex items-end">
+                  <button
+                    type="button"
+                    onClick={() => removeFrequencyItem(index)}
+                    className="cursor-pointer rounded-full px-4 py-3 text-sm font-semibold text-red-500 transition hover:bg-red-50"
+                  >
+                    Excluir
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <button
+            type="button"
+            onClick={addFrequencyItem}
+            className="mt-5 cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-950 hover:border-slate-950 hover:text-white"
+          >
+            + Novo formato
+          </button>
+        </SubSection>
+
+        <SubSection
+          title="Objetivos"
+          description="Defina os objetivos específicos do conteúdo para o Instagram."
+        >
+          <InlineList
+            items={objectiveItems}
+            onChangeItem={updateObjective}
+            onAddItem={addObjective}
+            onRemoveItem={removeObjective}
+            placeholder="Ex: Aumentar autoridade, gerar leads, fortalecer comunidade..."
+            buttonLabel="Novo objetivo"
+          />
+        </SubSection>
+      </FormSection>
+
+      {/* ── 3. Arquitetura de conteúdo ── */}
+      <FormSection
+        id="instagram-content"
+        title="Arquitetura de conteúdo"
+        description="Organize os formatos, temas e possibilidades editoriais do Instagram."
+      >
+        <SubSection
+          title="Stories"
+          description="Liste ideias, quadros, formatos e orientações para stories."
+        >
+          <InlineList
+            items={storyItems}
+            onChangeItem={updateStory}
+            onAddItem={addStory}
+            onRemoveItem={removeStory}
+            placeholder="Ex: Bastidores, rotina, perguntas, enquetes, provas sociais..."
+            buttonLabel="Novo story"
+          />
+        </SubSection>
+
+        <SubSection
+          title="Reels"
+          description="Liste ideias, formatos, séries e abordagens para vídeos curtos."
+        >
+          <InlineList
+            items={reelItems}
+            onChangeItem={updateReel}
+            onAddItem={addReel}
+            onRemoveItem={removeReel}
+            placeholder="Ex: Dicas rápidas, mitos e verdades, bastidores, tutoriais..."
+            buttonLabel="Novo Reels"
+          />
+        </SubSection>
+
+        <SubSection
+          title="Conteúdos"
+          description="Liste formatos, temas e ideias de conteúdos que podem ser usados no Instagram."
+        >
+          <InlineList
+            items={contentItems}
+            onChangeItem={updateContent}
+            onAddItem={addContent}
+            onRemoveItem={removeContent}
+            placeholder="Ex: Carrosséis educativos, reels de autoridade, posts de prova social..."
+            buttonLabel="Novo conteúdo"
+          />
+        </SubSection>
+
+        <SubSection
+          title="Hashtags"
+          description="Registre hashtags importantes para descoberta, nicho, localização, autoridade e temas recorrentes."
+        >
+          <InlineList
+            items={flatHashtags}
+            onChangeItem={updateHashtag}
+            onAddItem={addHashtag}
+            onRemoveItem={removeHashtag}
+            placeholder="Ex: #marketingdigital, #estrategiadeconteudo..."
+            buttonLabel="Nova hashtag"
+          />
+        </SubSection>
+      </FormSection>
+
+      {/* ── 4. Estrutura de linguagem ── */}
+      <FormSection
+        id="instagram-language"
+        title="Estrutura de linguagem"
+        description="Registre como a comunicação deve aparecer nos conteúdos do canal."
+      >
+        <InlineList
+          items={languageItems}
+          onChangeItem={updateLanguageStructure}
+          onAddItem={addLanguageStructure}
+          onRemoveItem={removeLanguageStructure}
+          placeholder="Ex: Gancho forte, explicação simples, exemplo prático, chamada final..."
+          buttonLabel="Nova estrutura de linguagem"
+        />
+      </FormSection>
+
+      {/* ── 5. Direção visual ── */}
+      <FormSection
+        id="instagram-visual"
+        title="Direção visual"
+        description="Defina a aparência, as referências e a sensação transmitida pelo perfil."
       >
         <div>
           <label className="mb-2 block text-sm font-semibold text-slate-600">
@@ -976,7 +1052,7 @@ export default function InstagramForm({
         </div>
 
         {data.visualDirection.references.length > 0 && (
-          <div className="mt-6 grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-3">
             {data.visualDirection.references.map((reference, index) => (
               <div
                 key={reference.id}
@@ -1027,7 +1103,7 @@ export default function InstagramForm({
           </div>
         )}
 
-        <div className="mt-4 flex items-center gap-4">
+        <div className="flex items-center gap-4">
           <button
             type="button"
             onClick={addVisualReferenceSlot}
@@ -1040,12 +1116,13 @@ export default function InstagramForm({
             Tamanho recomendado para imagem de feed: 1080x1350px.
           </p>
         </div>
-      </SectionCard>
+      </FormSection>
 
-      {/* Anexos e referências externas */}
-      <SectionCard
-        title="Anexos e referências externas"
-        description="Referências externas são opcionais, mas ajudam quem está visualizando o planejamento a entender melhor a estratégia do Instagram."
+      {/* ── 6. Referências externas ── */}
+      <FormSection
+        id="instagram-references"
+        title="Referências externas"
+        description="Centralize links e materiais que apoiam a estratégia do Instagram."
       >
         <div className="space-y-4">
           {data.externalReferences.map((reference, index) => (
@@ -1105,9 +1182,9 @@ export default function InstagramForm({
         >
           + Nova referência
         </button>
-      </SectionCard>
+      </FormSection>
 
-      {/* Sticky save bar */}
+      {/* ── Sticky save bar ── */}
       <div className="sticky bottom-0 rounded-[1.5rem] border border-slate-200 bg-white/95 p-5 shadow-sm backdrop-blur">
         <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           <Link
