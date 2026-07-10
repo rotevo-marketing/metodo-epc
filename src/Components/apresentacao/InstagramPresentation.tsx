@@ -5,13 +5,11 @@ import {
 import { PresentationHeader } from "./PresentationHeader";
 import {
   TextList,
-  VisualRefGrid,
   ExternalRefList,
   FieldBlock,
   SectionCard,
   EmptyState,
   TextItem,
-  VisualRef,
   ExtRef,
 } from "./ChannelPresentationShared";
 
@@ -123,17 +121,17 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
     filterFilledStrings(cat.hashtags).map((h) => ({ value: h }))
   );
 
-  // ─── Estratégia visual ──────────────────────────────────────────────────────
-  // Rich Text HTML preserved; rendered via FieldBlock inside "Conteúdo e linguagem"
+  // ─── Direção visual ─────────────────────────────────────────────────────────
   // generalStrategy (v2) ← visualStrategy (v1 legacy)
   const visualStrategy = d.visualDirection.generalStrategy;
 
-  // ─── Referências visuais ────────────────────────────────────────────────────
-  // Adapter: references[].url → VisualRef.image
+  // spread before sort to avoid mutating d.visualDirection.references
   // url (v2) ← visualReferences[].image (v1 legacy)
-  const visualReferences: VisualRef[] = d.visualDirection.references.map((ref) => ({
-    image: ref.url,
-  }));
+  const visualReferenceItems = [...d.visualDirection.references]
+    .sort((a, b) => a.order - b.order)
+    .filter(
+      (ref) => hasText(ref.url) || hasText(ref.title) || hasText(ref.description)
+    );
 
   // ─── Perfil ─────────────────────────────────────────────────────────────────
   const profilePhotoUrl = d.profile.photoUrl;
@@ -183,10 +181,22 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
     strategicStories.length > 0 ||
     editorialGuidelines.length > 0 ||
     languageStructureItems.length > 0 ||
-    hashtags.some((i) => hasText(i.value)) ||
-    hasText(visualStrategy);
+    hashtags.some((i) => hasText(i.value));
 
-  const hasVisualReferencesSection = visualReferences.some((r) => hasText(r.image));
+  const hasVisualDirectionSection =
+    hasText(visualStrategy) ||
+    hasText(d.visualDirection.humanPresence) ||
+    hasText(d.visualDirection.specialistRole) ||
+    hasText(d.visualDirection.backstage) ||
+    hasText(d.visualDirection.socialProof) ||
+    hasText(d.visualDirection.dataUsage) ||
+    hasText(d.visualDirection.informationHierarchy) ||
+    hasText(d.visualDirection.visualDensity) ||
+    hasText(d.visualDirection.desiredFeeling) ||
+    hasText(d.visualDirection.formatConsistency) ||
+    hasText(d.visualDirection.journeyAdaptation) ||
+    hasText(d.visualDirection.avoid) ||
+    visualReferenceItems.length > 0;
 
   // profile.enabled intentionally not used — section shows based on content presence
   const hasProfileSection =
@@ -403,13 +413,101 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
           )}
 
           <TextList items={hashtags} label="Hashtags" />
-          <FieldBlock label="Estratégia visual" value={visualStrategy} />
         </SectionCard>
       )}
 
-      {hasVisualReferencesSection && (
-        <SectionCard title="Referências visuais">
-          <VisualRefGrid refs={visualReferences} />
+      {hasVisualDirectionSection && (
+        <SectionCard title="Direção visual">
+          <FieldBlock label="Estratégia visual do canal" value={visualStrategy} />
+
+          {(hasText(d.visualDirection.humanPresence) ||
+            hasText(d.visualDirection.specialistRole) ||
+            hasText(d.visualDirection.backstage) ||
+            hasText(d.visualDirection.socialProof) ||
+            hasText(d.visualDirection.dataUsage)) && (
+            <div>
+              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                Presença e construção de autoridade
+              </p>
+              <div className="grid gap-x-8 sm:grid-cols-2">
+                <PlainTextField label="Presença humana" value={d.visualDirection.humanPresence} />
+                <PlainTextField label="Papel visual do especialista" value={d.visualDirection.specialistRole} />
+              </div>
+              <div className="grid gap-x-8 sm:grid-cols-2">
+                <PlainTextField label="Bastidores" value={d.visualDirection.backstage} />
+                <PlainTextField label="Provas e depoimentos" value={d.visualDirection.socialProof} />
+              </div>
+              <PlainTextField label="Uso de dados" value={d.visualDirection.dataUsage} />
+            </div>
+          )}
+
+          {(hasText(d.visualDirection.informationHierarchy) ||
+            hasText(d.visualDirection.visualDensity) ||
+            hasText(d.visualDirection.desiredFeeling)) && (
+            <div>
+              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                Organização visual dos conteúdos
+              </p>
+              <div className="grid gap-x-8 sm:grid-cols-2">
+                <PlainTextField label="Hierarquia da informação" value={d.visualDirection.informationHierarchy} />
+                <PlainTextField label="Densidade visual" value={d.visualDirection.visualDensity} />
+              </div>
+              <PlainTextField label="Sensação desejada" value={d.visualDirection.desiredFeeling} />
+            </div>
+          )}
+
+          {(hasText(d.visualDirection.formatConsistency) ||
+            hasText(d.visualDirection.journeyAdaptation) ||
+            hasText(d.visualDirection.avoid)) && (
+            <div>
+              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                Consistência e adaptação
+              </p>
+              <div className="grid gap-x-8 sm:grid-cols-2">
+                <PlainTextField label="Consistência entre formatos" value={d.visualDirection.formatConsistency} />
+                <PlainTextField label="Adaptação visual à jornada" value={d.visualDirection.journeyAdaptation} />
+              </div>
+              <PlainTextField label="O que evitar" value={d.visualDirection.avoid} />
+            </div>
+          )}
+
+          {visualReferenceItems.length > 0 && (
+            <div>
+              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                Referências visuais
+              </p>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {visualReferenceItems.map((ref) => (
+                  <div
+                    key={ref.id}
+                    className="overflow-hidden rounded-2xl bg-slate-50 ring-1 ring-slate-200"
+                  >
+                    {hasText(ref.url) && (
+                      // img used intentionally: url may be a base64 data URL (legacy) or HTTPS URL
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={ref.url}
+                        alt={hasText(ref.title) ? ref.title : "Referência visual do Instagram"}
+                        className="aspect-square w-full object-cover"
+                      />
+                    )}
+                    {(hasText(ref.title) || hasText(ref.description)) && (
+                      <div className="p-4">
+                        {hasText(ref.title) && (
+                          <p className="text-sm font-medium text-slate-950">{ref.title}</p>
+                        )}
+                        {hasText(ref.description) && (
+                          <p className="mt-1 whitespace-pre-wrap text-xs leading-5 text-slate-600">
+                            {ref.description}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </SectionCard>
       )}
 
