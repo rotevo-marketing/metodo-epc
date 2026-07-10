@@ -81,6 +81,165 @@ function SubSection({
   );
 }
 
+// ─── InstagramProfilePreview ──────────────────────────────────────────────────
+
+type InstagramProfilePreviewProps = {
+  profile: InstagramData["profile"];
+};
+
+function InstagramProfilePreview({ profile }: InstagramProfilePreviewProps) {
+  const initials = profile.displayName
+    ? profile.displayName
+        .split(" ")
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((w) => w[0].toUpperCase())
+        .join("")
+    : "";
+
+  const sortedLinks = [...profile.linkItems]
+    .sort((a, b) => a.order - b.order)
+    .filter((l) => l.title.trim() || l.url.trim());
+
+  const sortedHighlights = [...profile.highlights]
+    .sort((a, b) => a.order - b.order)
+    .filter((h) => h.title.trim() || h.purpose.trim() || h.imageUrl.trim());
+
+  return (
+    <div className="lg:sticky lg:top-8">
+      <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-slate-500">
+        Pré-visualização do perfil
+      </p>
+      <p className="mb-3 text-xs text-slate-400">
+        A visualização é atualizada conforme os campos são preenchidos.
+      </p>
+
+      <div
+        aria-label="Pré-visualização do perfil do Instagram"
+        className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
+      >
+        {/* Profile header */}
+        <div className="p-5">
+          <div className="flex items-center gap-4">
+            {/* Photo */}
+            <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-100">
+              {profile.photoUrl ? (
+                <img
+                  src={profile.photoUrl}
+                  alt={profile.displayName || "Foto do perfil"}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <span className="text-sm font-semibold text-slate-400">
+                  {initials || "?"}
+                </span>
+              )}
+            </div>
+
+            {/* Name + handle */}
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-bold text-slate-900">
+                {profile.displayName || (
+                  <span className="font-normal text-slate-300">Nome do perfil</span>
+                )}
+              </p>
+              <p className="mt-0.5 truncate text-xs text-slate-500">
+                {profile.handle || (
+                  <span className="text-slate-300">@nomedoperfil</span>
+                )}
+              </p>
+            </div>
+          </div>
+
+          {/* Bio-dependent content */}
+          {profile.enabled ? (
+            <div className="mt-4 space-y-3">
+              {/* Bio HTML */}
+              {profile.bio ? (
+                <div
+                  className="text-xs leading-5 text-slate-700 [&_em]:italic [&_ol]:list-decimal [&_ol]:pl-4 [&_p]:mb-1 [&_strong]:font-semibold [&_ul]:list-disc [&_ul]:pl-4"
+                  dangerouslySetInnerHTML={{ __html: profile.bio }}
+                />
+              ) : (
+                <p className="text-xs italic text-slate-300">
+                  A descrição estratégica do perfil aparecerá aqui.
+                </p>
+              )}
+
+              {/* Main link */}
+              {profile.mainLink && (
+                <p className="text-xs text-slate-500">
+                  <span className="font-semibold text-slate-700">Link: </span>
+                  <span className="break-all">{profile.mainLink}</span>
+                </p>
+              )}
+
+              {/* Additional links */}
+              {sortedLinks.length > 0 && (
+                <div className="space-y-1.5">
+                  {sortedLinks.map((link) => (
+                    <div
+                      key={link.id}
+                      aria-label={
+                        link.url
+                          ? `${link.title || link.url}: ${link.url}`
+                          : link.title
+                      }
+                      className="truncate rounded-xl bg-slate-50 px-3 py-2 text-xs text-slate-700"
+                    >
+                      {link.title || link.url}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <p className="mt-4 text-xs italic text-slate-400">
+              A bio está desativada neste planejamento.
+            </p>
+          )}
+        </div>
+
+        {/* Highlights */}
+        {profile.enabled && sortedHighlights.length > 0 && (
+          <div className="border-t border-slate-100 px-5 py-4">
+            <div className="flex gap-4 overflow-x-auto pb-1">
+              {sortedHighlights.map((h) => (
+                <div
+                  key={h.id}
+                  aria-label={
+                    h.purpose
+                      ? `${h.title || "Destaque"} — ${h.purpose}`
+                      : h.title || "Destaque"
+                  }
+                  className="flex flex-shrink-0 flex-col items-center gap-1.5"
+                >
+                  <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-slate-100 ring-2 ring-slate-200">
+                    {h.imageUrl ? (
+                      <img
+                        src={h.imageUrl}
+                        alt={h.title || "Destaque"}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-xs font-semibold text-slate-400">
+                        {h.title ? h.title[0].toUpperCase() : "•"}
+                      </span>
+                    )}
+                  </div>
+                  <span className="w-14 truncate text-center text-xs text-slate-600">
+                    {h.title || "Destaque"}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 type InstagramFormProps = {
@@ -918,6 +1077,8 @@ export default function InstagramForm({
         title="Perfil do Instagram"
         description="Configure como o perfil será apresentado visualmente ao público."
       >
+        <div className="grid gap-10 lg:grid-cols-[1fr_320px] lg:items-start">
+          <div className="space-y-10">
         {/* SubSection 1: Identificação */}
         <SubSection
           title="Identificação do perfil"
@@ -1299,6 +1460,11 @@ export default function InstagramForm({
             </div>
           )}
         </SubSection>
+          </div>
+          <div>
+            <InstagramProfilePreview profile={data.profile} />
+          </div>
+        </div>
       </FormSection>
 
       {/* ── 2. Frequência e objetivos ── */}
