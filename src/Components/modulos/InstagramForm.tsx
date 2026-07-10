@@ -6,7 +6,6 @@ import type { Dispatch, SetStateAction } from "react";
 import RichTextEditor from "@/Components/RichTextEditor";
 import type { InstagramData } from "@/types/instagram";
 import {
-  createInstagramItemId,
   createEmptyInstagramFrequencyItem,
   createEmptyInstagramObjective,
   createEmptyInstagramStoryFormat,
@@ -15,6 +14,8 @@ import {
   createEmptyInstagramHashtagCategory,
   createEmptyInstagramImageReference,
   createEmptyInstagramExternalReference,
+  createEmptyInstagramProfileLink,
+  createEmptyInstagramHighlight,
 } from "@/lib/normalizeInstagramData";
 import { uploadPlanningMedia } from "@/lib/uploadPlanningMedia";
 
@@ -109,19 +110,8 @@ export default function InstagramForm({
   const [profilePhotoError, setProfilePhotoError] = useState("");
   const [uploadingRefIndex, setUploadingRefIndex] = useState<number | null>(null);
   const [refUploadErrors, setRefUploadErrors] = useState<Record<number, string>>({});
-
-  // ─── Highlights controlled value ────────────────────────────────────────────
-  // legacy.originalHighlights holds the raw comma-separated string typed by the user.
-  // If it was never set, derive the display value from profile.highlights.
-
-  const highlightsInputValue =
-    data.legacy?.originalHighlights !== undefined
-      ? data.legacy.originalHighlights
-      : data.profile.highlights
-          .slice()
-          .sort((a, b) => a.order - b.order)
-          .map((h) => h.title)
-          .join(", ");
+  const [uploadingHighlightId, setUploadingHighlightId] = useState<string | null>(null);
+  const [highlightUploadErrors, setHighlightUploadErrors] = useState<Record<string, string>>({});
 
   // ─── Frequency handlers ─────────────────────────────────────────────────────
 
@@ -545,48 +535,6 @@ export default function InstagramForm({
     }));
   }
 
-  // ─── Highlights handler ───────────────────────────────────────────────────────
-
-  function updateHighlights(rawValue: string) {
-    setData((current) => {
-      const parts = rawValue.split(",").map((p) => p.trim());
-
-      // Remove trailing empty parts (from a trailing comma) before generating highlights,
-      // but keep at least one element.
-      const trimmedParts = [...parts];
-      while (trimmedParts.length > 1 && trimmedParts[trimmedParts.length - 1] === "") {
-        trimmedParts.pop();
-      }
-
-      const existingHighlights = current.profile.highlights
-        .slice()
-        .sort((a, b) => a.order - b.order);
-
-      const nextHighlights = trimmedParts.map((title, i) => {
-        const existing = existingHighlights[i];
-        if (existing) {
-          return { ...existing, title, order: i };
-        }
-        return {
-          id: createInstagramItemId(),
-          title,
-          purpose: "",
-          imageUrl: "",
-          order: i,
-        };
-      });
-
-      return {
-        ...current,
-        profile: {
-          ...current.profile,
-          highlights: nextHighlights.filter((h) => h.title.length > 0),
-        },
-        legacy: { ...current.legacy, originalHighlights: rawValue },
-      };
-    });
-  }
-
   // ─── Strategic direction handler ─────────────────────────────────────────────
 
   function updateStrategicDirection(
@@ -598,6 +546,177 @@ export default function InstagramForm({
       strategicDirection: {
         ...current.strategicDirection,
         [key]: value,
+      },
+    }));
+  }
+
+  // ─── Link items handlers ──────────────────────────────────────────────────────
+
+  function updateLinkItem(id: string, key: "title" | "url", value: string) {
+    setData((current) => ({
+      ...current,
+      profile: {
+        ...current.profile,
+        linkItems: current.profile.linkItems.map((l) =>
+          l.id === id ? { ...l, [key]: value } : l
+        ),
+      },
+    }));
+  }
+
+  function addLinkItem() {
+    setData((current) => {
+      const newLink = {
+        ...createEmptyInstagramProfileLink(),
+        order: current.profile.linkItems.length,
+      };
+      return {
+        ...current,
+        profile: {
+          ...current.profile,
+          linkItems: [...current.profile.linkItems, newLink],
+        },
+      };
+    });
+  }
+
+  function removeLinkItem(id: string) {
+    setData((current) => {
+      const reordered = current.profile.linkItems
+        .filter((l) => l.id !== id)
+        .map((l, i) => ({ ...l, order: i }));
+      return {
+        ...current,
+        profile: { ...current.profile, linkItems: reordered },
+      };
+    });
+  }
+
+  function moveLinkItem(id: string, direction: "up" | "down") {
+    setData((current) => {
+      const sorted = [...current.profile.linkItems].sort((a, b) => a.order - b.order);
+      const index = sorted.findIndex((l) => l.id === id);
+      if (index === -1) return current;
+      const targetIndex = direction === "up" ? index - 1 : index + 1;
+      if (targetIndex < 0 || targetIndex >= sorted.length) return current;
+      [sorted[index], sorted[targetIndex]] = [sorted[targetIndex], sorted[index]];
+      const reordered = sorted.map((l, i) => ({ ...l, order: i }));
+      return { ...current, profile: { ...current.profile, linkItems: reordered } };
+    });
+  }
+
+  // ─── Highlights handlers ──────────────────────────────────────────────────────
+
+  function updateHighlight(id: string, key: "title" | "purpose", value: string) {
+    setData((current) => ({
+      ...current,
+      profile: {
+        ...current.profile,
+        highlights: current.profile.highlights.map((h) =>
+          h.id === id ? { ...h, [key]: value } : h
+        ),
+      },
+    }));
+  }
+
+  function addHighlight() {
+    setData((current) => {
+      const newHighlight = {
+        ...createEmptyInstagramHighlight(),
+        order: current.profile.highlights.length,
+      };
+      return {
+        ...current,
+        profile: {
+          ...current.profile,
+          highlights: [...current.profile.highlights, newHighlight],
+        },
+      };
+    });
+  }
+
+  function removeHighlight(id: string) {
+    setData((current) => {
+      const reordered = current.profile.highlights
+        .filter((h) => h.id !== id)
+        .map((h, i) => ({ ...h, order: i }));
+      return {
+        ...current,
+        profile: { ...current.profile, highlights: reordered },
+      };
+    });
+    setHighlightUploadErrors((current) => {
+      const next = { ...current };
+      delete next[id];
+      return next;
+    });
+    if (uploadingHighlightId === id) {
+      setUploadingHighlightId(null);
+    }
+  }
+
+  function moveHighlight(id: string, direction: "up" | "down") {
+    setData((current) => {
+      const sorted = [...current.profile.highlights].sort((a, b) => a.order - b.order);
+      const index = sorted.findIndex((h) => h.id === id);
+      if (index === -1) return current;
+      const targetIndex = direction === "up" ? index - 1 : index + 1;
+      if (targetIndex < 0 || targetIndex >= sorted.length) return current;
+      [sorted[index], sorted[targetIndex]] = [sorted[targetIndex], sorted[index]];
+      const reordered = sorted.map((h, i) => ({ ...h, order: i }));
+      return { ...current, profile: { ...current.profile, highlights: reordered } };
+    });
+  }
+
+  async function uploadHighlightImage(
+    id: string,
+    event: ChangeEvent<HTMLInputElement>
+  ) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setUploadingHighlightId(id);
+    setHighlightUploadErrors((current) => {
+      const next = { ...current };
+      delete next[id];
+      return next;
+    });
+
+    try {
+      const { url } = await uploadPlanningMedia({
+        file,
+        planningProjectId,
+        category: "highlights",
+      });
+
+      setData((current) => ({
+        ...current,
+        profile: {
+          ...current.profile,
+          highlights: current.profile.highlights.map((h) =>
+            h.id === id ? { ...h, imageUrl: url } : h
+          ),
+        },
+      }));
+    } catch (err) {
+      setHighlightUploadErrors((current) => ({
+        ...current,
+        [id]: err instanceof Error ? err.message : "Erro ao enviar imagem.",
+      }));
+    } finally {
+      setUploadingHighlightId(null);
+      event.target.value = "";
+    }
+  }
+
+  function removeHighlightImage(id: string) {
+    setData((current) => ({
+      ...current,
+      profile: {
+        ...current.profile,
+        highlights: current.profile.highlights.map((h) =>
+          h.id === id ? { ...h, imageUrl: "" } : h
+        ),
       },
     }));
   }
@@ -799,70 +918,73 @@ export default function InstagramForm({
         title="Perfil do Instagram"
         description="Configure como o perfil será apresentado visualmente ao público."
       >
-        <div className="mb-6 flex justify-end">
-          <label className="flex cursor-pointer items-center gap-3 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700">
-            <input
-              type="checkbox"
-              checked={data.profile.enabled}
-              onChange={(event) =>
-                setData((current) => ({
-                  ...current,
-                  profile: { ...current.profile, enabled: event.target.checked },
-                }))
-              }
-              className="h-4 w-4 rounded border-slate-300"
-            />
-            Ativar bio
-          </label>
-        </div>
-
-        <div className="grid gap-6 md:grid-cols-[150px_1fr] md:items-start">
-          <div>
-            <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-full bg-slate-950 text-xs font-semibold text-white">
-              {data.profile.photoUrl ? (
-                <img
-                  src={data.profile.photoUrl}
-                  alt="Foto do perfil"
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                "Foto"
-              )}
-            </div>
-
-            <div className="mt-3 flex flex-col gap-2">
-              <label className="cursor-pointer rounded-full bg-slate-950 px-4 py-2 text-center text-xs font-semibold text-white transition hover:bg-slate-800">
-                {uploadingProfilePhoto ? "Enviando..." : "Escolher foto"}
-                <input
-                  type="file"
-                  accept="image/png,image/jpeg,image/webp"
-                  onChange={uploadBioPhoto}
-                  disabled={uploadingProfilePhoto}
-                  className="hidden"
-                />
-              </label>
-
-              <button
-                type="button"
-                onClick={removeBioPhoto}
-                className="cursor-pointer rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-600 transition hover:bg-slate-100"
-              >
-                Remover
-              </button>
-
-              {profilePhotoError && (
-                <p className="text-xs text-red-500">{profilePhotoError}</p>
-              )}
-            </div>
+        {/* SubSection 1: Identificação */}
+        <SubSection
+          title="Identificação do perfil"
+          description="Dados básicos de identificação do perfil no Instagram."
+        >
+          <div className="mb-4 flex justify-end">
+            <label className="flex cursor-pointer items-center gap-3 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700">
+              <input
+                type="checkbox"
+                checked={data.profile.enabled}
+                onChange={(event) =>
+                  setData((current) => ({
+                    ...current,
+                    profile: { ...current.profile, enabled: event.target.checked },
+                  }))
+                }
+                className="h-4 w-4 rounded border-slate-300"
+              />
+              Ativar bio
+            </label>
           </div>
 
-          <div className="grid gap-4">
+          <div className="grid gap-6 md:grid-cols-[150px_1fr] md:items-start">
+            <div>
+              <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-full bg-slate-950 text-xs font-semibold text-white">
+                {data.profile.photoUrl ? (
+                  <img
+                    src={data.profile.photoUrl}
+                    alt="Foto do perfil"
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  "Foto"
+                )}
+              </div>
+
+              <div className="mt-3 flex flex-col gap-2">
+                <label className="cursor-pointer rounded-full bg-slate-950 px-4 py-2 text-center text-xs font-semibold text-white transition hover:bg-slate-800">
+                  {uploadingProfilePhoto ? "Enviando..." : "Escolher foto"}
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    onChange={uploadBioPhoto}
+                    disabled={uploadingProfilePhoto}
+                    className="hidden"
+                  />
+                </label>
+
+                <button
+                  type="button"
+                  onClick={removeBioPhoto}
+                  className="cursor-pointer rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-600 transition hover:bg-slate-100"
+                >
+                  Remover
+                </button>
+
+                {profilePhotoError && (
+                  <p className="text-xs text-red-500">{profilePhotoError}</p>
+                )}
+              </div>
+            </div>
+
             <div className="grid gap-4 md:grid-cols-2">
               <div>
                 <label className="mb-2 block text-sm font-semibold text-slate-600">
                   Arroba do perfil
                 </label>
-
                 <input
                   type="text"
                   value={data.profile.handle}
@@ -876,22 +998,17 @@ export default function InstagramForm({
                   className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
                 />
               </div>
-
               <div>
                 <label className="mb-2 block text-sm font-semibold text-slate-600">
                   Nome do perfil
                 </label>
-
                 <input
                   type="text"
                   value={data.profile.displayName}
                   onChange={(event) =>
                     setData((current) => ({
                       ...current,
-                      profile: {
-                        ...current.profile,
-                        displayName: event.target.value,
-                      },
+                      profile: { ...current.profile, displayName: event.target.value },
                     }))
                   }
                   placeholder="Ex: Nome do especialista ou da marca"
@@ -899,12 +1016,19 @@ export default function InstagramForm({
                 />
               </div>
             </div>
+          </div>
+        </SubSection>
 
+        {/* SubSection 2: Biografia */}
+        <SubSection
+          title="Biografia"
+          description="Texto da bio e link principal exibido no perfil."
+        >
+          <div className="space-y-4">
             <div>
               <label className="mb-2 block text-sm font-semibold text-slate-600">
                 Conteúdo da bio
               </label>
-
               <RichTextEditor
                 value={data.profile.bio}
                 onChange={(value) =>
@@ -916,12 +1040,10 @@ export default function InstagramForm({
                 placeholder="Escreva uma sugestão de bio para o Instagram."
               />
             </div>
-
             <div>
               <label className="mb-2 block text-sm font-semibold text-slate-600">
-                Link da bio
+                Link principal
               </label>
-
               <input
                 type="url"
                 value={data.profile.mainLink}
@@ -935,22 +1057,248 @@ export default function InstagramForm({
                 className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
               />
             </div>
-
-            <div>
-              <label className="mb-2 block text-sm font-semibold text-slate-600">
-                Destaques sugeridos
-              </label>
-
-              <input
-                type="text"
-                value={highlightsInputValue}
-                onChange={(event) => updateHighlights(event.target.value)}
-                placeholder="Ex: Sobre, Serviços, Depoimentos, Conteúdos, Contato..."
-                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
-              />
-            </div>
           </div>
-        </div>
+        </SubSection>
+
+        {/* SubSection 3: Links do perfil */}
+        <SubSection
+          title="Links do perfil"
+          description="Lista de links adicionais que poderão ser exibidos em uma página de menu."
+        >
+          {data.profile.linkItems.length === 0 ? (
+            <div className="space-y-3">
+              <p className="text-sm text-slate-400">Nenhum link adicional cadastrado.</p>
+              <button
+                type="button"
+                onClick={addLinkItem}
+                className="cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-950 hover:bg-slate-950 hover:text-white"
+              >
+                + Adicionar link
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {data.profile.linkItems
+                .slice()
+                .sort((a, b) => a.order - b.order)
+                .map((link, index, sorted) => (
+                  <div
+                    key={link.id}
+                    className="grid gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 md:grid-cols-[1fr_1fr_auto]"
+                  >
+                    <div>
+                      <label className="mb-2 block text-sm font-semibold text-slate-600">
+                        Título do link
+                      </label>
+                      <input
+                        type="text"
+                        value={link.title}
+                        onChange={(event) =>
+                          updateLinkItem(link.id, "title", event.target.value)
+                        }
+                        placeholder="Ex: Site, Portfólio, WhatsApp..."
+                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-sm font-semibold text-slate-600">
+                        URL
+                      </label>
+                      <input
+                        type="url"
+                        value={link.url}
+                        onChange={(event) =>
+                          updateLinkItem(link.id, "url", event.target.value)
+                        }
+                        placeholder="https://..."
+                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                      />
+                    </div>
+                    <div className="flex flex-col items-end justify-between gap-2">
+                      <button
+                        type="button"
+                        onClick={() => moveLinkItem(link.id, "up")}
+                        disabled={index === 0}
+                        className="cursor-pointer rounded-full px-3 py-2 text-xs font-semibold text-slate-500 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        ↑
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => moveLinkItem(link.id, "down")}
+                        disabled={index === sorted.length - 1}
+                        className="cursor-pointer rounded-full px-3 py-2 text-xs font-semibold text-slate-500 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        ↓
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeLinkItem(link.id)}
+                        className="cursor-pointer rounded-full px-3 py-2 text-xs font-semibold text-red-500 transition hover:bg-red-50"
+                      >
+                        Excluir
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              <button
+                type="button"
+                onClick={addLinkItem}
+                className="cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-950 hover:bg-slate-950 hover:text-white"
+              >
+                + Adicionar link
+              </button>
+            </div>
+          )}
+        </SubSection>
+
+        {/* SubSection 4: Destaques */}
+        <SubSection
+          title="Destaques"
+          description="Destaques fixos exibidos no perfil do Instagram."
+        >
+          {data.profile.highlights.length === 0 ? (
+            <div className="space-y-3">
+              <p className="text-sm text-slate-400">Nenhum destaque cadastrado.</p>
+              <button
+                type="button"
+                onClick={addHighlight}
+                className="cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-950 hover:bg-slate-950 hover:text-white"
+              >
+                + Adicionar destaque
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {data.profile.highlights
+                .slice()
+                .sort((a, b) => a.order - b.order)
+                .map((highlight, index, sorted) => (
+                  <div
+                    key={highlight.id}
+                    className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+                  >
+                    <div className="flex gap-4">
+                      <div className="flex-shrink-0">
+                        <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-slate-200">
+                          {highlight.imageUrl ? (
+                            <img
+                              src={highlight.imageUrl}
+                              alt={highlight.title || "Destaque"}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <span className="text-xs text-slate-400">Sem imagem</span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="grid flex-1 gap-3 md:grid-cols-2">
+                        <div>
+                          <label className="mb-2 block text-sm font-semibold text-slate-600">
+                            Nome do destaque
+                          </label>
+                          <input
+                            type="text"
+                            value={highlight.title}
+                            onChange={(event) =>
+                              updateHighlight(highlight.id, "title", event.target.value)
+                            }
+                            placeholder="Ex: Sobre, Serviços, Depoimentos..."
+                            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                          />
+                        </div>
+                        <div>
+                          <label className="mb-2 block text-sm font-semibold text-slate-600">
+                            Função
+                          </label>
+                          <input
+                            type="text"
+                            value={highlight.purpose}
+                            onChange={(event) =>
+                              updateHighlight(highlight.id, "purpose", event.target.value)
+                            }
+                            placeholder="Ex: Apresentar o especialista, mostrar serviços..."
+                            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex flex-shrink-0 flex-col items-end justify-between gap-2">
+                        <button
+                          type="button"
+                          onClick={() => moveHighlight(highlight.id, "up")}
+                          disabled={index === 0}
+                          className="cursor-pointer rounded-full px-3 py-2 text-xs font-semibold text-slate-500 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          ↑
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => moveHighlight(highlight.id, "down")}
+                          disabled={index === sorted.length - 1}
+                          className="cursor-pointer rounded-full px-3 py-2 text-xs font-semibold text-slate-500 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          ↓
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => removeHighlight(highlight.id)}
+                          className="cursor-pointer rounded-full px-3 py-2 text-xs font-semibold text-red-500 transition hover:bg-red-50"
+                        >
+                          Excluir
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 flex flex-wrap items-center gap-3">
+                      <label
+                        className={`cursor-pointer rounded-full px-4 py-2 text-xs font-semibold transition ${
+                          uploadingHighlightId === highlight.id
+                            ? "bg-slate-200 text-slate-500"
+                            : "bg-slate-950 text-white hover:bg-slate-800"
+                        }`}
+                      >
+                        {uploadingHighlightId === highlight.id
+                          ? "Enviando..."
+                          : "Enviar imagem"}
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/webp"
+                          onChange={(event) => uploadHighlightImage(highlight.id, event)}
+                          disabled={uploadingHighlightId === highlight.id}
+                          className="hidden"
+                        />
+                      </label>
+
+                      {highlight.imageUrl && (
+                        <button
+                          type="button"
+                          onClick={() => removeHighlightImage(highlight.id)}
+                          className="cursor-pointer rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-600 transition hover:bg-slate-100"
+                        >
+                          Remover imagem
+                        </button>
+                      )}
+
+                      {highlightUploadErrors[highlight.id] && (
+                        <p className="text-xs text-red-500">
+                          {highlightUploadErrors[highlight.id]}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              <button
+                type="button"
+                onClick={addHighlight}
+                className="cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-950 hover:bg-slate-950 hover:text-white"
+              >
+                + Adicionar destaque
+              </button>
+            </div>
+          )}
+        </SubSection>
       </FormSection>
 
       {/* ── 2. Frequência e objetivos ── */}
