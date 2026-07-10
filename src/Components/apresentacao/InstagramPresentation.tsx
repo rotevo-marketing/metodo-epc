@@ -4,14 +4,12 @@ import {
 } from "@/lib/normalizeInstagramData";
 import { PresentationHeader } from "./PresentationHeader";
 import {
-  FrequencyTable,
   TextList,
   VisualRefGrid,
   ExternalRefList,
   FieldBlock,
   SectionCard,
   EmptyState,
-  FreqItem,
   TextItem,
   VisualRef,
   ExtRef,
@@ -35,25 +33,46 @@ function filterFilledStrings(arr: string[]): string[] {
 
 // ─────────────────────────────────────────────────────────────────────────────
 
+const VALIDATION_STATUS_LABELS: Record<"hypothesis" | "validated", string> = {
+  hypothesis: "Hipótese",
+  validated: "Validado",
+};
+
+function PlainTextField({ label, value }: { label: string; value: string }) {
+  if (!hasText(value)) return null;
+  return (
+    <div>
+      <p className="mb-1 mt-6 text-xs font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+        {label}
+      </p>
+      <p className="whitespace-pre-wrap text-sm leading-6 text-slate-700">{value}</p>
+    </div>
+  );
+}
+
 export default function InstagramPresentation({ data }: InstagramPresentationProps) {
   // Server component — normalize once per render; no hooks needed.
   const d = normalizeInstagramData(data);
 
   // ─── Frequência ─────────────────────────────────────────────────────────────
-  // Adapter: publishing.frequencyItems[].notes → FreqItem.observation
-  // notes (v2) ← observation (v1 legacy)
-  const freqItems: FreqItem[] = d.publishing.frequencyItems.map((item) => ({
-    format: item.format,
-    quantity: item.quantity,
-    period: item.period,
-    observation: item.notes,
-  }));
+  const visibleFreqItems = d.publishing.frequencyItems.filter(
+    (item) =>
+      hasText(item.format) ||
+      hasText(item.quantity) ||
+      hasText(item.period) ||
+      hasText(item.journeyRole) ||
+      hasText(item.notes)
+  );
 
   // ─── Objetivos ──────────────────────────────────────────────────────────────
-  // objective (v2) ← value (v1 legacy)
-  const objectives: TextItem[] = d.objectives.map((item) => ({
-    value: item.objective,
-  }));
+  // validationStatus alone does not make an item visible
+  const objectiveItems = d.objectives.filter(
+    (item) =>
+      hasText(item.objective) ||
+      hasText(item.indicator) ||
+      hasText(item.target) ||
+      hasText(item.deadline)
+  );
 
   // ─── Stories ────────────────────────────────────────────────────────────────
   // Fallback: name → description when name is empty
@@ -134,10 +153,16 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
     hasText(d.strategicDirection.profileDifferentiation) ||
     hasText(d.strategicDirection.initialEditorialPriorities);
 
-  const hasFrequencySection = freqItems.some((i) => hasText(i.quantity));
+  const hasFrequencySection =
+    visibleFreqItems.length > 0 ||
+    hasText(d.publishing.minimumViableFrequency) ||
+    hasText(d.publishing.recommendedFrequency) ||
+    hasText(d.publishing.maximumSustainableFrequency) ||
+    hasText(d.publishing.productionRoutine) ||
+    hasText(d.publishing.adjustmentRule);
 
   const hasContentAndLanguageSection =
-    objectives.some((i) => hasText(i.value)) ||
+    objectiveItems.length > 0 ||
     languageStructures.some((i) => hasText(i.value)) ||
     contents.some((i) => hasText(i.value)) ||
     stories.some((i) => hasText(i.value)) ||
@@ -186,13 +211,108 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
 
       {hasFrequencySection && (
         <SectionCard title="Frequência de publicação">
-          <FrequencyTable items={freqItems} />
+          {visibleFreqItems.length > 0 && (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-slate-200">
+                    <th className="pb-3 pr-6 text-left text-xs font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                      Formato
+                    </th>
+                    <th className="pb-3 pr-6 text-left text-xs font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                      Quantidade
+                    </th>
+                    <th className="pb-3 pr-6 text-left text-xs font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                      Período
+                    </th>
+                    <th className="pb-3 pr-6 text-left text-xs font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                      Papel na jornada
+                    </th>
+                    <th className="pb-3 text-left text-xs font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                      Observações
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {visibleFreqItems.map((item) => (
+                    <tr key={item.id}>
+                      <td className="py-3 pr-6 align-top text-slate-700">{item.format}</td>
+                      <td className="py-3 pr-6 align-top text-slate-700">{item.quantity}</td>
+                      <td className="py-3 pr-6 align-top text-slate-700">{item.period}</td>
+                      <td className="py-3 pr-6 align-top text-slate-700">{item.journeyRole}</td>
+                      <td className="py-3 align-top text-slate-700">{item.notes}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {(hasText(d.publishing.minimumViableFrequency) ||
+            hasText(d.publishing.recommendedFrequency) ||
+            hasText(d.publishing.maximumSustainableFrequency)) && (
+            <div>
+              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                Frequência sustentável
+              </p>
+              <div className="grid gap-x-8 sm:grid-cols-2 lg:grid-cols-3">
+                <PlainTextField
+                  label="Frequência mínima viável"
+                  value={d.publishing.minimumViableFrequency}
+                />
+                <PlainTextField
+                  label="Frequência recomendada"
+                  value={d.publishing.recommendedFrequency}
+                />
+                <PlainTextField
+                  label="Frequência máxima sustentável"
+                  value={d.publishing.maximumSustainableFrequency}
+                />
+              </div>
+            </div>
+          )}
+
+          {(hasText(d.publishing.productionRoutine) || hasText(d.publishing.adjustmentRule)) && (
+            <div>
+              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                Rotina operacional
+              </p>
+              <div className="grid gap-x-8 sm:grid-cols-2">
+                <PlainTextField label="Rotina de produção" value={d.publishing.productionRoutine} />
+                <PlainTextField label="Regra de ajuste" value={d.publishing.adjustmentRule} />
+              </div>
+            </div>
+          )}
         </SectionCard>
       )}
 
       {hasContentAndLanguageSection && (
         <SectionCard title="Conteúdo e linguagem">
-          <TextList items={objectives} label="Objetivos" />
+          {objectiveItems.length > 0 && (
+            <div>
+              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                Objetivos do canal
+              </p>
+              <div className="divide-y divide-slate-100">
+                {objectiveItems.map((item) => (
+                  <div key={item.id} className="py-6 first:pt-0">
+                    <PlainTextField label="Objetivo" value={item.objective} />
+                    <div className="grid gap-x-8 sm:grid-cols-2">
+                      <PlainTextField label="Indicador" value={item.indicator} />
+                      <PlainTextField label="Meta" value={item.target} />
+                    </div>
+                    <div className="grid gap-x-8 sm:grid-cols-2">
+                      <PlainTextField label="Prazo" value={item.deadline} />
+                      <PlainTextField
+                        label="Status de validação"
+                        value={VALIDATION_STATUS_LABELS[item.validationStatus]}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           <TextList items={languageStructures} label="Estruturas de linguagem" />
           <TextList items={contents} label="Tipos de conteúdo" />
           <TextList items={stories} label="Stories" />
