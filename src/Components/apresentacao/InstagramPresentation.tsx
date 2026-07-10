@@ -122,6 +122,14 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
 
   // ─── Condições de seção ─────────────────────────────────────────────────────
 
+  const hasStrategicDirectionSection =
+    hasText(d.strategicDirection.channelRole) ||
+    hasText(d.strategicDirection.generalStrategy) ||
+    hasText(d.strategicDirection.priorityAudiences) ||
+    hasText(d.strategicDirection.ecosystemFunction) ||
+    hasText(d.strategicDirection.profileDifferentiation) ||
+    hasText(d.strategicDirection.initialEditorialPriorities);
+
   const hasFrequencySection = freqItems.some((i) => hasText(i.quantity));
 
   const hasContentAndLanguageSection =
@@ -156,6 +164,19 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
         title="Instagram"
         slug="instagram"
       />
+
+      {hasStrategicDirectionSection && (
+        <SectionCard title="Direção estratégica">
+          <FieldBlock label="Papel do canal" value={d.strategicDirection.channelRole} />
+          <FieldBlock label="Estratégia geral" value={d.strategicDirection.generalStrategy} />
+          <div className="grid sm:grid-cols-2 gap-x-8">
+            <FieldBlock label="Públicos prioritários" value={d.strategicDirection.priorityAudiences} />
+            <FieldBlock label="Função no ecossistema" value={d.strategicDirection.ecosystemFunction} />
+            <FieldBlock label="Diferenciação do perfil" value={d.strategicDirection.profileDifferentiation} />
+            <FieldBlock label="Prioridades editoriais iniciais" value={d.strategicDirection.initialEditorialPriorities} />
+          </div>
+        </SectionCard>
+      )}
 
       {hasFrequencySection && (
         <SectionCard title="Frequência de publicação">
