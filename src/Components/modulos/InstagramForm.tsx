@@ -275,18 +275,19 @@ export default function InstagramForm({
   // ─── Frequency handlers ─────────────────────────────────────────────────────
 
   function updateFrequencyItem(
-    index: number,
-    key: "format" | "quantity" | "period" | "notes",
+    id: string,
+    key: "format" | "quantity" | "period" | "journeyRole" | "notes",
     value: string
   ) {
-    setData((current) => {
-      const nextItems = [...current.publishing.frequencyItems];
-      nextItems[index] = { ...nextItems[index], [key]: value };
-      return {
-        ...current,
-        publishing: { ...current.publishing, frequencyItems: nextItems },
-      };
-    });
+    setData((current) => ({
+      ...current,
+      publishing: {
+        ...current.publishing,
+        frequencyItems: current.publishing.frequencyItems.map((item) =>
+          item.id === id ? { ...item, [key]: value } : item
+        ),
+      },
+    }));
   }
 
   function addFrequencyItem() {
@@ -302,27 +303,46 @@ export default function InstagramForm({
     }));
   }
 
-  function removeFrequencyItem(index: number) {
-    setData((current) => {
-      const nextItems =
-        current.publishing.frequencyItems.length > 1
-          ? current.publishing.frequencyItems.filter((_, i) => i !== index)
-          : [{ ...createEmptyInstagramFrequencyItem(), period: "por semana" }];
-      return {
-        ...current,
-        publishing: { ...current.publishing, frequencyItems: nextItems },
-      };
-    });
+  function removeFrequencyItem(id: string) {
+    setData((current) => ({
+      ...current,
+      publishing: {
+        ...current.publishing,
+        frequencyItems: current.publishing.frequencyItems.filter(
+          (item) => item.id !== id
+        ),
+      },
+    }));
+  }
+
+  function updatePublishing(
+    key:
+      | "minimumViableFrequency"
+      | "recommendedFrequency"
+      | "maximumSustainableFrequency"
+      | "productionRoutine"
+      | "adjustmentRule",
+    value: string
+  ) {
+    setData((current) => ({
+      ...current,
+      publishing: { ...current.publishing, [key]: value },
+    }));
   }
 
   // ─── Objectives handlers ─────────────────────────────────────────────────────
 
-  function updateObjective(index: number, value: string) {
-    setData((current) => {
-      const nextItems = [...current.objectives];
-      nextItems[index] = { ...nextItems[index], objective: value };
-      return { ...current, objectives: nextItems };
-    });
+  function updateObjective(
+    id: string,
+    key: "objective" | "indicator" | "target" | "deadline" | "validationStatus",
+    value: string
+  ) {
+    setData((current) => ({
+      ...current,
+      objectives: current.objectives.map((o) =>
+        o.id === id ? { ...o, [key]: value } : o
+      ),
+    }));
   }
 
   function addObjective() {
@@ -332,13 +352,10 @@ export default function InstagramForm({
     }));
   }
 
-  function removeObjective(index: number) {
+  function removeObjective(id: string) {
     setData((current) => ({
       ...current,
-      objectives:
-        current.objectives.length > 1
-          ? current.objectives.filter((_, i) => i !== index)
-          : [createEmptyInstagramObjective()],
+      objectives: current.objectives.filter((o) => o.id !== id),
     }));
   }
 
@@ -933,7 +950,6 @@ export default function InstagramForm({
   }
 
   // Derived flat lists
-  const objectiveItems = data.objectives.map((o) => o.objective);
   const storyItems = data.contentArchitecture.stories.map((s) => s.name);
   const reelItems = data.contentArchitecture.formats.map((f) => f.name);
   const languageItems = data.languageStructures.map((l) => l.howItAppears);
@@ -1473,116 +1489,360 @@ export default function InstagramForm({
         title="Frequência e objetivos"
         description="Defina a cadência de publicação e os resultados esperados para o canal."
       >
+        {/* SubSection 1: Cadência por formato */}
         <SubSection
-          title="Frequência de publicações"
-          description="Defina a frequência por formato de conteúdo. Use quantidade e período para deixar a orientação mais clara."
+          title="Cadência por formato"
+          description="Defina a frequência de publicação por formato de conteúdo e o papel de cada um na jornada."
         >
-          <div className="space-y-4">
-            {data.publishing.frequencyItems.map((item, index) => (
-              <div
-                key={item.id}
-                className="grid gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 md:grid-cols-[1fr_160px_180px_1fr_auto]"
+          {data.publishing.frequencyItems.length === 0 ? (
+            <div className="space-y-3">
+              <p className="text-sm text-slate-400">
+                Nenhuma frequência por formato cadastrada.
+              </p>
+              <button
+                type="button"
+                onClick={addFrequencyItem}
+                className="cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-950 hover:bg-slate-950 hover:text-white"
               >
-                <div>
-                  <label className="mb-2 block text-sm font-semibold text-slate-600">
-                    Formato
-                  </label>
+                + Adicionar formato
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {data.publishing.frequencyItems.map((item, index) => (
+                <div
+                  key={item.id}
+                  className="rounded-2xl border border-slate-200 bg-slate-50 p-5"
+                >
+                  <div className="mb-4 flex items-center justify-between">
+                    <span className="text-xs font-semibold text-slate-400">
+                      Formato {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removeFrequencyItem(item.id)}
+                      className="cursor-pointer rounded-full px-3 py-1.5 text-xs font-semibold text-red-500 transition hover:bg-red-50"
+                    >
+                      Excluir
+                    </button>
+                  </div>
 
-                  <input
-                    type="text"
-                    value={item.format}
-                    onChange={(event) =>
-                      updateFrequencyItem(index, "format", event.target.value)
-                    }
-                    placeholder="Ex: Reels"
-                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
-                  />
+                  <div className="grid gap-4 md:grid-cols-[1fr_140px_180px]">
+                    <div>
+                      <label className="mb-2 block text-sm font-semibold text-slate-600">
+                        Formato
+                      </label>
+                      <input
+                        type="text"
+                        value={item.format}
+                        onChange={(event) =>
+                          updateFrequencyItem(item.id, "format", event.target.value)
+                        }
+                        placeholder="Reels, Carrossel, Stories, Live..."
+                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-sm font-semibold text-slate-600">
+                        Quantidade
+                      </label>
+                      <input
+                        type="text"
+                        value={item.quantity}
+                        onChange={(event) =>
+                          updateFrequencyItem(item.id, "quantity", event.target.value)
+                        }
+                        placeholder="3, diário..."
+                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-sm font-semibold text-slate-600">
+                        Período
+                      </label>
+                      <select
+                        value={item.period}
+                        onChange={(event) =>
+                          updateFrequencyItem(item.id, "period", event.target.value)
+                        }
+                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                      >
+                        {!["por dia", "por semana", "por mês"].includes(item.period) &&
+                          item.period && (
+                            <option value={item.period}>{item.period}</option>
+                          )}
+                        <option value="por dia">por dia</option>
+                        <option value="por semana">por semana</option>
+                        <option value="por mês">por mês</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 grid gap-4 md:grid-cols-2">
+                    <div>
+                      <label className="mb-2 block text-sm font-semibold text-slate-600">
+                        Papel na jornada
+                      </label>
+                      <input
+                        type="text"
+                        value={item.journeyRole}
+                        onChange={(event) =>
+                          updateFrequencyItem(item.id, "journeyRole", event.target.value)
+                        }
+                        placeholder="Descoberta, aprofundamento, relacionamento ou conversão"
+                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-sm font-semibold text-slate-600">
+                        Observações
+                      </label>
+                      <textarea
+                        value={item.notes}
+                        onChange={(event) =>
+                          updateFrequencyItem(item.id, "notes", event.target.value)
+                        }
+                        rows={2}
+                        placeholder="Ex: Priorizar conteúdos de autoridade."
+                        className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                      />
+                    </div>
+                  </div>
                 </div>
-
-                <div>
-                  <label className="mb-2 block text-sm font-semibold text-slate-600">
-                    Quantidade
-                  </label>
-
-                  <input
-                    type="text"
-                    value={item.quantity}
-                    onChange={(event) =>
-                      updateFrequencyItem(index, "quantity", event.target.value)
-                    }
-                    placeholder="Ex: 3"
-                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
-                  />
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm font-semibold text-slate-600">
-                    Período
-                  </label>
-
-                  <select
-                    value={item.period}
-                    onChange={(event) =>
-                      updateFrequencyItem(index, "period", event.target.value)
-                    }
-                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
-                  >
-                    <option value="por dia">por dia</option>
-                    <option value="por semana">por semana</option>
-                    <option value="por mês">por mês</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm font-semibold text-slate-600">
-                    Observação
-                  </label>
-
-                  <input
-                    type="text"
-                    value={item.notes}
-                    onChange={(event) =>
-                      updateFrequencyItem(index, "notes", event.target.value)
-                    }
-                    placeholder="Ex: Priorizar conteúdos de autoridade."
-                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
-                  />
-                </div>
-
-                <div className="flex items-end">
-                  <button
-                    type="button"
-                    onClick={() => removeFrequencyItem(index)}
-                    className="cursor-pointer rounded-full px-4 py-3 text-sm font-semibold text-red-500 transition hover:bg-red-50"
-                  >
-                    Excluir
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <button
-            type="button"
-            onClick={addFrequencyItem}
-            className="mt-5 cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-950 hover:border-slate-950 hover:text-white"
-          >
-            + Novo formato
-          </button>
+              ))}
+              <button
+                type="button"
+                onClick={addFrequencyItem}
+                className="cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-950 hover:bg-slate-950 hover:text-white"
+              >
+                + Adicionar formato
+              </button>
+            </div>
+          )}
         </SubSection>
 
+        {/* SubSection 2: Frequência sustentável */}
         <SubSection
-          title="Objetivos"
-          description="Defina os objetivos específicos do conteúdo para o Instagram."
+          title="Frequência sustentável"
+          description="Estabeleça os limites de produção para orientar decisões operacionais ao longo do tempo."
         >
-          <InlineList
-            items={objectiveItems}
-            onChangeItem={updateObjective}
-            onAddItem={addObjective}
-            onRemoveItem={removeObjective}
-            placeholder="Ex: Aumentar autoridade, gerar leads, fortalecer comunidade..."
-            buttonLabel="Novo objetivo"
-          />
+          <div className="space-y-6">
+            <div>
+              <label className="mb-1 block text-sm font-semibold text-slate-600">
+                Frequência mínima viável
+              </label>
+              <p className="mb-2 text-xs leading-5 text-slate-500">
+                Registre a cadência mínima necessária para manter consistência sem comprometer a estratégia.
+              </p>
+              <textarea
+                value={data.publishing.minimumViableFrequency}
+                onChange={(event) =>
+                  updatePublishing("minimumViableFrequency", event.target.value)
+                }
+                rows={3}
+                className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-semibold text-slate-600">
+                Frequência recomendada
+              </label>
+              <p className="mb-2 text-xs leading-5 text-slate-500">
+                Defina a cadência considerada ideal para alcançar os objetivos do canal.
+              </p>
+              <textarea
+                value={data.publishing.recommendedFrequency}
+                onChange={(event) =>
+                  updatePublishing("recommendedFrequency", event.target.value)
+                }
+                rows={3}
+                className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-semibold text-slate-600">
+                Frequência máxima sustentável
+              </label>
+              <p className="mb-2 text-xs leading-5 text-slate-500">
+                Estabeleça o limite de produção que pode ser mantido sem comprometer qualidade ou operação.
+              </p>
+              <textarea
+                value={data.publishing.maximumSustainableFrequency}
+                onChange={(event) =>
+                  updatePublishing("maximumSustainableFrequency", event.target.value)
+                }
+                rows={3}
+                className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+              />
+            </div>
+          </div>
+        </SubSection>
+
+        {/* SubSection 3: Rotina operacional */}
+        <SubSection
+          title="Rotina operacional"
+          description="Documente como a produção e os ajustes serão gerenciados na prática."
+        >
+          <div className="space-y-6">
+            <div>
+              <label className="mb-1 block text-sm font-semibold text-slate-600">
+                Rotina de produção
+              </label>
+              <p className="mb-2 text-xs leading-5 text-slate-500">
+                Descreva como gravação, produção, edição, aprovação e publicação serão organizadas.
+              </p>
+              <textarea
+                value={data.publishing.productionRoutine}
+                onChange={(event) =>
+                  updatePublishing("productionRoutine", event.target.value)
+                }
+                rows={5}
+                className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-semibold text-slate-600">
+                Regra de ajuste operacional
+              </label>
+              <p className="mb-2 text-xs leading-5 text-slate-500">
+                Defina quando reduzir, ampliar ou reorganizar a frequência do canal.
+              </p>
+              <textarea
+                value={data.publishing.adjustmentRule}
+                onChange={(event) =>
+                  updatePublishing("adjustmentRule", event.target.value)
+                }
+                rows={5}
+                className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+              />
+            </div>
+          </div>
+        </SubSection>
+
+        {/* SubSection 4: Objetivos do canal */}
+        <SubSection
+          title="Objetivos do canal"
+          description="Registre os objetivos estratégicos do Instagram com indicadores, metas e prazos."
+        >
+          {data.objectives.length === 0 ? (
+            <div className="space-y-3">
+              <p className="text-sm text-slate-400">Nenhum objetivo cadastrado.</p>
+              <button
+                type="button"
+                onClick={addObjective}
+                className="cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-950 hover:bg-slate-950 hover:text-white"
+              >
+                + Adicionar objetivo
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {data.objectives.map((obj, index) => (
+                <div
+                  key={obj.id}
+                  className="rounded-2xl border border-slate-200 bg-slate-50 p-5"
+                >
+                  <div className="mb-4 flex items-center justify-between">
+                    <span className="text-xs font-semibold text-slate-400">
+                      Objetivo {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removeObjective(obj.id)}
+                      className="cursor-pointer rounded-full px-3 py-1.5 text-xs font-semibold text-red-500 transition hover:bg-red-50"
+                    >
+                      Excluir
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="mb-2 block text-sm font-semibold text-slate-600">
+                        Objetivo
+                      </label>
+                      <textarea
+                        value={obj.objective}
+                        onChange={(event) =>
+                          updateObjective(obj.id, "objective", event.target.value)
+                        }
+                        rows={3}
+                        placeholder="Ex: Gerar contatos qualificados para o atendimento."
+                        className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                      />
+                    </div>
+
+                    <div className="grid gap-4 md:grid-cols-3">
+                      <div>
+                        <label className="mb-2 block text-sm font-semibold text-slate-600">
+                          Indicador
+                        </label>
+                        <input
+                          type="text"
+                          value={obj.indicator}
+                          onChange={(event) =>
+                            updateObjective(obj.id, "indicator", event.target.value)
+                          }
+                          placeholder="Ex: cliques na bio, mensagens iniciadas..."
+                          className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                        />
+                      </div>
+                      <div>
+                        <label className="mb-2 block text-sm font-semibold text-slate-600">
+                          Meta
+                        </label>
+                        <input
+                          type="text"
+                          value={obj.target}
+                          onChange={(event) =>
+                            updateObjective(obj.id, "target", event.target.value)
+                          }
+                          placeholder="Ex: 55 contatos mensais, linha de base..."
+                          className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                        />
+                      </div>
+                      <div>
+                        <label className="mb-2 block text-sm font-semibold text-slate-600">
+                          Prazo
+                        </label>
+                        <input
+                          type="text"
+                          value={obj.deadline}
+                          onChange={(event) =>
+                            updateObjective(obj.id, "deadline", event.target.value)
+                          }
+                          placeholder="Ex: primeiros 30 dias, segundo mês..."
+                          className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="mb-2 block text-sm font-semibold text-slate-600">
+                        Status da definição
+                      </label>
+                      <select
+                        value={obj.validationStatus}
+                        onChange={(event) =>
+                          updateObjective(obj.id, "validationStatus", event.target.value)
+                        }
+                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100 md:w-64"
+                      >
+                        <option value="hypothesis">Hipótese a validar</option>
+                        <option value="validated">Objetivo validado</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={addObjective}
+                className="cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-950 hover:bg-slate-950 hover:text-white"
+              >
+                + Adicionar objetivo
+              </button>
+            </div>
+          )}
         </SubSection>
       </FormSection>
 
