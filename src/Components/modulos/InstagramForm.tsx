@@ -21,6 +21,7 @@ import { uploadPlanningMedia } from "@/lib/uploadPlanningMedia";
 // ─── Navigation ───────────────────────────────────────────────────────────────
 
 const NAV_ITEMS = [
+  { label: "Direção estratégica", id: "instagram-strategic-direction" },
   { label: "Perfil", id: "instagram-profile" },
   { label: "Frequência e objetivos", id: "instagram-frequency-objectives" },
   { label: "Conteúdo", id: "instagram-content" },
@@ -586,6 +587,21 @@ export default function InstagramForm({
     });
   }
 
+  // ─── Strategic direction handler ─────────────────────────────────────────────
+
+  function updateStrategicDirection(
+    key: keyof InstagramData["strategicDirection"],
+    value: string
+  ) {
+    setData((current) => ({
+      ...current,
+      strategicDirection: {
+        ...current.strategicDirection,
+        [key]: value,
+      },
+    }));
+  }
+
   // ─── InlineList ───────────────────────────────────────────────────────────────
 
   function InlineList({
@@ -666,6 +682,116 @@ export default function InstagramForm({
           </button>
         ))}
       </nav>
+
+      {/* ── 0. Direção estratégica ── */}
+      <FormSection
+        id="instagram-strategic-direction"
+        title="Direção estratégica"
+        description="Defina o papel do Instagram, sua função no ecossistema e as prioridades que orientarão o canal."
+      >
+        <div className="space-y-6">
+          <div>
+            <label className="mb-1 block text-sm font-semibold text-slate-600">
+              Papel estratégico do Instagram
+            </label>
+            <p className="mb-2 text-sm leading-5 text-slate-500">
+              Explique por que o Instagram existe dentro desta estratégia e qual função principal deverá cumprir.
+            </p>
+            <textarea
+              value={data.strategicDirection.channelRole}
+              onChange={(event) =>
+                updateStrategicDirection("channelRole", event.target.value)
+              }
+              rows={4}
+              className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+            />
+          </div>
+
+          <div>
+            <label className="mb-1 block text-sm font-semibold text-slate-600">
+              Estratégia geral do canal
+            </label>
+            <p className="mb-2 text-sm leading-5 text-slate-500">
+              Descreva como o canal será utilizado para gerar descoberta, autoridade, relacionamento e conversão.
+            </p>
+            <RichTextEditor
+              value={data.strategicDirection.generalStrategy}
+              onChange={(value) =>
+                updateStrategicDirection("generalStrategy", value)
+              }
+              placeholder="Descreva como o canal será utilizado para gerar descoberta, autoridade, relacionamento e conversão."
+            />
+          </div>
+
+          <div>
+            <label className="mb-1 block text-sm font-semibold text-slate-600">
+              Públicos e personas prioritárias
+            </label>
+            <p className="mb-2 text-sm leading-5 text-slate-500">
+              Identifique quais públicos e personas devem receber maior atenção no Instagram.
+            </p>
+            <textarea
+              value={data.strategicDirection.priorityAudiences}
+              onChange={(event) =>
+                updateStrategicDirection("priorityAudiences", event.target.value)
+              }
+              rows={4}
+              className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+            />
+          </div>
+
+          <div>
+            <label className="mb-1 block text-sm font-semibold text-slate-600">
+              Função no ecossistema digital
+            </label>
+            <p className="mb-2 text-sm leading-5 text-slate-500">
+              Explique de quais canais o Instagram recebe audiência e para quais destinos deverá direcioná-la.
+            </p>
+            <textarea
+              value={data.strategicDirection.ecosystemFunction}
+              onChange={(event) =>
+                updateStrategicDirection("ecosystemFunction", event.target.value)
+              }
+              rows={4}
+              className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+            />
+          </div>
+
+          <div>
+            <label className="mb-1 block text-sm font-semibold text-slate-600">
+              Diferenciação do perfil
+            </label>
+            <p className="mb-2 text-sm leading-5 text-slate-500">
+              Registre o que deverá fazer este perfil parecer diferente de concorrentes, agências ou perfis genéricos do nicho.
+            </p>
+            <textarea
+              value={data.strategicDirection.profileDifferentiation}
+              onChange={(event) =>
+                updateStrategicDirection("profileDifferentiation", event.target.value)
+              }
+              rows={4}
+              className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+            />
+          </div>
+
+          <div>
+            <label className="mb-1 block text-sm font-semibold text-slate-600">
+              Prioridades editoriais iniciais
+            </label>
+            <p className="mb-2 text-sm leading-5 text-slate-500">
+              Defina os temas, conceitos e mensagens que devem receber prioridade no primeiro ciclo editorial.
+            </p>
+            <textarea
+              value={data.strategicDirection.initialEditorialPriorities}
+              onChange={(event) =>
+                updateStrategicDirection("initialEditorialPriorities", event.target.value)
+              }
+              rows={4}
+              className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+            />
+          </div>
+        </div>
+      </FormSection>
 
       {/* ── 1. Perfil do Instagram ── */}
       <FormSection
