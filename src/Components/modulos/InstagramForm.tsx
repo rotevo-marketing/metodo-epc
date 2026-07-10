@@ -361,15 +361,20 @@ export default function InstagramForm({
 
   // ─── Stories handlers ────────────────────────────────────────────────────────
 
-  function updateStory(index: number, value: string) {
-    setData((current) => {
-      const nextItems = [...current.contentArchitecture.stories];
-      nextItems[index] = { ...nextItems[index], name: value };
-      return {
-        ...current,
-        contentArchitecture: { ...current.contentArchitecture, stories: nextItems },
-      };
-    });
+  function updateStory(
+    id: string,
+    key: "name" | "frequency" | "journeyStage" | "purpose" | "cta" | "description",
+    value: string
+  ) {
+    setData((current) => ({
+      ...current,
+      contentArchitecture: {
+        ...current.contentArchitecture,
+        stories: current.contentArchitecture.stories.map((s) =>
+          s.id === id ? { ...s, [key]: value } : s
+        ),
+      },
+    }));
   }
 
   function addStory() {
@@ -385,17 +390,29 @@ export default function InstagramForm({
     }));
   }
 
-  function removeStory(index: number) {
+  function removeStory(id: string) {
     setData((current) => ({
       ...current,
       contentArchitecture: {
         ...current.contentArchitecture,
-        stories:
-          current.contentArchitecture.stories.length > 1
-            ? current.contentArchitecture.stories.filter((_, i) => i !== index)
-            : [createEmptyInstagramStoryFormat()],
+        stories: current.contentArchitecture.stories.filter((s) => s.id !== id),
       },
     }));
+  }
+
+  function moveStory(id: string, direction: "up" | "down") {
+    setData((current) => {
+      const arr = [...current.contentArchitecture.stories];
+      const index = arr.findIndex((s) => s.id === id);
+      if (index === -1) return current;
+      const targetIndex = direction === "up" ? index - 1 : index + 1;
+      if (targetIndex < 0 || targetIndex >= arr.length) return current;
+      [arr[index], arr[targetIndex]] = [arr[targetIndex], arr[index]];
+      return {
+        ...current,
+        contentArchitecture: { ...current.contentArchitecture, stories: arr },
+      };
+    });
   }
 
   // ─── Hashtags handlers ────────────────────────────────────────────────────────
@@ -462,20 +479,25 @@ export default function InstagramForm({
 
   const flatHashtags = data.hashtags.flatMap((cat) => cat.hashtags);
 
-  // ─── Reels (formats) handlers ─────────────────────────────────────────────────
+  // ─── Formats (content formats) handlers ──────────────────────────────────────
 
-  function updateReel(index: number, value: string) {
-    setData((current) => {
-      const nextItems = [...current.contentArchitecture.formats];
-      nextItems[index] = { ...nextItems[index], name: value };
-      return {
-        ...current,
-        contentArchitecture: { ...current.contentArchitecture, formats: nextItems },
-      };
-    });
+  function updateFormat(
+    id: string,
+    key: "name" | "structure" | "duration" | "journeyRole" | "purpose" | "cta" | "notes",
+    value: string
+  ) {
+    setData((current) => ({
+      ...current,
+      contentArchitecture: {
+        ...current.contentArchitecture,
+        formats: current.contentArchitecture.formats.map((f) =>
+          f.id === id ? { ...f, [key]: value } : f
+        ),
+      },
+    }));
   }
 
-  function addReel() {
+  function addFormat() {
     setData((current) => ({
       ...current,
       contentArchitecture: {
@@ -488,17 +510,29 @@ export default function InstagramForm({
     }));
   }
 
-  function removeReel(index: number) {
+  function removeFormat(id: string) {
     setData((current) => ({
       ...current,
       contentArchitecture: {
         ...current.contentArchitecture,
-        formats:
-          current.contentArchitecture.formats.length > 1
-            ? current.contentArchitecture.formats.filter((_, i) => i !== index)
-            : [createEmptyInstagramContentFormat()],
+        formats: current.contentArchitecture.formats.filter((f) => f.id !== id),
       },
     }));
+  }
+
+  function moveFormat(id: string, direction: "up" | "down") {
+    setData((current) => {
+      const arr = [...current.contentArchitecture.formats];
+      const index = arr.findIndex((f) => f.id === id);
+      if (index === -1) return current;
+      const targetIndex = direction === "up" ? index - 1 : index + 1;
+      if (targetIndex < 0 || targetIndex >= arr.length) return current;
+      [arr[index], arr[targetIndex]] = [arr[targetIndex], arr[index]];
+      return {
+        ...current,
+        contentArchitecture: { ...current.contentArchitecture, formats: arr },
+      };
+    });
   }
 
   // ─── Language structures handlers ─────────────────────────────────────────────
@@ -567,14 +601,27 @@ export default function InstagramForm({
       ...current,
       contentArchitecture: {
         ...current.contentArchitecture,
-        generalContentGuidelines:
-          current.contentArchitecture.generalContentGuidelines.length > 1
-            ? current.contentArchitecture.generalContentGuidelines.filter(
-                (_, i) => i !== index
-              )
-            : [""],
+        generalContentGuidelines: current.contentArchitecture.generalContentGuidelines.filter(
+          (_, i) => i !== index
+        ),
       },
     }));
+  }
+
+  function moveContent(index: number, direction: "up" | "down") {
+    setData((current) => {
+      const arr = [...current.contentArchitecture.generalContentGuidelines];
+      const targetIndex = direction === "up" ? index - 1 : index + 1;
+      if (targetIndex < 0 || targetIndex >= arr.length) return current;
+      [arr[index], arr[targetIndex]] = [arr[targetIndex], arr[index]];
+      return {
+        ...current,
+        contentArchitecture: {
+          ...current.contentArchitecture,
+          generalContentGuidelines: arr,
+        },
+      };
+    });
   }
 
   // ─── Visual reference handlers ────────────────────────────────────────────────
@@ -950,10 +997,7 @@ export default function InstagramForm({
   }
 
   // Derived flat lists
-  const storyItems = data.contentArchitecture.stories.map((s) => s.name);
-  const reelItems = data.contentArchitecture.formats.map((f) => f.name);
   const languageItems = data.languageStructures.map((l) => l.howItAppears);
-  const contentItems = data.contentArchitecture.generalContentGuidelines;
 
   // ─── JSX ─────────────────────────────────────────────────────────────────────
 
@@ -1852,48 +1896,425 @@ export default function InstagramForm({
         title="Arquitetura de conteúdo"
         description="Organize os formatos, temas e possibilidades editoriais do Instagram."
       >
+        {/* SubSection 1: Formatos de conteúdo */}
         <SubSection
-          title="Stories"
-          description="Liste ideias, quadros, formatos e orientações para stories."
+          title="Formatos de conteúdo"
+          description="Registre os formatos utilizados no canal, com estrutura, duração, papel na jornada, finalidade, CTA e observações."
         >
-          <InlineList
-            items={storyItems}
-            onChangeItem={updateStory}
-            onAddItem={addStory}
-            onRemoveItem={removeStory}
-            placeholder="Ex: Bastidores, rotina, perguntas, enquetes, provas sociais..."
-            buttonLabel="Novo story"
-          />
+          {data.contentArchitecture.formats.length === 0 ? (
+            <div className="space-y-3">
+              <p className="text-sm text-slate-400">Nenhum formato de conteúdo cadastrado.</p>
+              <button
+                type="button"
+                onClick={addFormat}
+                className="cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-950 hover:bg-slate-950 hover:text-white"
+              >
+                + Adicionar formato
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {data.contentArchitecture.formats.map((format, index) => (
+                <div
+                  key={format.id}
+                  className="rounded-2xl border border-slate-200 bg-slate-50 p-5"
+                >
+                  <div className="mb-4 flex items-center justify-between">
+                    <span className="text-xs font-semibold text-slate-400">
+                      Formato {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => moveFormat(format.id, "up")}
+                        disabled={index === 0}
+                        aria-label="Mover formato para cima"
+                        className="cursor-pointer rounded-full px-3 py-1.5 text-xs font-semibold text-slate-500 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        ↑
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => moveFormat(format.id, "down")}
+                        disabled={index === data.contentArchitecture.formats.length - 1}
+                        aria-label="Mover formato para baixo"
+                        className="cursor-pointer rounded-full px-3 py-1.5 text-xs font-semibold text-slate-500 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        ↓
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeFormat(format.id)}
+                        className="cursor-pointer rounded-full px-3 py-1.5 text-xs font-semibold text-red-500 transition hover:bg-red-50"
+                      >
+                        Excluir
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-4 md:grid-cols-[1fr_180px]">
+                    <div>
+                      <label className="mb-2 block text-sm font-semibold text-slate-600">
+                        Nome do formato
+                      </label>
+                      <input
+                        type="text"
+                        value={format.name}
+                        onChange={(event) =>
+                          updateFormat(format.id, "name", event.target.value)
+                        }
+                        placeholder="Ex.: Reenquadramento de crença, Carrossel educativo ou Live curta"
+                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-sm font-semibold text-slate-600">
+                        Duração ou extensão
+                      </label>
+                      <input
+                        type="text"
+                        value={format.duration}
+                        onChange={(event) =>
+                          updateFormat(format.id, "duration", event.target.value)
+                        }
+                        placeholder="30 a 45 segundos"
+                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="mt-4">
+                    <label className="mb-1 block text-sm font-semibold text-slate-600">
+                      Estrutura
+                    </label>
+                    <p className="mb-2 text-xs leading-5 text-slate-500">
+                      Descreva a sequência ou construção recomendada para esse formato.
+                    </p>
+                    <textarea
+                      value={format.structure}
+                      onChange={(event) =>
+                        updateFormat(format.id, "structure", event.target.value)
+                      }
+                      rows={3}
+                      className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                    />
+                  </div>
+
+                  <div className="mt-4 grid gap-4 md:grid-cols-2">
+                    <div>
+                      <label className="mb-2 block text-sm font-semibold text-slate-600">
+                        Papel na jornada
+                      </label>
+                      <input
+                        type="text"
+                        value={format.journeyRole}
+                        onChange={(event) =>
+                          updateFormat(format.id, "journeyRole", event.target.value)
+                        }
+                        placeholder="Descoberta, consciência, consideração, decisão ou relacionamento"
+                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-semibold text-slate-600">
+                        CTA recomendado
+                      </label>
+                      <p className="mb-2 text-xs leading-5 text-slate-500">
+                        Registre o próximo passo mais adequado para esse formato.
+                      </p>
+                      <input
+                        type="text"
+                        value={format.cta}
+                        onChange={(event) =>
+                          updateFormat(format.id, "cta", event.target.value)
+                        }
+                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="mt-4">
+                    <label className="mb-1 block text-sm font-semibold text-slate-600">
+                      Finalidade estratégica
+                    </label>
+                    <p className="mb-2 text-xs leading-5 text-slate-500">
+                      Explique o que esse formato deve gerar na estratégia do canal.
+                    </p>
+                    <textarea
+                      value={format.purpose}
+                      onChange={(event) =>
+                        updateFormat(format.id, "purpose", event.target.value)
+                      }
+                      rows={2}
+                      className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                    />
+                  </div>
+
+                  <div className="mt-4">
+                    <label className="mb-1 block text-sm font-semibold text-slate-600">
+                      Observações
+                    </label>
+                    <textarea
+                      value={format.notes}
+                      onChange={(event) =>
+                        updateFormat(format.id, "notes", event.target.value)
+                      }
+                      rows={2}
+                      placeholder="Use para regras, restrições ou aplicações específicas."
+                      className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                    />
+                  </div>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={addFormat}
+                className="cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-950 hover:bg-slate-950 hover:text-white"
+              >
+                + Adicionar formato
+              </button>
+            </div>
+          )}
         </SubSection>
 
+        {/* SubSection 2: Stories estratégicos */}
         <SubSection
-          title="Reels"
-          description="Liste ideias, formatos, séries e abordagens para vídeos curtos."
+          title="Stories estratégicos"
+          description="Registre os tipos de Stories utilizados estrategicamente, com frequência, etapa da jornada, finalidade, CTA e descrição."
         >
-          <InlineList
-            items={reelItems}
-            onChangeItem={updateReel}
-            onAddItem={addReel}
-            onRemoveItem={removeReel}
-            placeholder="Ex: Dicas rápidas, mitos e verdades, bastidores, tutoriais..."
-            buttonLabel="Novo Reels"
-          />
+          {data.contentArchitecture.stories.length === 0 ? (
+            <div className="space-y-3">
+              <p className="text-sm text-slate-400">Nenhum Story estratégico cadastrado.</p>
+              <button
+                type="button"
+                onClick={addStory}
+                className="cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-950 hover:bg-slate-950 hover:text-white"
+              >
+                + Adicionar Story estratégico
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {data.contentArchitecture.stories.map((story, index) => (
+                <div
+                  key={story.id}
+                  className="rounded-2xl border border-slate-200 bg-slate-50 p-5"
+                >
+                  <div className="mb-4 flex items-center justify-between">
+                    <span className="text-xs font-semibold text-slate-400">
+                      Story {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => moveStory(story.id, "up")}
+                        disabled={index === 0}
+                        aria-label="Mover Story para cima"
+                        className="cursor-pointer rounded-full px-3 py-1.5 text-xs font-semibold text-slate-500 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        ↑
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => moveStory(story.id, "down")}
+                        disabled={index === data.contentArchitecture.stories.length - 1}
+                        aria-label="Mover Story para baixo"
+                        className="cursor-pointer rounded-full px-3 py-1.5 text-xs font-semibold text-slate-500 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        ↓
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeStory(story.id)}
+                        className="cursor-pointer rounded-full px-3 py-1.5 text-xs font-semibold text-red-500 transition hover:bg-red-50"
+                      >
+                        Excluir
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-4 md:grid-cols-[1fr_160px_180px]">
+                    <div>
+                      <label className="mb-2 block text-sm font-semibold text-slate-600">
+                        Nome do Story estratégico
+                      </label>
+                      <input
+                        type="text"
+                        value={story.name}
+                        onChange={(event) =>
+                          updateStory(story.id, "name", event.target.value)
+                        }
+                        placeholder="Ex.: Bastidor de raciocínio, Enquete de identificação ou Caixa de perguntas"
+                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-sm font-semibold text-slate-600">
+                        Frequência
+                      </label>
+                      <input
+                        type="text"
+                        value={story.frequency}
+                        onChange={(event) =>
+                          updateStory(story.id, "frequency", event.target.value)
+                        }
+                        placeholder="Diário, semanal..."
+                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-sm font-semibold text-slate-600">
+                        Etapa da jornada
+                      </label>
+                      <input
+                        type="text"
+                        value={story.journeyStage}
+                        onChange={(event) =>
+                          updateStory(story.id, "journeyStage", event.target.value)
+                        }
+                        placeholder="Descoberta, consciência, consideração ou decisão"
+                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="mt-4 grid gap-4 md:grid-cols-2">
+                    <div>
+                      <label className="mb-1 block text-sm font-semibold text-slate-600">
+                        Finalidade estratégica
+                      </label>
+                      <p className="mb-2 text-xs leading-5 text-slate-500">
+                        Explique o papel desse Story na estratégia.
+                      </p>
+                      <textarea
+                        value={story.purpose}
+                        onChange={(event) =>
+                          updateStory(story.id, "purpose", event.target.value)
+                        }
+                        rows={3}
+                        className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-sm font-semibold text-slate-600">
+                        CTA
+                      </label>
+                      <input
+                        type="text"
+                        value={story.cta}
+                        onChange={(event) =>
+                          updateStory(story.id, "cta", event.target.value)
+                        }
+                        placeholder="Responder à enquete, enviar uma dúvida..."
+                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="mt-4">
+                    <label className="mb-1 block text-sm font-semibold text-slate-600">
+                      Descrição
+                    </label>
+                    <p className="mb-2 text-xs leading-5 text-slate-500">
+                      Descreva como esse Story deve ser aplicado ou desenvolvido.
+                    </p>
+                    <textarea
+                      value={story.description}
+                      onChange={(event) =>
+                        updateStory(story.id, "description", event.target.value)
+                      }
+                      rows={3}
+                      className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                    />
+                  </div>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={addStory}
+                className="cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-950 hover:bg-slate-950 hover:text-white"
+              >
+                + Adicionar Story estratégico
+              </button>
+            </div>
+          )}
         </SubSection>
 
+        {/* SubSection 3: Diretrizes editoriais */}
         <SubSection
-          title="Conteúdos"
-          description="Liste formatos, temas e ideias de conteúdos que podem ser usados no Instagram."
+          title="Diretrizes editoriais"
+          description="Registre princípios, temas prioritários, restrições e orientações que devem ser considerados na produção de conteúdo."
         >
-          <InlineList
-            items={contentItems}
-            onChangeItem={updateContent}
-            onAddItem={addContent}
-            onRemoveItem={removeContent}
-            placeholder="Ex: Carrosséis educativos, reels de autoridade, posts de prova social..."
-            buttonLabel="Novo conteúdo"
-          />
+          {data.contentArchitecture.generalContentGuidelines.length === 0 ? (
+            <div className="space-y-3">
+              <p className="text-sm text-slate-400">Nenhuma diretriz editorial cadastrada.</p>
+              <button
+                type="button"
+                onClick={addContent}
+                className="cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-950 hover:bg-slate-950 hover:text-white"
+              >
+                + Adicionar diretriz
+              </button>
+            </div>
+          ) : (
+            <div>
+              <div className="space-y-3">
+                {data.contentArchitecture.generalContentGuidelines.map(
+                  (guideline, index) => (
+                    <div key={index} className="flex gap-3">
+                      <textarea
+                        value={guideline}
+                        onChange={(event) => updateContent(index, event.target.value)}
+                        rows={2}
+                        placeholder="Ex.: Cada conteúdo deve partir de um sintoma reconhecível e indicar um próximo movimento."
+                        className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                      />
+                      <div className="flex flex-shrink-0 flex-col gap-1">
+                        <button
+                          type="button"
+                          onClick={() => moveContent(index, "up")}
+                          disabled={index === 0}
+                          aria-label="Mover diretriz para cima"
+                          className="cursor-pointer rounded-full px-3 py-2 text-xs font-semibold text-slate-500 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          ↑
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => moveContent(index, "down")}
+                          disabled={
+                            index ===
+                            data.contentArchitecture.generalContentGuidelines.length - 1
+                          }
+                          aria-label="Mover diretriz para baixo"
+                          className="cursor-pointer rounded-full px-3 py-2 text-xs font-semibold text-slate-500 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          ↓
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => removeContent(index)}
+                          className="cursor-pointer rounded-full px-3 py-2 text-xs font-semibold text-red-500 transition hover:bg-red-50"
+                        >
+                          Excluir
+                        </button>
+                      </div>
+                    </div>
+                  )
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={addContent}
+                className="mt-4 cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-950 hover:bg-slate-950 hover:text-white"
+              >
+                + Adicionar diretriz
+              </button>
+            </div>
+          )}
         </SubSection>
 
+        {/* SubSection 4: Hashtags */}
         <SubSection
           title="Hashtags"
           description="Registre hashtags importantes para descoberta, nicho, localização, autoridade e temas recorrentes."
