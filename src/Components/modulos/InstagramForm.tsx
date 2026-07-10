@@ -30,6 +30,7 @@ const NAV_ITEMS = [
   { label: "Direção visual", id: "instagram-visual" },
   { label: "Conversão", id: "instagram-conversion" },
   { label: "Indicadores", id: "instagram-measurement" },
+  { label: "Integração", id: "instagram-integration" },
   { label: "Referências", id: "instagram-references" },
 ];
 
@@ -918,6 +919,100 @@ export default function InstagramForm({
         ...current,
         measurement: {
           ...current.measurement,
+          [list]: arr,
+        },
+      };
+    });
+  }
+
+  // ─── Integration handlers ────────────────────────────────────────────────────
+
+  function updateIntegration(
+    key: "ecosystemRole" | "contentRepurposing",
+    value: string
+  ) {
+    setData((current) => ({
+      ...current,
+      integration: {
+        ...current.integration,
+        [key]: value,
+      },
+    }));
+  }
+
+  function updateIntegrationListItem(
+    list:
+      | "receivesAudienceFrom"
+      | "directsAudienceTo"
+      | "connectionCtas"
+      | "operationalDependencies",
+    index: number,
+    value: string
+  ) {
+    setData((current) => {
+      const arr = [...current.integration[list]];
+      arr[index] = value;
+      return {
+        ...current,
+        integration: {
+          ...current.integration,
+          [list]: arr,
+        },
+      };
+    });
+  }
+
+  function addIntegrationListItem(
+    list:
+      | "receivesAudienceFrom"
+      | "directsAudienceTo"
+      | "connectionCtas"
+      | "operationalDependencies"
+  ) {
+    setData((current) => ({
+      ...current,
+      integration: {
+        ...current.integration,
+        [list]: [...current.integration[list], ""],
+      },
+    }));
+  }
+
+  function removeIntegrationListItem(
+    list:
+      | "receivesAudienceFrom"
+      | "directsAudienceTo"
+      | "connectionCtas"
+      | "operationalDependencies",
+    index: number
+  ) {
+    setData((current) => ({
+      ...current,
+      integration: {
+        ...current.integration,
+        [list]: current.integration[list].filter((_, i) => i !== index),
+      },
+    }));
+  }
+
+  function moveIntegrationListItem(
+    list:
+      | "receivesAudienceFrom"
+      | "directsAudienceTo"
+      | "connectionCtas"
+      | "operationalDependencies",
+    index: number,
+    direction: "up" | "down"
+  ) {
+    setData((current) => {
+      const arr = [...current.integration[list]];
+      const targetIndex = direction === "up" ? index - 1 : index + 1;
+      if (targetIndex < 0 || targetIndex >= arr.length) return current;
+      [arr[index], arr[targetIndex]] = [arr[targetIndex], arr[index]];
+      return {
+        ...current,
+        integration: {
+          ...current.integration,
           [list]: arr,
         },
       };
@@ -3848,6 +3943,440 @@ export default function InstagramForm({
               )}
             </div>
           </div>
+        </SubSection>
+      </FormSection>
+
+      {/* ── Integração com outros canais ── */}
+      <FormSection
+        id="instagram-integration"
+        title="Integração com outros canais"
+        description="Defina como o Instagram se conecta aos demais canais, conteúdos e pontos de contato da estratégia."
+      >
+        {/* ── 1. Papel no ecossistema ── */}
+        <SubSection title="Papel no ecossistema">
+          <label
+            htmlFor="integration-ecosystem-role"
+            className="mb-1 block text-sm font-semibold text-slate-600"
+          >
+            Papel do Instagram no ecossistema
+          </label>
+          <p className="mb-2 text-xs leading-5 text-slate-500">
+            Explique qual função o Instagram cumpre em relação aos demais canais e etapas da estratégia.
+          </p>
+          <textarea
+            id="integration-ecosystem-role"
+            value={data.integration.ecosystemRole}
+            onChange={(event) =>
+              updateIntegration("ecosystemRole", event.target.value)
+            }
+            rows={4}
+            placeholder="Ex.: Funcionar como canal público de descoberta, autoridade e relacionamento, conduzindo parte da audiência para conteúdos aprofundados e canais comerciais."
+            className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+          />
+        </SubSection>
+
+        {/* ── 2. Fluxo de audiência ── */}
+        <SubSection title="Fluxo de audiência">
+          <div className="grid gap-8 md:grid-cols-2">
+            {/* Recebe audiência de */}
+            <div>
+              <p className="mb-1 text-sm font-semibold text-slate-600">
+                Recebe audiência de
+              </p>
+              <p className="mb-3 text-xs leading-5 text-slate-500">
+                Registre os canais, campanhas ou pontos de contato que podem levar pessoas até o Instagram.
+              </p>
+              {data.integration.receivesAudienceFrom.length === 0 ? (
+                <div className="space-y-3">
+                  <p className="text-sm text-slate-400">
+                    Nenhuma origem de audiência cadastrada.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => addIntegrationListItem("receivesAudienceFrom")}
+                    className="cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-950 hover:bg-slate-950 hover:text-white"
+                  >
+                    + Adicionar origem de audiência
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {data.integration.receivesAudienceFrom.map((item, index) => (
+                    <div
+                      key={index}
+                      className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+                    >
+                      <div className="mb-2 flex items-center justify-between">
+                        <span className="text-xs font-semibold text-slate-400">
+                          Origem {String(index + 1).padStart(2, "0")}
+                        </span>
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              moveIntegrationListItem("receivesAudienceFrom", index, "up")
+                            }
+                            disabled={index === 0}
+                            aria-label="Mover origem para cima"
+                            className="cursor-pointer rounded-full px-3 py-1.5 text-xs font-semibold text-slate-500 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-40"
+                          >
+                            ↑
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              moveIntegrationListItem("receivesAudienceFrom", index, "down")
+                            }
+                            disabled={
+                              index === data.integration.receivesAudienceFrom.length - 1
+                            }
+                            aria-label="Mover origem para baixo"
+                            className="cursor-pointer rounded-full px-3 py-1.5 text-xs font-semibold text-slate-500 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-40"
+                          >
+                            ↓
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              removeIntegrationListItem("receivesAudienceFrom", index)
+                            }
+                            className="cursor-pointer rounded-full px-3 py-1.5 text-xs font-semibold text-red-500 transition hover:bg-red-50"
+                          >
+                            Excluir
+                          </button>
+                        </div>
+                      </div>
+                      <textarea
+                        value={item}
+                        onChange={(event) =>
+                          updateIntegrationListItem(
+                            "receivesAudienceFrom",
+                            index,
+                            event.target.value
+                          )
+                        }
+                        rows={2}
+                        placeholder="Ex.: YouTube, evento presencial ou campanha de tráfego pago"
+                        className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                      />
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => addIntegrationListItem("receivesAudienceFrom")}
+                    className="cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-950 hover:bg-slate-950 hover:text-white"
+                  >
+                    + Adicionar origem de audiência
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Direciona audiência para */}
+            <div>
+              <p className="mb-1 text-sm font-semibold text-slate-600">
+                Direciona audiência para
+              </p>
+              <p className="mb-3 text-xs leading-5 text-slate-500">
+                Registre os canais, páginas e ambientes para os quais o Instagram deve conduzir o público.
+              </p>
+              {data.integration.directsAudienceTo.length === 0 ? (
+                <div className="space-y-3">
+                  <p className="text-sm text-slate-400">
+                    Nenhum destino de audiência cadastrado.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => addIntegrationListItem("directsAudienceTo")}
+                    className="cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-950 hover:bg-slate-950 hover:text-white"
+                  >
+                    + Adicionar destino de audiência
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {data.integration.directsAudienceTo.map((item, index) => (
+                    <div
+                      key={index}
+                      className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+                    >
+                      <div className="mb-2 flex items-center justify-between">
+                        <span className="text-xs font-semibold text-slate-400">
+                          Destino {String(index + 1).padStart(2, "0")}
+                        </span>
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              moveIntegrationListItem("directsAudienceTo", index, "up")
+                            }
+                            disabled={index === 0}
+                            aria-label="Mover destino para cima"
+                            className="cursor-pointer rounded-full px-3 py-1.5 text-xs font-semibold text-slate-500 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-40"
+                          >
+                            ↑
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              moveIntegrationListItem("directsAudienceTo", index, "down")
+                            }
+                            disabled={
+                              index === data.integration.directsAudienceTo.length - 1
+                            }
+                            aria-label="Mover destino para baixo"
+                            className="cursor-pointer rounded-full px-3 py-1.5 text-xs font-semibold text-slate-500 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-40"
+                          >
+                            ↓
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              removeIntegrationListItem("directsAudienceTo", index)
+                            }
+                            className="cursor-pointer rounded-full px-3 py-1.5 text-xs font-semibold text-red-500 transition hover:bg-red-50"
+                          >
+                            Excluir
+                          </button>
+                        </div>
+                      </div>
+                      <textarea
+                        value={item}
+                        onChange={(event) =>
+                          updateIntegrationListItem(
+                            "directsAudienceTo",
+                            index,
+                            event.target.value
+                          )
+                        }
+                        rows={2}
+                        placeholder="Ex.: WhatsApp, canal no YouTube, página do Diagnóstico ou lista de e-mails"
+                        className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                      />
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => addIntegrationListItem("directsAudienceTo")}
+                    className="cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-950 hover:bg-slate-950 hover:text-white"
+                  >
+                    + Adicionar destino de audiência
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </SubSection>
+
+        {/* ── 3. Reaproveitamento e conexão ── */}
+        <SubSection title="Reaproveitamento e conexão">
+          <div className="space-y-6">
+            <div>
+              <label
+                htmlFor="integration-content-repurposing"
+                className="mb-1 block text-sm font-semibold text-slate-600"
+              >
+                Estratégia de reaproveitamento
+              </label>
+              <p className="mb-2 text-xs leading-5 text-slate-500">
+                Defina como conteúdos criados para outros canais podem ser adaptados para o Instagram e como conteúdos do Instagram podem originar materiais em outros ambientes.
+              </p>
+              <textarea
+                id="integration-content-repurposing"
+                value={data.integration.contentRepurposing}
+                onChange={(event) =>
+                  updateIntegration("contentRepurposing", event.target.value)
+                }
+                rows={4}
+                placeholder="Ex.: Transformar aulas do YouTube em Reels, carrosséis e Stories, preservando a tese central e adaptando profundidade, abertura e CTA."
+                className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+              />
+            </div>
+
+            <div>
+              <p className="mb-1 text-sm font-semibold text-slate-600">
+                CTAs de conexão entre canais
+              </p>
+              <p className="mb-3 text-xs leading-5 text-slate-500">
+                Registre chamadas que conduzam o público do Instagram para outro canal ou tragam audiência de volta para o perfil.
+              </p>
+              {data.integration.connectionCtas.length === 0 ? (
+                <div className="space-y-3">
+                  <p className="text-sm text-slate-400">
+                    Nenhum CTA de conexão cadastrado.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => addIntegrationListItem("connectionCtas")}
+                    className="cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-950 hover:bg-slate-950 hover:text-white"
+                  >
+                    + Adicionar CTA de conexão
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {data.integration.connectionCtas.map((item, index) => (
+                    <div
+                      key={index}
+                      className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+                    >
+                      <div className="mb-2 flex items-center justify-between">
+                        <span className="text-xs font-semibold text-slate-400">
+                          CTA {String(index + 1).padStart(2, "0")}
+                        </span>
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              moveIntegrationListItem("connectionCtas", index, "up")
+                            }
+                            disabled={index === 0}
+                            aria-label="Mover CTA para cima"
+                            className="cursor-pointer rounded-full px-3 py-1.5 text-xs font-semibold text-slate-500 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-40"
+                          >
+                            ↑
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              moveIntegrationListItem("connectionCtas", index, "down")
+                            }
+                            disabled={
+                              index === data.integration.connectionCtas.length - 1
+                            }
+                            aria-label="Mover CTA para baixo"
+                            className="cursor-pointer rounded-full px-3 py-1.5 text-xs font-semibold text-slate-500 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-40"
+                          >
+                            ↓
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              removeIntegrationListItem("connectionCtas", index)
+                            }
+                            className="cursor-pointer rounded-full px-3 py-1.5 text-xs font-semibold text-red-500 transition hover:bg-red-50"
+                          >
+                            Excluir
+                          </button>
+                        </div>
+                      </div>
+                      <textarea
+                        value={item}
+                        onChange={(event) =>
+                          updateIntegrationListItem(
+                            "connectionCtas",
+                            index,
+                            event.target.value
+                          )
+                        }
+                        rows={2}
+                        placeholder="Ex.: Assista à análise completa no YouTube"
+                        className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                      />
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => addIntegrationListItem("connectionCtas")}
+                    className="cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-950 hover:bg-slate-950 hover:text-white"
+                  >
+                    + Adicionar CTA de conexão
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </SubSection>
+
+        {/* ── 4. Dependências operacionais ── */}
+        <SubSection title="Dependências operacionais">
+          <p className="mb-3 text-xs leading-5 text-slate-500">
+            Registre recursos, processos, pessoas ou entregas necessárias para que a integração entre canais funcione.
+          </p>
+          {data.integration.operationalDependencies.length === 0 ? (
+            <div className="space-y-3">
+              <p className="text-sm text-slate-400">
+                Nenhuma dependência operacional cadastrada.
+              </p>
+              <button
+                type="button"
+                onClick={() => addIntegrationListItem("operationalDependencies")}
+                className="cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-950 hover:bg-slate-950 hover:text-white"
+              >
+                + Adicionar dependência
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {data.integration.operationalDependencies.map((item, index) => (
+                <div
+                  key={index}
+                  className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+                >
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="text-xs font-semibold text-slate-400">
+                      Dependência {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          moveIntegrationListItem("operationalDependencies", index, "up")
+                        }
+                        disabled={index === 0}
+                        aria-label="Mover dependência para cima"
+                        className="cursor-pointer rounded-full px-3 py-1.5 text-xs font-semibold text-slate-500 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        ↑
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          moveIntegrationListItem("operationalDependencies", index, "down")
+                        }
+                        disabled={
+                          index === data.integration.operationalDependencies.length - 1
+                        }
+                        aria-label="Mover dependência para baixo"
+                        className="cursor-pointer rounded-full px-3 py-1.5 text-xs font-semibold text-slate-500 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        ↓
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          removeIntegrationListItem("operationalDependencies", index)
+                        }
+                        className="cursor-pointer rounded-full px-3 py-1.5 text-xs font-semibold text-red-500 transition hover:bg-red-50"
+                      >
+                        Excluir
+                      </button>
+                    </div>
+                  </div>
+                  <textarea
+                    value={item}
+                    onChange={(event) =>
+                      updateIntegrationListItem(
+                        "operationalDependencies",
+                        index,
+                        event.target.value
+                      )
+                    }
+                    rows={2}
+                    placeholder="Ex.: Vídeo longo aprovado antes da produção dos cortes para Reels"
+                    className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                  />
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => addIntegrationListItem("operationalDependencies")}
+                className="cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-950 hover:bg-slate-950 hover:text-white"
+              >
+                + Adicionar dependência
+              </button>
+            </div>
+          )}
         </SubSection>
       </FormSection>
 
