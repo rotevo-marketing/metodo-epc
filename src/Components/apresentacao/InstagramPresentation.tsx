@@ -198,6 +198,29 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
     hasText(d.visualDirection.avoid) ||
     visualReferenceItems.length > 0;
 
+  const hasDiscoveryConversion =
+    hasText(d.conversion.discovery.cta) ||
+    hasText(d.conversion.discovery.destination);
+
+  const hasConsiderationConversion =
+    hasText(d.conversion.consideration.cta) ||
+    hasText(d.conversion.consideration.destination);
+
+  const hasDecisionConversion =
+    hasText(d.conversion.decision.cta) ||
+    hasText(d.conversion.decision.destination);
+
+  const hasConversionSection =
+    hasDiscoveryConversion ||
+    hasConsiderationConversion ||
+    hasDecisionConversion ||
+    hasText(d.conversion.conversionPath) ||
+    hasText(d.conversion.primaryOffer) ||
+    hasText(d.conversion.commercialChannel) ||
+    hasText(d.conversion.crmIntegration);
+
+  const hasVisibleInstagramContent = hasMeaningfulInstagramContent(d) || hasConversionSection;
+
   // profile.enabled intentionally not used — section shows based on content presence
   const hasProfileSection =
     hasText(profilePhotoUrl) ||
@@ -511,6 +534,67 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
         </SectionCard>
       )}
 
+      {hasConversionSection && (
+        <SectionCard title="Conversão">
+          {(hasDiscoveryConversion || hasConsiderationConversion || hasDecisionConversion) && (
+            <div>
+              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                Conversão por etapa da jornada
+              </p>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {hasDiscoveryConversion && (
+                  <div className="rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200">
+                    <p className="text-sm font-semibold text-slate-950">Descoberta</p>
+                    <p className="mt-1 text-xs leading-5 text-slate-500">
+                      Primeiro contato e progressão para um próximo conteúdo ou ponto de interesse.
+                    </p>
+                    <PlainTextField label="CTA" value={d.conversion.discovery.cta} />
+                    <PlainTextField label="Destino" value={d.conversion.discovery.destination} />
+                  </div>
+                )}
+                {hasConsiderationConversion && (
+                  <div className="rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200">
+                    <p className="text-sm font-semibold text-slate-950">Consideração</p>
+                    <p className="mt-1 text-xs leading-5 text-slate-500">
+                      Aprofundamento do problema, da solução ou do método.
+                    </p>
+                    <PlainTextField label="CTA" value={d.conversion.consideration.cta} />
+                    <PlainTextField label="Destino" value={d.conversion.consideration.destination} />
+                  </div>
+                )}
+                {hasDecisionConversion && (
+                  <div className="rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200">
+                    <p className="text-sm font-semibold text-slate-950">Decisão</p>
+                    <p className="mt-1 text-xs leading-5 text-slate-500">
+                      Encaminhamento para a ação comercial ou conversa qualificada.
+                    </p>
+                    <PlainTextField label="CTA" value={d.conversion.decision.cta} />
+                    <PlainTextField label="Destino" value={d.conversion.decision.destination} />
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {(hasText(d.conversion.conversionPath) ||
+            hasText(d.conversion.primaryOffer) ||
+            hasText(d.conversion.commercialChannel) ||
+            hasText(d.conversion.crmIntegration)) && (
+            <div>
+              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                Caminho e operação comercial
+              </p>
+              <PlainTextField label="Caminho de conversão" value={d.conversion.conversionPath} />
+              <div className="grid gap-x-8 sm:grid-cols-2">
+                <PlainTextField label="Oferta principal" value={d.conversion.primaryOffer} />
+                <PlainTextField label="Canal comercial" value={d.conversion.commercialChannel} />
+              </div>
+              <PlainTextField label="Integração com CRM" value={d.conversion.crmIntegration} />
+            </div>
+          )}
+        </SectionCard>
+      )}
+
       {hasProfileSection && (
         <SectionCard title="Perfil">
           {(hasText(profilePhotoUrl) || hasText(profileName) || hasText(profileHandle)) && (
@@ -622,7 +706,7 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
         </SectionCard>
       )}
 
-      {!hasMeaningfulInstagramContent(d) && <EmptyState />}
+      {!hasVisibleInstagramContent && <EmptyState />}
     </article>
   );
 }
