@@ -1441,14 +1441,14 @@ export default function InstagramForm({
         title="Perfil do Instagram"
         description="Configure como o perfil será apresentado visualmente ao público."
       >
-        <div className="grid gap-10 lg:grid-cols-[1fr_320px] lg:items-start">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)] lg:items-start">
           <div className="space-y-10">
         {/* SubSection 1: Identificação */}
         <SubSection
           title="Identificação do perfil"
           description="Dados básicos de identificação do perfil no Instagram."
         >
-          <div className="mb-4 flex justify-end">
+          <div className="mb-4">
             <label className="flex cursor-pointer items-center gap-3 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700">
               <input
                 type="checkbox"
@@ -1465,8 +1465,8 @@ export default function InstagramForm({
             </label>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-[150px_1fr] md:items-start">
-            <div>
+          <div className="grid gap-6 md:grid-cols-[150px_minmax(0,1fr)] md:items-start">
+            <div className="flex flex-col items-center">
               <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-full bg-slate-950 text-xs font-semibold text-white">
                 {data.profile.photoUrl ? (
                   <img
@@ -1480,7 +1480,7 @@ export default function InstagramForm({
               </div>
 
               <div className="mt-3 flex flex-col gap-2">
-                <label className="cursor-pointer rounded-full bg-slate-950 px-4 py-2 text-center text-xs font-semibold text-white transition hover:bg-slate-800">
+                <label className="w-full cursor-pointer rounded-full bg-slate-950 px-4 py-2 text-center text-xs font-semibold text-white transition hover:bg-slate-800">
                   {uploadingProfilePhoto ? "Enviando..." : "Escolher foto"}
                   <input
                     type="file"
@@ -1494,7 +1494,7 @@ export default function InstagramForm({
                 <button
                   type="button"
                   onClick={removeBioPhoto}
-                  className="cursor-pointer rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-600 transition hover:bg-slate-100"
+                  className="w-full cursor-pointer rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-600 transition hover:bg-slate-100"
                 >
                   Remover
                 </button>
@@ -1506,7 +1506,7 @@ export default function InstagramForm({
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
-              <div>
+              <div className="min-w-0">
                 <label className="mb-2 block text-sm font-semibold text-slate-600">
                   Arroba do perfil
                 </label>
@@ -1523,7 +1523,7 @@ export default function InstagramForm({
                   className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
                 />
               </div>
-              <div>
+              <div className="min-w-0">
                 <label className="mb-2 block text-sm font-semibold text-slate-600">
                   Nome do perfil
                 </label>
