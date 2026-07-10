@@ -267,14 +267,6 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
 
   const hasExternalReferencesSection = externalReferenceItems.length > 0;
 
-  const hasVisibleInstagramContent =
-    hasMeaningfulInstagramContent(d) ||
-    hasConversionSection ||
-    hasMeasurementSection ||
-    hasIntegrationSection ||
-    hasContentAndLanguageSection ||
-    hasExternalReferencesSection;
-
   // profile.enabled intentionally not used — section shows based on content presence
   const hasProfileSection =
     hasText(profilePhotoUrl) ||
@@ -284,6 +276,17 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
     hasText(bioLink) ||
     profileLinkItems.length > 0 ||
     profileHighlights.length > 0;
+
+  const hasVisibleInstagramContent =
+    hasMeaningfulInstagramContent(d) ||
+    hasFrequencySection ||
+    hasContentAndLanguageSection ||
+    hasVisualDirectionSection ||
+    hasConversionSection ||
+    hasMeasurementSection ||
+    hasIntegrationSection ||
+    hasProfileSection ||
+    hasExternalReferencesSection;
 
   // ─── Render ─────────────────────────────────────────────────────────────────
 
