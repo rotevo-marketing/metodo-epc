@@ -792,15 +792,20 @@ export default function InstagramForm({
 
   // ─── External references handlers ─────────────────────────────────────────────
 
-  function updateReference(index: number, key: "title" | "url", value: string) {
-    setData((current) => {
-      const nextRefs = [...current.externalReferences];
-      nextRefs[index] = { ...nextRefs[index], [key]: value };
-      return { ...current, externalReferences: nextRefs };
-    });
+  function updateExternalReference(
+    id: string,
+    key: "title" | "url" | "notes",
+    value: string
+  ) {
+    setData((current) => ({
+      ...current,
+      externalReferences: current.externalReferences.map((ref) =>
+        ref.id === id ? { ...ref, [key]: value } : ref
+      ),
+    }));
   }
 
-  function addReference() {
+  function addExternalReference() {
     setData((current) => ({
       ...current,
       externalReferences: [
@@ -810,14 +815,23 @@ export default function InstagramForm({
     }));
   }
 
-  function removeReference(index: number) {
+  function removeExternalReference(id: string) {
     setData((current) => ({
       ...current,
-      externalReferences:
-        current.externalReferences.length > 1
-          ? current.externalReferences.filter((_, i) => i !== index)
-          : [createEmptyInstagramExternalReference()],
+      externalReferences: current.externalReferences.filter((ref) => ref.id !== id),
     }));
+  }
+
+  function moveExternalReference(id: string, direction: "up" | "down") {
+    setData((current) => {
+      const arr = [...current.externalReferences];
+      const index = arr.findIndex((ref) => ref.id === id);
+      if (index === -1) return current;
+      const targetIndex = direction === "up" ? index - 1 : index + 1;
+      if (targetIndex < 0 || targetIndex >= arr.length) return current;
+      [arr[index], arr[targetIndex]] = [arr[targetIndex], arr[index]];
+      return { ...current, externalReferences: arr };
+    });
   }
 
   // ─── Strategic direction handler ─────────────────────────────────────────────
@@ -2943,64 +2957,135 @@ export default function InstagramForm({
         title="Referências externas"
         description="Centralize links e materiais que apoiam a estratégia do Instagram."
       >
-        <div className="space-y-4">
-          {data.externalReferences.map((reference, index) => (
-            <div
-              key={reference.id}
-              className="grid gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 md:grid-cols-[1fr_1fr_auto]"
-            >
-              <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-600">
-                  Título da referência
-                </label>
-
-                <input
-                  type="text"
-                  value={reference.title}
-                  onChange={(event) =>
-                    updateReference(index, "title", event.target.value)
-                  }
-                  placeholder="Ex: Perfil, post, reels, campanha ou referência visual"
-                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
-                />
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-600">
-                  Link
-                </label>
-
-                <input
-                  type="url"
-                  value={reference.url}
-                  onChange={(event) =>
-                    updateReference(index, "url", event.target.value)
-                  }
-                  placeholder="https://..."
-                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
-                />
-              </div>
-
-              <div className="flex items-end">
-                <button
-                  type="button"
-                  onClick={() => removeReference(index)}
-                  className="cursor-pointer rounded-full px-4 py-3 text-sm font-semibold text-red-500 transition hover:bg-red-50"
-                >
-                  Excluir
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <button
-          type="button"
-          onClick={addReference}
-          className="mt-5 cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-950 hover:border-slate-950 hover:text-white"
+        <SubSection
+          title="Links e materiais de apoio"
+          description="Registre páginas, documentos, perfis e conteúdos usados como referência para a estratégia do canal."
         >
-          + Nova referência
-        </button>
+          {data.externalReferences.length === 0 ? (
+            <div className="space-y-3">
+              <p className="text-sm text-slate-400">Nenhuma referência externa cadastrada.</p>
+              <button
+                type="button"
+                onClick={addExternalReference}
+                className="cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-950 hover:bg-slate-950 hover:text-white"
+              >
+                + Adicionar referência
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {data.externalReferences.map((reference, index) => (
+                <div
+                  key={reference.id}
+                  className="rounded-2xl border border-slate-200 bg-slate-50 p-5"
+                >
+                  <div className="mb-4 flex items-center justify-between">
+                    <span className="text-xs font-semibold text-slate-400">
+                      Referência {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => moveExternalReference(reference.id, "up")}
+                        disabled={index === 0}
+                        aria-label="Mover referência para cima"
+                        className="cursor-pointer rounded-full px-3 py-1.5 text-xs font-semibold text-slate-500 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        ↑
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          moveExternalReference(reference.id, "down")
+                        }
+                        disabled={index === data.externalReferences.length - 1}
+                        aria-label="Mover referência para baixo"
+                        className="cursor-pointer rounded-full px-3 py-1.5 text-xs font-semibold text-slate-500 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        ↓
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeExternalReference(reference.id)}
+                        className="cursor-pointer rounded-full px-3 py-1.5 text-xs font-semibold text-red-500 transition hover:bg-red-50"
+                      >
+                        Excluir
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div>
+                      <label className="mb-2 block text-sm font-semibold text-slate-600">
+                        Título da referência
+                      </label>
+                      <input
+                        type="text"
+                        value={reference.title}
+                        onChange={(event) =>
+                          updateExternalReference(
+                            reference.id,
+                            "title",
+                            event.target.value
+                          )
+                        }
+                        placeholder="Ex.: Perfil de referência, artigo, estudo ou página de concorrente"
+                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-sm font-semibold text-slate-600">
+                        URL
+                      </label>
+                      <input
+                        type="url"
+                        value={reference.url}
+                        onChange={(event) =>
+                          updateExternalReference(
+                            reference.id,
+                            "url",
+                            event.target.value
+                          )
+                        }
+                        placeholder="https://"
+                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="mt-4">
+                    <label className="mb-1 block text-sm font-semibold text-slate-600">
+                      Observações
+                    </label>
+                    <p className="mb-2 text-xs leading-5 text-slate-500">
+                      Explique por que essa referência é relevante e o que deve ser analisado ou aproveitado.
+                    </p>
+                    <textarea
+                      value={reference.notes}
+                      onChange={(event) =>
+                        updateExternalReference(
+                          reference.id,
+                          "notes",
+                          event.target.value
+                        )
+                      }
+                      rows={3}
+                      placeholder="Ex.: Observar a organização dos destaques e a clareza da proposta na bio."
+                      className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                    />
+                  </div>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={addExternalReference}
+                className="cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-950 hover:bg-slate-950 hover:text-white"
+              >
+                + Adicionar referência
+              </button>
+            </div>
+          )}
+        </SubSection>
       </FormSection>
 
       {/* ── Sticky save bar ── */}
