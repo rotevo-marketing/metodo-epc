@@ -537,12 +537,17 @@ export default function InstagramForm({
 
   // ─── Language structures handlers ─────────────────────────────────────────────
 
-  function updateLanguageStructure(index: number, value: string) {
-    setData((current) => {
-      const nextItems = [...current.languageStructures];
-      nextItems[index] = { ...nextItems[index], howItAppears: value };
-      return { ...current, languageStructures: nextItems };
-    });
+  function updateLanguageStructure(
+    id: string,
+    key: "name" | "howItAppears" | "journeyRelation" | "avoid" | "example",
+    value: string
+  ) {
+    setData((current) => ({
+      ...current,
+      languageStructures: current.languageStructures.map((l) =>
+        l.id === id ? { ...l, [key]: value } : l
+      ),
+    }));
   }
 
   function addLanguageStructure() {
@@ -555,14 +560,23 @@ export default function InstagramForm({
     }));
   }
 
-  function removeLanguageStructure(index: number) {
+  function removeLanguageStructure(id: string) {
     setData((current) => ({
       ...current,
-      languageStructures:
-        current.languageStructures.length > 1
-          ? current.languageStructures.filter((_, i) => i !== index)
-          : [createEmptyInstagramLanguageStructure()],
+      languageStructures: current.languageStructures.filter((l) => l.id !== id),
     }));
+  }
+
+  function moveLanguageStructure(id: string, direction: "up" | "down") {
+    setData((current) => {
+      const arr = [...current.languageStructures];
+      const index = arr.findIndex((l) => l.id === id);
+      if (index === -1) return current;
+      const targetIndex = direction === "up" ? index - 1 : index + 1;
+      if (targetIndex < 0 || targetIndex >= arr.length) return current;
+      [arr[index], arr[targetIndex]] = [arr[targetIndex], arr[index]];
+      return { ...current, languageStructures: arr };
+    });
   }
 
   // ─── Contents handlers ────────────────────────────────────────────────────────
@@ -997,7 +1011,6 @@ export default function InstagramForm({
   }
 
   // Derived flat lists
-  const languageItems = data.languageStructures.map((l) => l.howItAppears);
 
   // ─── JSX ─────────────────────────────────────────────────────────────────────
 
@@ -2336,14 +2349,160 @@ export default function InstagramForm({
         title="Estrutura de linguagem"
         description="Registre como a comunicação deve aparecer nos conteúdos do canal."
       >
-        <InlineList
-          items={languageItems}
-          onChangeItem={updateLanguageStructure}
-          onAddItem={addLanguageStructure}
-          onRemoveItem={removeLanguageStructure}
-          placeholder="Ex: Gancho forte, explicação simples, exemplo prático, chamada final..."
-          buttonLabel="Nova estrutura de linguagem"
-        />
+        <SubSection
+          title="Diretrizes de linguagem"
+          description="Defina os padrões de comunicação que devem orientar a produção dos conteúdos no Instagram."
+        >
+          {data.languageStructures.length === 0 ? (
+            <div className="space-y-3">
+              <p className="text-sm text-slate-400">Nenhuma estrutura de linguagem cadastrada.</p>
+              <button
+                type="button"
+                onClick={addLanguageStructure}
+                className="cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-950 hover:bg-slate-950 hover:text-white"
+              >
+                + Adicionar estrutura de linguagem
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {data.languageStructures.map((lang, index) => (
+                <div
+                  key={lang.id}
+                  className="rounded-2xl border border-slate-200 bg-slate-50 p-5"
+                >
+                  <div className="mb-4 flex items-center justify-between">
+                    <span className="text-xs font-semibold text-slate-400">
+                      Estrutura {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => moveLanguageStructure(lang.id, "up")}
+                        disabled={index === 0}
+                        aria-label="Mover estrutura para cima"
+                        className="cursor-pointer rounded-full px-3 py-1.5 text-xs font-semibold text-slate-500 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        ↑
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => moveLanguageStructure(lang.id, "down")}
+                        disabled={index === data.languageStructures.length - 1}
+                        aria-label="Mover estrutura para baixo"
+                        className="cursor-pointer rounded-full px-3 py-1.5 text-xs font-semibold text-slate-500 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        ↓
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeLanguageStructure(lang.id)}
+                        className="cursor-pointer rounded-full px-3 py-1.5 text-xs font-semibold text-red-500 transition hover:bg-red-50"
+                      >
+                        Excluir
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div>
+                      <label className="mb-2 block text-sm font-semibold text-slate-600">
+                        Nome da estrutura
+                      </label>
+                      <input
+                        type="text"
+                        value={lang.name}
+                        onChange={(event) =>
+                          updateLanguageStructure(lang.id, "name", event.target.value)
+                        }
+                        placeholder="Ex.: Investigativa, Didática ou Contestadora com fundamento"
+                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-semibold text-slate-600">
+                        Relação com a jornada
+                      </label>
+                      <p className="mb-2 text-xs leading-5 text-slate-500">
+                        Indique em quais etapas da jornada essa estrutura é mais importante.
+                      </p>
+                      <input
+                        type="text"
+                        value={lang.journeyRelation}
+                        onChange={(event) =>
+                          updateLanguageStructure(lang.id, "journeyRelation", event.target.value)
+                        }
+                        placeholder="Ex.: Mais forte em descoberta e consciência da causa."
+                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="mt-4">
+                    <label className="mb-1 block text-sm font-semibold text-slate-600">
+                      Como aparece na comunicação
+                    </label>
+                    <p className="mb-2 text-xs leading-5 text-slate-500">
+                      Explique como essa característica deve se manifestar nos conteúdos e nas falas do canal.
+                    </p>
+                    <textarea
+                      value={lang.howItAppears}
+                      onChange={(event) =>
+                        updateLanguageStructure(lang.id, "howItAppears", event.target.value)
+                      }
+                      rows={3}
+                      placeholder="Ex.: Perguntas que antecedem a recomendação e ajudam o público a analisar o próprio cenário."
+                      className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                    />
+                  </div>
+
+                  <div className="mt-4">
+                    <label className="mb-1 block text-sm font-semibold text-slate-600">
+                      O que evitar
+                    </label>
+                    <p className="mb-2 text-xs leading-5 text-slate-500">
+                      Registre excessos, erros de tom ou comportamentos que contradizem essa estrutura.
+                    </p>
+                    <textarea
+                      value={lang.avoid}
+                      onChange={(event) =>
+                        updateLanguageStructure(lang.id, "avoid", event.target.value)
+                      }
+                      rows={2}
+                      placeholder="Ex.: Perguntas retóricas sem conclusão ou recomendações genéricas."
+                      className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                    />
+                  </div>
+
+                  <div className="mt-4">
+                    <label className="mb-1 block text-sm font-semibold text-slate-600">
+                      Exemplo aplicado
+                    </label>
+                    <p className="mb-2 text-xs leading-5 text-slate-500">
+                      Inclua uma frase ou trecho que demonstre como essa estrutura deve ser aplicada no Instagram.
+                    </p>
+                    <textarea
+                      value={lang.example}
+                      onChange={(event) =>
+                        updateLanguageStructure(lang.id, "example", event.target.value)
+                      }
+                      rows={3}
+                      placeholder="Ex.: Você está pensando em abrir mais um canal. Antes disso: qual persona ele alcança?"
+                      className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                    />
+                  </div>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={addLanguageStructure}
+                className="cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-950 hover:bg-slate-950 hover:text-white"
+              >
+                + Adicionar estrutura de linguagem
+              </button>
+            </div>
+          )}
+        </SubSection>
       </FormSection>
 
       {/* ── 5. Direção visual ── */}
