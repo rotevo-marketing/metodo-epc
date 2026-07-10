@@ -28,6 +28,7 @@ const NAV_ITEMS = [
   { label: "Conteúdo", id: "instagram-content" },
   { label: "Linguagem", id: "instagram-language" },
   { label: "Direção visual", id: "instagram-visual" },
+  { label: "Conversão", id: "instagram-conversion" },
   { label: "Referências", id: "instagram-references" },
 ];
 
@@ -787,6 +788,38 @@ export default function InstagramForm({
     setData((current) => ({
       ...current,
       profile: { ...current.profile, photoUrl: "" },
+    }));
+  }
+
+  // ─── Conversion handlers ─────────────────────────────────────────────────────
+
+  function updateConversionStage(
+    stage: "discovery" | "consideration" | "decision",
+    key: "cta" | "destination",
+    value: string
+  ) {
+    setData((current) => ({
+      ...current,
+      conversion: {
+        ...current.conversion,
+        [stage]: {
+          ...current.conversion[stage],
+          [key]: value,
+        },
+      },
+    }));
+  }
+
+  function updateConversion(
+    key: "conversionPath" | "primaryOffer" | "commercialChannel" | "crmIntegration",
+    value: string
+  ) {
+    setData((current) => ({
+      ...current,
+      conversion: {
+        ...current.conversion,
+        [key]: value,
+      },
     }));
   }
 
@@ -2948,6 +2981,245 @@ export default function InstagramForm({
               </div>
             </div>
           )}
+        </SubSection>
+      </FormSection>
+
+      {/* ── Conversão ── */}
+      <FormSection
+        id="instagram-conversion"
+        title="Conversão"
+        description="Defina como os conteúdos do Instagram conduzirão o público da descoberta até a ação comercial."
+      >
+        <SubSection title="Conversão por etapa da jornada">
+          <div className="flex flex-col gap-4 md:flex-row md:items-stretch">
+            {/* Descoberta */}
+            <div className="flex-1 rounded-2xl border border-slate-200 bg-slate-50 p-5">
+              <div className="mb-1 flex items-center gap-2">
+                <span className="text-xs font-semibold text-slate-400">01</span>
+                <span className="text-sm font-semibold text-slate-700">Descoberta</span>
+              </div>
+              <p className="mb-4 text-xs leading-5 text-slate-500">
+                Para conteúdos que alcançam pessoas ainda no início da jornada.
+              </p>
+              <div className="space-y-4">
+                <div>
+                  <label
+                    htmlFor="conversion-discovery-cta"
+                    className="mb-1 block text-sm font-semibold text-slate-600"
+                  >
+                    CTA de descoberta
+                  </label>
+                  <textarea
+                    id="conversion-discovery-cta"
+                    value={data.conversion.discovery.cta}
+                    onChange={(event) =>
+                      updateConversionStage("discovery", "cta", event.target.value)
+                    }
+                    rows={3}
+                    placeholder="Seguir o perfil, consumir outro conteúdo ou salvar a publicação"
+                    className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="conversion-discovery-destination"
+                    className="mb-1 block text-sm font-semibold text-slate-600"
+                  >
+                    Destino de descoberta
+                  </label>
+                  <textarea
+                    id="conversion-discovery-destination"
+                    value={data.conversion.discovery.destination}
+                    onChange={(event) =>
+                      updateConversionStage("discovery", "destination", event.target.value)
+                    }
+                    rows={3}
+                    placeholder="Perfil, Reel relacionado, carrossel ou conteúdo complementar"
+                    className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="hidden shrink-0 items-center text-slate-300 md:flex">→</div>
+
+            {/* Consideração */}
+            <div className="flex-1 rounded-2xl border border-slate-200 bg-slate-50 p-5">
+              <div className="mb-1 flex items-center gap-2">
+                <span className="text-xs font-semibold text-slate-400">02</span>
+                <span className="text-sm font-semibold text-slate-700">Consideração</span>
+              </div>
+              <p className="mb-4 text-xs leading-5 text-slate-500">
+                Para conteúdos que aprofundam o problema, a solução ou o método.
+              </p>
+              <div className="space-y-4">
+                <div>
+                  <label
+                    htmlFor="conversion-consideration-cta"
+                    className="mb-1 block text-sm font-semibold text-slate-600"
+                  >
+                    CTA de consideração
+                  </label>
+                  <textarea
+                    id="conversion-consideration-cta"
+                    value={data.conversion.consideration.cta}
+                    onChange={(event) =>
+                      updateConversionStage("consideration", "cta", event.target.value)
+                    }
+                    rows={3}
+                    placeholder="Conhecer o Diagnóstico ou salvar o material"
+                    className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="conversion-consideration-destination"
+                    className="mb-1 block text-sm font-semibold text-slate-600"
+                  >
+                    Destino de consideração
+                  </label>
+                  <textarea
+                    id="conversion-consideration-destination"
+                    value={data.conversion.consideration.destination}
+                    onChange={(event) =>
+                      updateConversionStage("consideration", "destination", event.target.value)
+                    }
+                    rows={3}
+                    placeholder="Página do Diagnóstico, destaque, aula ou conteúdo aprofundado"
+                    className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="hidden shrink-0 items-center text-slate-300 md:flex">→</div>
+
+            {/* Decisão */}
+            <div className="flex-1 rounded-2xl border border-slate-200 bg-slate-50 p-5">
+              <div className="mb-1 flex items-center gap-2">
+                <span className="text-xs font-semibold text-slate-400">03</span>
+                <span className="text-sm font-semibold text-slate-700">Decisão</span>
+              </div>
+              <p className="mb-4 text-xs leading-5 text-slate-500">
+                Para conteúdos direcionados a pessoas próximas da ação comercial.
+              </p>
+              <div className="space-y-4">
+                <div>
+                  <label
+                    htmlFor="conversion-decision-cta"
+                    className="mb-1 block text-sm font-semibold text-slate-600"
+                  >
+                    CTA de decisão
+                  </label>
+                  <textarea
+                    id="conversion-decision-cta"
+                    value={data.conversion.decision.cta}
+                    onChange={(event) =>
+                      updateConversionStage("decision", "cta", event.target.value)
+                    }
+                    rows={3}
+                    placeholder="Falar no WhatsApp ou solicitar uma conversa"
+                    className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="conversion-decision-destination"
+                    className="mb-1 block text-sm font-semibold text-slate-600"
+                  >
+                    Destino de decisão
+                  </label>
+                  <textarea
+                    id="conversion-decision-destination"
+                    value={data.conversion.decision.destination}
+                    onChange={(event) =>
+                      updateConversionStage("decision", "destination", event.target.value)
+                    }
+                    rows={3}
+                    placeholder="WhatsApp, formulário ou página comercial"
+                    className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </SubSection>
+
+        <SubSection
+          title="Caminho de conversão"
+          description="Descreva a sequência que conecta conteúdos, perfil, bio, destaques, oferta e canal comercial."
+        >
+          <textarea
+            id="conversion-path"
+            value={data.conversion.conversionPath}
+            onChange={(event) => updateConversion("conversionPath", event.target.value)}
+            rows={4}
+            placeholder="Ex.: Reel de descoberta → carrossel de aprofundamento → destaque do Diagnóstico → WhatsApp"
+            className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+          />
+        </SubSection>
+
+        <SubSection title="Oferta e operação comercial">
+          <div className="space-y-6">
+            <div>
+              <label
+                htmlFor="conversion-primary-offer"
+                className="mb-1 block text-sm font-semibold text-slate-600"
+              >
+                Oferta principal
+              </label>
+              <p className="mb-2 text-xs leading-5 text-slate-500">
+                Registre qual produto, serviço ou próximo passo comercial será priorizado pelo Instagram.
+              </p>
+              <textarea
+                id="conversion-primary-offer"
+                value={data.conversion.primaryOffer}
+                onChange={(event) => updateConversion("primaryOffer", event.target.value)}
+                rows={2}
+                className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="conversion-commercial-channel"
+                className="mb-1 block text-sm font-semibold text-slate-600"
+              >
+                Canal comercial
+              </label>
+              <p className="mb-2 text-xs leading-5 text-slate-500">
+                Defina onde a conversa comercial deverá acontecer.
+              </p>
+              <input
+                id="conversion-commercial-channel"
+                type="text"
+                value={data.conversion.commercialChannel}
+                onChange={(event) => updateConversion("commercialChannel", event.target.value)}
+                placeholder="Ex.: WhatsApp, formulário de aplicação ou reunião"
+                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="conversion-crm-integration"
+                className="mb-1 block text-sm font-semibold text-slate-600"
+              >
+                Integração com CRM
+              </label>
+              <p className="mb-2 text-xs leading-5 text-slate-500">
+                Explique como os contatos originados pelo Instagram serão registrados, identificados e acompanhados.
+              </p>
+              <textarea
+                id="conversion-crm-integration"
+                value={data.conversion.crmIntegration}
+                onChange={(event) => updateConversion("crmIntegration", event.target.value)}
+                rows={3}
+                placeholder="Ex.: Registrar origem Instagram no CRM e acompanhar o avanço até o Diagnóstico"
+                className="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+              />
+            </div>
+          </div>
         </SubSection>
       </FormSection>
 
