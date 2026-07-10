@@ -147,6 +147,20 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
     (s) => ({ value: s })
   );
 
+  // ─── Integração com outros canais ───────────────────────────────────────────
+  const receivesAudienceFrom: TextItem[] = filterFilledStrings(
+    d.integration.receivesAudienceFrom
+  ).map((s) => ({ value: s }));
+  const directsAudienceTo: TextItem[] = filterFilledStrings(
+    d.integration.directsAudienceTo
+  ).map((s) => ({ value: s }));
+  const connectionCtas: TextItem[] = filterFilledStrings(d.integration.connectionCtas).map(
+    (s) => ({ value: s })
+  );
+  const operationalDependencies: TextItem[] = filterFilledStrings(
+    d.integration.operationalDependencies
+  ).map((s) => ({ value: s }));
+
   // ─── Perfil ─────────────────────────────────────────────────────────────────
   const profilePhotoUrl = d.profile.photoUrl;
   const profileHandle = d.profile.handle;
@@ -245,8 +259,19 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
     hasText(d.measurement.stopCriterion) ||
     hasText(d.measurement.baseline);
 
+  const hasIntegrationSection =
+    receivesAudienceFrom.length > 0 ||
+    directsAudienceTo.length > 0 ||
+    connectionCtas.length > 0 ||
+    operationalDependencies.length > 0 ||
+    hasText(d.integration.ecosystemRole) ||
+    hasText(d.integration.contentRepurposing);
+
   const hasVisibleInstagramContent =
-    hasMeaningfulInstagramContent(d) || hasConversionSection || hasMeasurementSection;
+    hasMeaningfulInstagramContent(d) ||
+    hasConversionSection ||
+    hasMeasurementSection ||
+    hasIntegrationSection;
 
   // profile.enabled intentionally not used — section shows based on content presence
   const hasProfileSection =
@@ -671,6 +696,56 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
               </p>
               <PlainTextField label="Linha de base" value={d.measurement.baseline} />
               <TextList items={measurementHypotheses} label="Hipóteses a testar" />
+            </div>
+          )}
+        </SectionCard>
+      )}
+
+      {hasIntegrationSection && (
+        <SectionCard title="Integração com outros canais">
+          {hasText(d.integration.ecosystemRole) && (
+            <div>
+              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                Papel no ecossistema
+              </p>
+              <PlainTextField
+                label="Papel do Instagram no ecossistema"
+                value={d.integration.ecosystemRole}
+              />
+            </div>
+          )}
+
+          {(receivesAudienceFrom.length > 0 || directsAudienceTo.length > 0) && (
+            <div>
+              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                Fluxo de audiência
+              </p>
+              <div className="grid gap-x-8 sm:grid-cols-2">
+                <TextList items={receivesAudienceFrom} label="Recebe audiência de" />
+                <TextList items={directsAudienceTo} label="Direciona audiência para" />
+              </div>
+            </div>
+          )}
+
+          {(hasText(d.integration.contentRepurposing) || connectionCtas.length > 0) && (
+            <div>
+              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                Reaproveitamento e conexão
+              </p>
+              <PlainTextField
+                label="Estratégia de reaproveitamento"
+                value={d.integration.contentRepurposing}
+              />
+              <TextList items={connectionCtas} label="CTAs de conexão entre canais" />
+            </div>
+          )}
+
+          {operationalDependencies.length > 0 && (
+            <div>
+              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                Dependências operacionais
+              </p>
+              <TextList items={operationalDependencies} label="Recursos e processos necessários" />
             </div>
           )}
         </SectionCard>
