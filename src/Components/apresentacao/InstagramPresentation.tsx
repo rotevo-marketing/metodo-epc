@@ -1,3 +1,7 @@
+import {
+  normalizeInstagramData,
+  hasMeaningfulInstagramContent,
+} from "@/lib/normalizeInstagramData";
 import { PresentationHeader } from "./PresentationHeader";
 import {
   FrequencyTable,
@@ -13,32 +17,86 @@ import {
   ExtRef,
 } from "./ChannelPresentationShared";
 
-type InstagramData = {
-  frequencyItems: FreqItem[];
-  objectives: TextItem[];
-  stories: TextItem[];
-  hashtags: TextItem[];
-  reels: TextItem[];
-  languageStructures: TextItem[];
-  contents: TextItem[];
-  visualStrategy: string;
-  visualReferences: VisualRef[];
-  bioEnabled: boolean;
-  bioPhoto: string;
-  profileHandle: string;
-  profileName: string;
-  bioText: string;
-  bioLink: string;
-  highlights: string;
-  references: ExtRef[];
+type InstagramPresentationProps = {
+  data: unknown;
 };
 
-function isInstagramData(v: unknown): v is InstagramData {
-  return typeof v === "object" && v !== null && "frequencyItems" in v;
-}
+export default function InstagramPresentation({ data }: InstagramPresentationProps) {
+  // Server component — normalize once per render; no hooks needed.
+  const d = normalizeInstagramData(data);
 
-export default function InstagramPresentation({ data }: { data: unknown }) {
-  const d = isInstagramData(data) ? data : null;
+  // ─── Frequência ───────────────────────────────────────────────────────────────
+  // notes (v2) ← observation (v1 legacy)
+  const freqItems: FreqItem[] = d.publishing.frequencyItems.map((item) => ({
+    format: item.format,
+    quantity: item.quantity,
+    period: item.period,
+    observation: item.notes,
+  }));
+
+  // ─── Objetivos ────────────────────────────────────────────────────────────────
+  // objective (v2) ← value (v1 legacy)
+  const objectives: TextItem[] = d.objectives.map((item) => ({
+    value: item.objective,
+  }));
+
+  // ─── Stories ──────────────────────────────────────────────────────────────────
+  // name (v2); description as visual fallback when name is empty
+  const stories: TextItem[] = d.contentArchitecture.stories.map((item) => ({
+    value: item.name?.trim() || item.description?.trim() || "",
+  }));
+
+  // ─── Reels / formatos ─────────────────────────────────────────────────────────
+  // name (v2) ← reels[].value (v1 legacy)
+  const reels: TextItem[] = d.contentArchitecture.formats.map((item) => ({
+    value: item.name,
+  }));
+
+  // ─── Conteúdos gerais ─────────────────────────────────────────────────────────
+  // generalContentGuidelines (v2) ← contents[].value (v1 legacy)
+  const contents: TextItem[] = d.contentArchitecture.generalContentGuidelines.map((s) => ({
+    value: s,
+  }));
+
+  // ─── Estruturas de linguagem ──────────────────────────────────────────────────
+  // howItAppears (v2) ← languageStructures[].value (v1 legacy); name as fallback
+  const languageStructures: TextItem[] = d.languageStructures
+    .map((item) => ({ value: item.howItAppears?.trim() || item.name?.trim() || "" }))
+    .filter((item) => item.value);
+
+  // ─── Hashtags ─────────────────────────────────────────────────────────────────
+  // flatten all categories; category name not shown in this bridge layer
+  const hashtags: TextItem[] = d.hashtags.flatMap((cat) =>
+    cat.hashtags.filter((h) => h?.trim()).map((h) => ({ value: h }))
+  );
+
+  // ─── Estratégia visual ────────────────────────────────────────────────────────
+  // generalStrategy (v2) ← visualStrategy (v1 legacy); Rich Text HTML preserved
+  const visualStrategy = d.visualDirection.generalStrategy;
+
+  // ─── Referências visuais ──────────────────────────────────────────────────────
+  // url (v2) ← image (v1 legacy); data URL and HTTPS URL both accepted
+  const visualReferences: VisualRef[] = d.visualDirection.references.map((ref) => ({
+    image: ref.url,
+  }));
+
+  // ─── Perfil ───────────────────────────────────────────────────────────────────
+  const profileHandle = d.profile.handle;
+  const profileName = d.profile.displayName;
+  const bioText = d.profile.bio;
+  const bioLink = d.profile.mainLink;
+  // highlights: join non-empty titles for the current single-string display slot
+  const highlights = d.profile.highlights
+    .filter((h) => h.title?.trim())
+    .map((h) => h.title)
+    .join(", ");
+
+  // ─── Referências externas ─────────────────────────────────────────────────────
+  // url (v2) ← link (v1 legacy)
+  const externalRefs: ExtRef[] = d.externalReferences.map((ref) => ({
+    title: ref.title,
+    link: ref.url,
+  }));
 
   return (
     <article className="divide-y divide-slate-100 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-slate-200">
@@ -48,52 +106,52 @@ export default function InstagramPresentation({ data }: { data: unknown }) {
         slug="instagram"
       />
 
-      {d?.frequencyItems?.some((i) => i.quantity?.trim()) && (
+      {freqItems.some((i) => i.quantity?.trim()) && (
         <SectionCard title="Frequência de publicação">
-          <FrequencyTable items={d.frequencyItems} />
+          <FrequencyTable items={freqItems} />
         </SectionCard>
       )}
 
-      {(d?.objectives?.some((i) => i.value?.trim()) ||
-        d?.languageStructures?.some((i) => i.value?.trim()) ||
-        d?.contents?.some((i) => i.value?.trim()) ||
-        d?.stories?.some((i) => i.value?.trim()) ||
-        d?.reels?.some((i) => i.value?.trim()) ||
-        d?.hashtags?.some((i) => i.value?.trim())) && (
+      {(objectives.some((i) => i.value?.trim()) ||
+        languageStructures.some((i) => i.value?.trim()) ||
+        contents.some((i) => i.value?.trim()) ||
+        stories.some((i) => i.value?.trim()) ||
+        reels.some((i) => i.value?.trim()) ||
+        hashtags.some((i) => i.value?.trim())) && (
         <SectionCard title="Conteúdo e linguagem">
-          <TextList items={d?.objectives ?? []} label="Objetivos" />
-          <TextList items={d?.languageStructures ?? []} label="Estruturas de linguagem" />
-          <TextList items={d?.contents ?? []} label="Tipos de conteúdo" />
-          <TextList items={d?.stories ?? []} label="Stories" />
-          <TextList items={d?.reels ?? []} label="Reels" />
-          <TextList items={d?.hashtags ?? []} label="Hashtags" />
-          <FieldBlock label="Estratégia visual" value={d?.visualStrategy ?? ""} />
+          <TextList items={objectives} label="Objetivos" />
+          <TextList items={languageStructures} label="Estruturas de linguagem" />
+          <TextList items={contents} label="Tipos de conteúdo" />
+          <TextList items={stories} label="Stories" />
+          <TextList items={reels} label="Reels" />
+          <TextList items={hashtags} label="Hashtags" />
+          <FieldBlock label="Estratégia visual" value={visualStrategy} />
         </SectionCard>
       )}
 
-      {d?.visualReferences?.some((r) => r.image?.trim()) && (
+      {visualReferences.some((r) => r.image?.trim()) && (
         <SectionCard title="Referências visuais">
-          <VisualRefGrid refs={d.visualReferences} />
+          <VisualRefGrid refs={visualReferences} />
         </SectionCard>
       )}
 
-      {(d?.profileHandle || d?.profileName || d?.bioText || d?.bioLink || d?.highlights) && (
+      {(profileHandle || profileName || bioText || bioLink || highlights) && (
         <SectionCard title="Perfil">
-          <FieldBlock label="Handle" value={d?.profileHandle ?? ""} />
-          <FieldBlock label="Nome do perfil" value={d?.profileName ?? ""} />
-          <FieldBlock label="Bio" value={d?.bioText ?? ""} />
-          <FieldBlock label="Link na bio" value={d?.bioLink ?? ""} />
-          <FieldBlock label="Destaques" value={d?.highlights ?? ""} />
+          <FieldBlock label="Handle" value={profileHandle} />
+          <FieldBlock label="Nome do perfil" value={profileName} />
+          <FieldBlock label="Bio" value={bioText} />
+          <FieldBlock label="Link na bio" value={bioLink} />
+          <FieldBlock label="Destaques" value={highlights} />
         </SectionCard>
       )}
 
-      {d?.references?.some((r) => r.title?.trim() || r.link?.trim()) && (
+      {externalRefs.some((r) => r.title?.trim() || r.link?.trim()) && (
         <SectionCard title="Referências externas">
-          <ExternalRefList refs={d.references} />
+          <ExternalRefList refs={externalRefs} />
         </SectionCard>
       )}
 
-      {!d && <EmptyState />}
+      {!hasMeaningfulInstagramContent(d) && <EmptyState />}
     </article>
   );
 }

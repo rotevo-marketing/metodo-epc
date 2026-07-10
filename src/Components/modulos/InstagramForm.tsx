@@ -1,124 +1,24 @@
-﻿"use client";
+"use client";
 
-import { ChangeEvent } from "react";
+import { ChangeEvent, useState, ReactNode } from "react";
 import Link from "next/link";
-import type { Dispatch, ReactNode, SetStateAction } from "react";
+import type { Dispatch, SetStateAction } from "react";
 import RichTextEditor from "@/Components/RichTextEditor";
+import type { InstagramData } from "@/types/instagram";
+import {
+  createInstagramItemId,
+  createEmptyInstagramFrequencyItem,
+  createEmptyInstagramObjective,
+  createEmptyInstagramStoryFormat,
+  createEmptyInstagramContentFormat,
+  createEmptyInstagramLanguageStructure,
+  createEmptyInstagramHashtagCategory,
+  createEmptyInstagramImageReference,
+  createEmptyInstagramExternalReference,
+} from "@/lib/normalizeInstagramData";
+import { uploadPlanningMedia } from "@/lib/uploadPlanningMedia";
 
-export type InstagramFrequencyItem = {
-  format: string;
-  quantity: string;
-  period: string;
-  observation: string;
-};
-
-export type InstagramTextListItem = {
-  value: string;
-};
-
-export type InstagramVisualReference = {
-  image: string;
-};
-
-export type InstagramExternalReference = {
-  title: string;
-  link: string;
-};
-
-export type InstagramData = {
-  frequencyItems: InstagramFrequencyItem[];
-  objectives: InstagramTextListItem[];
-  stories: InstagramTextListItem[];
-  hashtags: InstagramTextListItem[];
-  reels: InstagramTextListItem[];
-  languageStructures: InstagramTextListItem[];
-  contents: InstagramTextListItem[];
-  visualStrategy: string;
-  visualReferences: InstagramVisualReference[];
-  bioEnabled: boolean;
-  bioPhoto: string;
-  profileHandle: string;
-  profileName: string;
-  bioText: string;
-  bioLink: string;
-  highlights: string;
-  references: InstagramExternalReference[];
-};
-
-export const initialInstagramFrequencyItems: InstagramFrequencyItem[] = [
-  {
-    format: "Reels",
-    quantity: "",
-    period: "por semana",
-    observation: "",
-  },
-  {
-    format: "Stories",
-    quantity: "",
-    period: "por dia",
-    observation: "",
-  },
-  {
-    format: "Carrossel",
-    quantity: "",
-    period: "por semana",
-    observation: "",
-  },
-  {
-    format: "Card único",
-    quantity: "",
-    period: "por semana",
-    observation: "",
-  },
-  {
-    format: "Canal de transmissão",
-    quantity: "",
-    period: "por semana",
-    observation: "",
-  },
-];
-
-export const initialInstagramData: InstagramData = {
-  frequencyItems: initialInstagramFrequencyItems,
-  objectives: [{ value: "" }],
-  stories: [{ value: "" }],
-  hashtags: [{ value: "" }],
-  reels: [{ value: "" }],
-  languageStructures: [{ value: "" }],
-  contents: [{ value: "" }],
-  visualStrategy: "",
-  visualReferences: [{ image: "" }, { image: "" }, { image: "" }],
-  bioEnabled: true,
-  bioPhoto: "",
-  profileHandle: "",
-  profileName: "",
-  bioText: "",
-  bioLink: "",
-  highlights: "",
-  references: [{ title: "", link: "" }],
-};
-
-export function normalizeInstagramTextList(
-  value: unknown
-): InstagramTextListItem[] {
-  if (!Array.isArray(value) || value.length === 0) {
-    return [{ value: "" }];
-  }
-
-  return value.map((item) => {
-    if (typeof item === "string") {
-      return { value: item };
-    }
-
-    if (item && typeof item === "object") {
-      const record = item as Partial<InstagramTextListItem>;
-
-      return { value: record.value || "" };
-    }
-
-    return { value: "" };
-  });
-}
+// ─── Inner components ─────────────────────────────────────────────────────────
 
 function SectionCard({
   title,
@@ -146,13 +46,7 @@ function SectionCard({
   );
 }
 
-type InstagramListKey =
-  | "objectives"
-  | "stories"
-  | "hashtags"
-  | "reels"
-  | "languageStructures"
-  | "contents";
+// ─── Props ────────────────────────────────────────────────────────────────────
 
 type InstagramFormProps = {
   data: InstagramData;
@@ -162,6 +56,7 @@ type InstagramFormProps = {
   isSaving: boolean;
   isDisabled: boolean;
   onSave: () => void;
+  planningProjectId: string;
 };
 
 export default function InstagramForm({
@@ -172,23 +67,41 @@ export default function InstagramForm({
   isSaving,
   isDisabled,
   onSave,
+  planningProjectId,
 }: InstagramFormProps) {
+  // ─── Upload states ──────────────────────────────────────────────────────────
+
+  const [uploadingProfilePhoto, setUploadingProfilePhoto] = useState(false);
+  const [profilePhotoError, setProfilePhotoError] = useState("");
+  const [uploadingRefIndex, setUploadingRefIndex] = useState<number | null>(null);
+  const [refUploadErrors, setRefUploadErrors] = useState<Record<number, string>>({});
+
+  // ─── Highlights controlled value ────────────────────────────────────────────
+  // legacy.originalHighlights holds the raw comma-separated string typed by the user.
+  // If it was never set, derive the display value from profile.highlights.
+
+  const highlightsInputValue =
+    data.legacy?.originalHighlights !== undefined
+      ? data.legacy.originalHighlights
+      : data.profile.highlights
+          .slice()
+          .sort((a, b) => a.order - b.order)
+          .map((h) => h.title)
+          .join(", ");
+
+  // ─── Frequency handlers ─────────────────────────────────────────────────────
+
   function updateFrequencyItem(
     index: number,
-    key: keyof InstagramFrequencyItem,
+    key: "format" | "quantity" | "period" | "notes",
     value: string
   ) {
     setData((current) => {
-      const nextItems = [...current.frequencyItems];
-
-      nextItems[index] = {
-        ...nextItems[index],
-        [key]: value,
-      };
-
+      const nextItems = [...current.publishing.frequencyItems];
+      nextItems[index] = { ...nextItems[index], [key]: value };
       return {
         ...current,
-        frequencyItems: nextItems,
+        publishing: { ...current.publishing, frequencyItems: nextItems },
       };
     });
   }
@@ -196,212 +109,487 @@ export default function InstagramForm({
   function addFrequencyItem() {
     setData((current) => ({
       ...current,
-      frequencyItems: [
-        ...current.frequencyItems,
-        {
-          format: "",
-          quantity: "",
-          period: "por semana",
-          observation: "",
-        },
-      ],
+      publishing: {
+        ...current.publishing,
+        frequencyItems: [
+          ...current.publishing.frequencyItems,
+          { ...createEmptyInstagramFrequencyItem(), period: "por semana" },
+        ],
+      },
     }));
   }
 
   function removeFrequencyItem(index: number) {
-    setData((current) => ({
-      ...current,
-      frequencyItems:
-        current.frequencyItems.length > 1
-          ? current.frequencyItems.filter((_, itemIndex) => itemIndex !== index)
-          : [
-              {
-                format: "",
-                quantity: "",
-                period: "por semana",
-                observation: "",
-              },
-            ],
-    }));
-  }
-
-  function updateTextListItem(
-    listKey: InstagramListKey,
-    index: number,
-    value: string
-  ) {
     setData((current) => {
-      const nextList = [...current[listKey]];
-
-      nextList[index] = {
-        value,
-      };
-
+      const nextItems =
+        current.publishing.frequencyItems.length > 1
+          ? current.publishing.frequencyItems.filter((_, i) => i !== index)
+          : [{ ...createEmptyInstagramFrequencyItem(), period: "por semana" }];
       return {
         ...current,
-        [listKey]: nextList,
+        publishing: { ...current.publishing, frequencyItems: nextItems },
       };
     });
   }
 
-  function addTextListItem(listKey: InstagramListKey) {
+  // ─── Objectives handlers ─────────────────────────────────────────────────────
+
+  function updateObjective(index: number, value: string) {
+    setData((current) => {
+      const nextItems = [...current.objectives];
+      nextItems[index] = { ...nextItems[index], objective: value };
+      return { ...current, objectives: nextItems };
+    });
+  }
+
+  function addObjective() {
     setData((current) => ({
       ...current,
-      [listKey]: [...current[listKey], { value: "" }],
+      objectives: [...current.objectives, createEmptyInstagramObjective()],
     }));
   }
 
-  function removeTextListItem(listKey: InstagramListKey, index: number) {
+  function removeObjective(index: number) {
     setData((current) => ({
       ...current,
-      [listKey]:
-        current[listKey].length > 1
-          ? current[listKey].filter((_, itemIndex) => itemIndex !== index)
-          : [{ value: "" }],
+      objectives:
+        current.objectives.length > 1
+          ? current.objectives.filter((_, i) => i !== index)
+          : [createEmptyInstagramObjective()],
     }));
   }
 
-  function updateVisualReferenceImage(
+  // ─── Stories handlers ────────────────────────────────────────────────────────
+
+  function updateStory(index: number, value: string) {
+    setData((current) => {
+      const nextItems = [...current.contentArchitecture.stories];
+      nextItems[index] = { ...nextItems[index], name: value };
+      return {
+        ...current,
+        contentArchitecture: { ...current.contentArchitecture, stories: nextItems },
+      };
+    });
+  }
+
+  function addStory() {
+    setData((current) => ({
+      ...current,
+      contentArchitecture: {
+        ...current.contentArchitecture,
+        stories: [
+          ...current.contentArchitecture.stories,
+          createEmptyInstagramStoryFormat(),
+        ],
+      },
+    }));
+  }
+
+  function removeStory(index: number) {
+    setData((current) => ({
+      ...current,
+      contentArchitecture: {
+        ...current.contentArchitecture,
+        stories:
+          current.contentArchitecture.stories.length > 1
+            ? current.contentArchitecture.stories.filter((_, i) => i !== index)
+            : [createEmptyInstagramStoryFormat()],
+      },
+    }));
+  }
+
+  // ─── Hashtags handlers ────────────────────────────────────────────────────────
+  // All categories are flattened into a single list for display.
+  // Setters traverse the nested structure using a cursor to find the correct
+  // (catIndex, tagIndex) from the flat index.
+
+  function updateHashtag(flatIndex: number, value: string) {
+    setData((current) => {
+      let cursor = 0;
+      const nextHashtags = current.hashtags.map((cat) => ({
+        ...cat,
+        hashtags: cat.hashtags.map((h) => {
+          const result = cursor === flatIndex ? value : h;
+          cursor++;
+          return result;
+        }),
+      }));
+      return { ...current, hashtags: nextHashtags };
+    });
+  }
+
+  function addHashtag() {
+    setData((current) => {
+      if (current.hashtags.length === 0) {
+        return {
+          ...current,
+          hashtags: [{ ...createEmptyInstagramHashtagCategory(), hashtags: [""] }],
+        };
+      }
+      const nextHashtags = [...current.hashtags];
+      nextHashtags[0] = {
+        ...nextHashtags[0],
+        hashtags: [...nextHashtags[0].hashtags, ""],
+      };
+      return { ...current, hashtags: nextHashtags };
+    });
+  }
+
+  function removeHashtag(flatIndex: number) {
+    setData((current) => {
+      let cursor = 0;
+      const nextHashtags = current.hashtags
+        .map((cat) => ({
+          ...cat,
+          hashtags: cat.hashtags.filter(() => {
+            const keep = cursor !== flatIndex;
+            cursor++;
+            return keep;
+          }),
+        }))
+        .filter((cat) => cat.hashtags.length > 0);
+
+      if (nextHashtags.length === 0) {
+        const base =
+          current.hashtags.length > 0
+            ? current.hashtags[0]
+            : createEmptyInstagramHashtagCategory();
+        return { ...current, hashtags: [{ ...base, hashtags: [""] }] };
+      }
+      return { ...current, hashtags: nextHashtags };
+    });
+  }
+
+  const flatHashtags = data.hashtags.flatMap((cat) => cat.hashtags);
+
+  // ─── Reels (formats) handlers ─────────────────────────────────────────────────
+
+  function updateReel(index: number, value: string) {
+    setData((current) => {
+      const nextItems = [...current.contentArchitecture.formats];
+      nextItems[index] = { ...nextItems[index], name: value };
+      return {
+        ...current,
+        contentArchitecture: { ...current.contentArchitecture, formats: nextItems },
+      };
+    });
+  }
+
+  function addReel() {
+    setData((current) => ({
+      ...current,
+      contentArchitecture: {
+        ...current.contentArchitecture,
+        formats: [
+          ...current.contentArchitecture.formats,
+          createEmptyInstagramContentFormat(),
+        ],
+      },
+    }));
+  }
+
+  function removeReel(index: number) {
+    setData((current) => ({
+      ...current,
+      contentArchitecture: {
+        ...current.contentArchitecture,
+        formats:
+          current.contentArchitecture.formats.length > 1
+            ? current.contentArchitecture.formats.filter((_, i) => i !== index)
+            : [createEmptyInstagramContentFormat()],
+      },
+    }));
+  }
+
+  // ─── Language structures handlers ─────────────────────────────────────────────
+
+  function updateLanguageStructure(index: number, value: string) {
+    setData((current) => {
+      const nextItems = [...current.languageStructures];
+      nextItems[index] = { ...nextItems[index], howItAppears: value };
+      return { ...current, languageStructures: nextItems };
+    });
+  }
+
+  function addLanguageStructure() {
+    setData((current) => ({
+      ...current,
+      languageStructures: [
+        ...current.languageStructures,
+        createEmptyInstagramLanguageStructure(),
+      ],
+    }));
+  }
+
+  function removeLanguageStructure(index: number) {
+    setData((current) => ({
+      ...current,
+      languageStructures:
+        current.languageStructures.length > 1
+          ? current.languageStructures.filter((_, i) => i !== index)
+          : [createEmptyInstagramLanguageStructure()],
+    }));
+  }
+
+  // ─── Contents handlers ────────────────────────────────────────────────────────
+
+  function updateContent(index: number, value: string) {
+    setData((current) => {
+      const nextItems = [
+        ...current.contentArchitecture.generalContentGuidelines,
+      ];
+      nextItems[index] = value;
+      return {
+        ...current,
+        contentArchitecture: {
+          ...current.contentArchitecture,
+          generalContentGuidelines: nextItems,
+        },
+      };
+    });
+  }
+
+  function addContent() {
+    setData((current) => ({
+      ...current,
+      contentArchitecture: {
+        ...current.contentArchitecture,
+        generalContentGuidelines: [
+          ...current.contentArchitecture.generalContentGuidelines,
+          "",
+        ],
+      },
+    }));
+  }
+
+  function removeContent(index: number) {
+    setData((current) => ({
+      ...current,
+      contentArchitecture: {
+        ...current.contentArchitecture,
+        generalContentGuidelines:
+          current.contentArchitecture.generalContentGuidelines.length > 1
+            ? current.contentArchitecture.generalContentGuidelines.filter(
+                (_, i) => i !== index
+              )
+            : [""],
+      },
+    }));
+  }
+
+  // ─── Visual reference handlers ────────────────────────────────────────────────
+
+  async function uploadVisualReference(
     index: number,
     event: ChangeEvent<HTMLInputElement>
   ) {
     const file = event.target.files?.[0];
+    if (!file) return;
 
-    if (!file) {
-      return;
-    }
+    setUploadingRefIndex(index);
+    setRefUploadErrors((current) => {
+      const next = { ...current };
+      delete next[index];
+      return next;
+    });
 
-    const reader = new FileReader();
+    try {
+      const { url } = await uploadPlanningMedia({
+        file,
+        planningProjectId,
+        category: "references",
+      });
 
-    reader.onload = () => {
       setData((current) => {
-        const nextReferences = [...current.visualReferences];
-
-        nextReferences[index] = {
-          image: String(reader.result || ""),
-        };
-
+        const nextRefs = [...current.visualDirection.references];
+        nextRefs[index] = { ...nextRefs[index], url };
         return {
           ...current,
-          visualReferences: nextReferences,
+          visualDirection: { ...current.visualDirection, references: nextRefs },
         };
       });
-    };
-
-    reader.readAsDataURL(file);
-  }
-
-  function removeVisualReferenceImage(index: number) {
-    setData((current) => {
-      const nextReferences = [...current.visualReferences];
-
-      nextReferences[index] = {
-        image: "",
-      };
-
-      return {
+    } catch (err) {
+      setRefUploadErrors((current) => ({
         ...current,
-        visualReferences: nextReferences,
-      };
-    });
+        [index]: err instanceof Error ? err.message : "Erro ao enviar imagem.",
+      }));
+    } finally {
+      setUploadingRefIndex(null);
+      event.target.value = "";
+    }
   }
 
-  function updateBioPhoto(event: ChangeEvent<HTMLInputElement>) {
+  function removeVisualReference(index: number) {
+    setData((current) => ({
+      ...current,
+      visualDirection: {
+        ...current.visualDirection,
+        references: current.visualDirection.references.filter(
+          (_, i) => i !== index
+        ),
+      },
+    }));
+  }
+
+  function addVisualReferenceSlot() {
+    setData((current) => ({
+      ...current,
+      visualDirection: {
+        ...current.visualDirection,
+        references: [
+          ...current.visualDirection.references,
+          createEmptyInstagramImageReference(),
+        ],
+      },
+    }));
+  }
+
+  // ─── Bio photo handlers ───────────────────────────────────────────────────────
+
+  async function uploadBioPhoto(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
+    if (!file) return;
 
-    if (!file) {
-      return;
-    }
+    setUploadingProfilePhoto(true);
+    setProfilePhotoError("");
 
-    const reader = new FileReader();
+    try {
+      const { url } = await uploadPlanningMedia({
+        file,
+        planningProjectId,
+        category: "profile",
+      });
 
-    reader.onload = () => {
       setData((current) => ({
         ...current,
-        bioPhoto: String(reader.result || ""),
+        profile: { ...current.profile, photoUrl: url },
       }));
-    };
-
-    reader.readAsDataURL(file);
+    } catch (err) {
+      setProfilePhotoError(
+        err instanceof Error ? err.message : "Erro ao enviar foto."
+      );
+    } finally {
+      setUploadingProfilePhoto(false);
+      event.target.value = "";
+    }
   }
 
   function removeBioPhoto() {
     setData((current) => ({
       ...current,
-      bioPhoto: "",
+      profile: { ...current.profile, photoUrl: "" },
     }));
   }
 
-  function updateReference(
-    index: number,
-    key: keyof InstagramExternalReference,
-    value: string
-  ) {
+  // ─── External references handlers ─────────────────────────────────────────────
+
+  function updateReference(index: number, key: "title" | "url", value: string) {
     setData((current) => {
-      const nextReferences = [...current.references];
-
-      nextReferences[index] = {
-        ...nextReferences[index],
-        [key]: value,
-      };
-
-      return {
-        ...current,
-        references: nextReferences,
-      };
+      const nextRefs = [...current.externalReferences];
+      nextRefs[index] = { ...nextRefs[index], [key]: value };
+      return { ...current, externalReferences: nextRefs };
     });
   }
 
   function addReference() {
     setData((current) => ({
       ...current,
-      references: [...current.references, { title: "", link: "" }],
+      externalReferences: [
+        ...current.externalReferences,
+        createEmptyInstagramExternalReference(),
+      ],
     }));
   }
 
   function removeReference(index: number) {
     setData((current) => ({
       ...current,
-      references:
-        current.references.length > 1
-          ? current.references.filter(
-              (_, referenceIndex) => referenceIndex !== index
-            )
-          : [{ title: "", link: "" }],
+      externalReferences:
+        current.externalReferences.length > 1
+          ? current.externalReferences.filter((_, i) => i !== index)
+          : [createEmptyInstagramExternalReference()],
     }));
   }
+
+  // ─── Highlights handler ───────────────────────────────────────────────────────
+
+  function updateHighlights(rawValue: string) {
+    setData((current) => {
+      const parts = rawValue.split(",").map((p) => p.trim());
+
+      // Remove trailing empty parts (from a trailing comma) before generating highlights,
+      // but keep at least one element.
+      const trimmedParts = [...parts];
+      while (trimmedParts.length > 1 && trimmedParts[trimmedParts.length - 1] === "") {
+        trimmedParts.pop();
+      }
+
+      const existingHighlights = current.profile.highlights
+        .slice()
+        .sort((a, b) => a.order - b.order);
+
+      const nextHighlights = trimmedParts.map((title, i) => {
+        const existing = existingHighlights[i];
+        if (existing) {
+          return { ...existing, title, order: i };
+        }
+        return {
+          id: createInstagramItemId(),
+          title,
+          purpose: "",
+          imageUrl: "",
+          order: i,
+        };
+      });
+
+      return {
+        ...current,
+        profile: {
+          ...current.profile,
+          highlights: nextHighlights.filter((h) => h.title.length > 0),
+        },
+        legacy: { ...current.legacy, originalHighlights: rawValue },
+      };
+    });
+  }
+
+  // ─── TextListSection ──────────────────────────────────────────────────────────
 
   function TextListSection({
     title,
     description,
-    listKey,
+    items,
+    onChangeItem,
+    onAddItem,
+    onRemoveItem,
     placeholder,
     buttonLabel,
   }: {
     title: string;
     description: string;
-    listKey: InstagramListKey;
+    items: string[];
+    onChangeItem: (index: number, value: string) => void;
+    onAddItem: () => void;
+    onRemoveItem: (index: number) => void;
     placeholder: string;
     buttonLabel: string;
   }) {
     return (
       <SectionCard title={title} description={description}>
         <div className="space-y-3">
-          {data[listKey].map((item, index) => (
+          {items.map((item, index) => (
             <div key={index} className="flex gap-3">
               <input
                 type="text"
-                value={item.value}
-                onChange={(event) =>
-                  updateTextListItem(listKey, index, event.target.value)
-                }
+                value={item}
+                onChange={(event) => onChangeItem(index, event.target.value)}
                 placeholder={placeholder}
                 className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
               />
 
               <button
                 type="button"
-                onClick={() => removeTextListItem(listKey, index)}
+                onClick={() => onRemoveItem(index)}
                 className="cursor-pointer rounded-full px-4 py-2 text-sm font-semibold text-red-500 transition hover:bg-red-50"
               >
                 Excluir
@@ -412,7 +600,7 @@ export default function InstagramForm({
 
         <button
           type="button"
-          onClick={() => addTextListItem(listKey)}
+          onClick={onAddItem}
           className="mt-4 cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-950 hover:border-slate-950 hover:text-white"
         >
           + {buttonLabel}
@@ -421,8 +609,18 @@ export default function InstagramForm({
     );
   }
 
+  // Derived flat lists for TextListSection
+  const objectiveItems = data.objectives.map((o) => o.objective);
+  const storyItems = data.contentArchitecture.stories.map((s) => s.name);
+  const reelItems = data.contentArchitecture.formats.map((f) => f.name);
+  const languageItems = data.languageStructures.map((l) => l.howItAppears);
+  const contentItems = data.contentArchitecture.generalContentGuidelines;
+
+  // ─── JSX ─────────────────────────────────────────────────────────────────────
+
   return (
     <div className="mt-6 space-y-6">
+      {/* Bio do Instagram */}
       <SectionCard
         title="Bio do Instagram"
         description="Defina os principais elementos da bio do Instagram: arroba, nome do perfil, conteúdo da bio, link, destaques e foto do perfil."
@@ -431,11 +629,11 @@ export default function InstagramForm({
           <label className="flex cursor-pointer items-center gap-3 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700">
             <input
               type="checkbox"
-              checked={data.bioEnabled}
+              checked={data.profile.enabled}
               onChange={(event) =>
                 setData((current) => ({
                   ...current,
-                  bioEnabled: event.target.checked,
+                  profile: { ...current.profile, enabled: event.target.checked },
                 }))
               }
               className="h-4 w-4 rounded border-slate-300"
@@ -447,9 +645,9 @@ export default function InstagramForm({
         <div className="grid gap-6 md:grid-cols-[150px_1fr] md:items-start">
           <div>
             <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-full bg-slate-950 text-xs font-semibold text-white">
-              {data.bioPhoto ? (
+              {data.profile.photoUrl ? (
                 <img
-                  src={data.bioPhoto}
+                  src={data.profile.photoUrl}
                   alt="Foto do perfil"
                   className="h-full w-full object-cover"
                 />
@@ -460,11 +658,12 @@ export default function InstagramForm({
 
             <div className="mt-3 flex flex-col gap-2">
               <label className="cursor-pointer rounded-full bg-slate-950 px-4 py-2 text-center text-xs font-semibold text-white transition hover:bg-slate-800">
-                Escolher foto
+                {uploadingProfilePhoto ? "Enviando..." : "Escolher foto"}
                 <input
                   type="file"
                   accept="image/png,image/jpeg,image/webp"
-                  onChange={updateBioPhoto}
+                  onChange={uploadBioPhoto}
+                  disabled={uploadingProfilePhoto}
                   className="hidden"
                 />
               </label>
@@ -476,6 +675,10 @@ export default function InstagramForm({
               >
                 Remover
               </button>
+
+              {profilePhotoError && (
+                <p className="text-xs text-red-500">{profilePhotoError}</p>
+              )}
             </div>
           </div>
 
@@ -488,11 +691,11 @@ export default function InstagramForm({
 
                 <input
                   type="text"
-                  value={data.profileHandle}
+                  value={data.profile.handle}
                   onChange={(event) =>
                     setData((current) => ({
                       ...current,
-                      profileHandle: event.target.value,
+                      profile: { ...current.profile, handle: event.target.value },
                     }))
                   }
                   placeholder="Ex: @nomedoperfil"
@@ -507,11 +710,14 @@ export default function InstagramForm({
 
                 <input
                   type="text"
-                  value={data.profileName}
+                  value={data.profile.displayName}
                   onChange={(event) =>
                     setData((current) => ({
                       ...current,
-                      profileName: event.target.value,
+                      profile: {
+                        ...current.profile,
+                        displayName: event.target.value,
+                      },
                     }))
                   }
                   placeholder="Ex: Nome do especialista ou da marca"
@@ -526,9 +732,12 @@ export default function InstagramForm({
               </label>
 
               <RichTextEditor
-                value={data.bioText}
+                value={data.profile.bio}
                 onChange={(value) =>
-                  setData((current) => ({ ...current, bioText: value }))
+                  setData((current) => ({
+                    ...current,
+                    profile: { ...current.profile, bio: value },
+                  }))
                 }
                 placeholder="Escreva uma sugestão de bio para o Instagram."
               />
@@ -541,11 +750,11 @@ export default function InstagramForm({
 
               <input
                 type="url"
-                value={data.bioLink}
+                value={data.profile.mainLink}
                 onChange={(event) =>
                   setData((current) => ({
                     ...current,
-                    bioLink: event.target.value,
+                    profile: { ...current.profile, mainLink: event.target.value },
                   }))
                 }
                 placeholder="https://..."
@@ -560,13 +769,8 @@ export default function InstagramForm({
 
               <input
                 type="text"
-                value={data.highlights}
-                onChange={(event) =>
-                  setData((current) => ({
-                    ...current,
-                    highlights: event.target.value,
-                  }))
-                }
+                value={highlightsInputValue}
+                onChange={(event) => updateHighlights(event.target.value)}
                 placeholder="Ex: Sobre, Serviços, Depoimentos, Conteúdos, Contato..."
                 className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
               />
@@ -575,14 +779,15 @@ export default function InstagramForm({
         </div>
       </SectionCard>
 
+      {/* Frequência */}
       <SectionCard
         title="Frequência"
         description="Defina a frequência por formato de conteúdo. Use quantidade e período para deixar a orientação mais clara."
       >
         <div className="space-y-4">
-          {data.frequencyItems.map((item, index) => (
+          {data.publishing.frequencyItems.map((item, index) => (
             <div
-              key={index}
+              key={item.id}
               className="grid gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 md:grid-cols-[1fr_160px_180px_1fr_auto]"
             >
               <div>
@@ -642,13 +847,9 @@ export default function InstagramForm({
 
                 <input
                   type="text"
-                  value={item.observation}
+                  value={item.notes}
                   onChange={(event) =>
-                    updateFrequencyItem(
-                      index,
-                      "observation",
-                      event.target.value
-                    )
+                    updateFrequencyItem(index, "notes", event.target.value)
                   }
                   placeholder="Ex: Priorizar conteúdos de autoridade."
                   className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
@@ -677,54 +878,79 @@ export default function InstagramForm({
         </button>
       </SectionCard>
 
+      {/* Objetivos */}
       <TextListSection
         title="Objetivos"
         description="Defina os objetivos específicos do conteúdo para o Instagram."
-        listKey="objectives"
+        items={objectiveItems}
+        onChangeItem={updateObjective}
+        onAddItem={addObjective}
+        onRemoveItem={removeObjective}
         placeholder="Ex: Aumentar autoridade, gerar leads, fortalecer comunidade..."
         buttonLabel="Novo objetivo"
       />
 
+      {/* Stories */}
       <TextListSection
         title="Stories"
         description="Liste ideias, quadros, formatos e orientações para stories."
-        listKey="stories"
+        items={storyItems}
+        onChangeItem={updateStory}
+        onAddItem={addStory}
+        onRemoveItem={removeStory}
         placeholder="Ex: Bastidores, rotina, perguntas, enquetes, provas sociais..."
         buttonLabel="Novo story"
       />
 
+      {/* Hashtags */}
       <TextListSection
         title="Hashtags"
         description="Registre hashtags importantes para descoberta, nicho, localização, autoridade e temas recorrentes."
-        listKey="hashtags"
+        items={flatHashtags}
+        onChangeItem={updateHashtag}
+        onAddItem={addHashtag}
+        onRemoveItem={removeHashtag}
         placeholder="Ex: #marketingdigital, #estrategiadeconteudo..."
         buttonLabel="Nova hashtag"
       />
 
+      {/* Reels */}
       <TextListSection
         title="Reels"
         description="Liste ideias, formatos, séries e abordagens para vídeos curtos."
-        listKey="reels"
+        items={reelItems}
+        onChangeItem={updateReel}
+        onAddItem={addReel}
+        onRemoveItem={removeReel}
         placeholder="Ex: Dicas rápidas, mitos e verdades, bastidores, tutoriais..."
         buttonLabel="Novo Reels"
       />
 
+      {/* Estruturas de linguagem */}
       <TextListSection
         title="Estruturas de linguagem"
         description="Descreva estruturas de linguagem adequadas para que o conteúdo do Instagram cumpra seu papel na estratégia."
-        listKey="languageStructures"
+        items={languageItems}
+        onChangeItem={updateLanguageStructure}
+        onAddItem={addLanguageStructure}
+        onRemoveItem={removeLanguageStructure}
         placeholder="Ex: Gancho forte, explicação simples, exemplo prático, chamada final..."
         buttonLabel="Nova estrutura de linguagem"
       />
 
+      {/* Conteúdos */}
       <TextListSection
         title="Conteúdos"
         description="Liste formatos, temas e ideias de conteúdos que podem ser usados no Instagram."
-        listKey="contents"
+        items={contentItems}
+        onChangeItem={updateContent}
+        onAddItem={addContent}
+        onRemoveItem={removeContent}
         placeholder="Ex: Carrosséis educativos, reels de autoridade, posts de prova social..."
         buttonLabel="Novo conteúdo"
       />
 
+      {/* Identidade visual */}
       <SectionCard
         title="Identidade visual"
         description="Defina o estilo visual do perfil no Instagram, tanto nas imagens quanto nos vídeos e stories. Você pode carregar imagens de referência para exemplificar."
@@ -735,68 +961,96 @@ export default function InstagramForm({
           </label>
 
           <RichTextEditor
-            value={data.visualStrategy}
+            value={data.visualDirection.generalStrategy}
             onChange={(value) =>
-              setData((current) => ({ ...current, visualStrategy: value }))
+              setData((current) => ({
+                ...current,
+                visualDirection: {
+                  ...current.visualDirection,
+                  generalStrategy: value,
+                },
+              }))
             }
             placeholder="Explique a direção visual do Instagram: estilo dos posts, cores, fundos, fotos, vídeos, ritmo, estética e referências."
           />
         </div>
 
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
-          {data.visualReferences.map((reference, index) => (
-            <div
-              key={index}
-              className="overflow-hidden rounded-2xl border border-dashed border-slate-300 bg-slate-50"
-            >
-              <label className="flex aspect-[4/3] cursor-pointer items-center justify-center text-center text-sm font-semibold text-slate-500 transition hover:bg-slate-100">
-                {reference.image ? (
-                  <img
-                    src={reference.image}
-                    alt={`Referência ${index + 1}`}
-                    className="h-full w-full object-cover"
+        {data.visualDirection.references.length > 0 && (
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
+            {data.visualDirection.references.map((reference, index) => (
+              <div
+                key={reference.id}
+                className="overflow-hidden rounded-2xl border border-dashed border-slate-300 bg-slate-50"
+              >
+                <label className="flex aspect-[4/3] cursor-pointer items-center justify-center text-center text-sm font-semibold text-slate-500 transition hover:bg-slate-100">
+                  {uploadingRefIndex === index ? (
+                    <span>Enviando...</span>
+                  ) : reference.url ? (
+                    <img
+                      src={reference.url}
+                      alt={`Referência ${index + 1}`}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <span>
+                      +<br />
+                      Adicionar referência
+                    </span>
+                  )}
+
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    onChange={(event) => uploadVisualReference(index, event)}
+                    disabled={uploadingRefIndex !== null}
+                    className="hidden"
                   />
-                ) : (
-                  <span>
-                    +<br />
-                    Adicionar referência
-                  </span>
-                )}
+                </label>
 
-                <input
-                  type="file"
-                  accept="image/png,image/jpeg,image/webp"
-                  onChange={(event) => updateVisualReferenceImage(index, event)}
-                  className="hidden"
-                />
-              </label>
+                <div className="p-3">
+                  {refUploadErrors[index] && (
+                    <p className="mb-2 text-xs text-red-500">
+                      {refUploadErrors[index]}
+                    </p>
+                  )}
 
-              <div className="p-3">
-                <button
-                  type="button"
-                  onClick={() => removeVisualReferenceImage(index)}
-                  className="cursor-pointer rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-600 transition hover:bg-slate-100"
-                >
-                  Remover
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => removeVisualReference(index)}
+                    className="cursor-pointer rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-600 transition hover:bg-slate-100"
+                  >
+                    Remover
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
-        <p className="mt-4 text-xs text-slate-500">
-          Tamanho recomendado para imagem de feed: 1080x1350px.
-        </p>
+        <div className="mt-4 flex items-center gap-4">
+          <button
+            type="button"
+            onClick={addVisualReferenceSlot}
+            className="cursor-pointer rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-950 hover:border-slate-950 hover:text-white"
+          >
+            + Adicionar referência
+          </button>
+
+          <p className="text-xs text-slate-500">
+            Tamanho recomendado para imagem de feed: 1080x1350px.
+          </p>
+        </div>
       </SectionCard>
 
+      {/* Anexos e referências externas */}
       <SectionCard
         title="Anexos e referências externas"
         description="Referências externas são opcionais, mas ajudam quem está visualizando o planejamento a entender melhor a estratégia do Instagram."
       >
         <div className="space-y-4">
-          {data.references.map((reference, index) => (
+          {data.externalReferences.map((reference, index) => (
             <div
-              key={index}
+              key={reference.id}
               className="grid gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 md:grid-cols-[1fr_1fr_auto]"
             >
               <div>
@@ -822,9 +1076,9 @@ export default function InstagramForm({
 
                 <input
                   type="url"
-                  value={reference.link}
+                  value={reference.url}
                   onChange={(event) =>
-                    updateReference(index, "link", event.target.value)
+                    updateReference(index, "url", event.target.value)
                   }
                   placeholder="https://..."
                   className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
@@ -853,6 +1107,7 @@ export default function InstagramForm({
         </button>
       </SectionCard>
 
+      {/* Sticky save bar */}
       <div className="sticky bottom-0 rounded-[1.5rem] border border-slate-200 bg-white/95 p-5 shadow-sm backdrop-blur">
         <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           <Link

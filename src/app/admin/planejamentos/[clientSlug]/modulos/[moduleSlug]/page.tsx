@@ -87,12 +87,12 @@ import LinhasEditoriaisForm, {
   initialEditorialLinesData,
 } from "@/Components/modulos/LinhasEditoriaisForm";
 
-import InstagramForm, {
-  initialInstagramData,
-  initialInstagramFrequencyItems,
-  InstagramData,
-  normalizeInstagramTextList,
-} from "@/Components/modulos/InstagramForm";
+import InstagramForm from "@/Components/modulos/InstagramForm";
+import type { InstagramData } from "@/types/instagram";
+import {
+  createEmptyInstagramData,
+  normalizeInstagramData,
+} from "@/lib/normalizeInstagramData";
 
 import TikTokForm, {
   initialTikTokData,
@@ -364,7 +364,7 @@ const [selectedLegacyPersonaId, setSelectedLegacyPersonaId] = useState("");
   const [editorialLinesData, setEditorialLinesData] =
   useState<EditorialLinesData>(initialEditorialLinesData);
   const [instagramData, setInstagramData] =
-  useState<InstagramData>(initialInstagramData);
+  useState<InstagramData>(() => createEmptyInstagramData());
   const [tiktokData, setTiktokData] =
   useState<TikTokData>(initialTikTokData);
   const [youtubeData, setYoutubeData] =
@@ -1014,52 +1014,8 @@ if (isEditorialLinesModule && isEditorialLinesData(savedContent)) {
   });
 }
 
-if (isInstagramModule && isInstagramData(savedContent)) {
-  setInstagramData({
-    frequencyItems:
-      Array.isArray(savedContent.frequencyItems) &&
-      savedContent.frequencyItems.length
-        ? savedContent.frequencyItems.map((item) => ({
-            format: item.format || "",
-            quantity: item.quantity || "",
-            period: item.period || "por semana",
-            observation: item.observation || "",
-          }))
-        : initialInstagramFrequencyItems,
-    objectives: normalizeInstagramTextList(savedContent.objectives),
-    stories: normalizeInstagramTextList(savedContent.stories),
-    hashtags: normalizeInstagramTextList(savedContent.hashtags),
-    reels: normalizeInstagramTextList(savedContent.reels),
-    languageStructures: normalizeInstagramTextList(
-      savedContent.languageStructures
-    ),
-    contents: normalizeInstagramTextList(savedContent.contents),
-    visualStrategy: savedContent.visualStrategy || "",
-    visualReferences:
-      Array.isArray(savedContent.visualReferences) &&
-      savedContent.visualReferences.length
-        ? savedContent.visualReferences.map((reference) => ({
-            image: reference.image || "",
-          }))
-        : initialInstagramData.visualReferences,
-    bioEnabled:
-      typeof savedContent.bioEnabled === "boolean"
-        ? savedContent.bioEnabled
-        : true,
-    bioPhoto: savedContent.bioPhoto || "",
-    profileHandle: savedContent.profileHandle || "",
-    profileName: savedContent.profileName || "",
-    bioText: savedContent.bioText || "",
-    bioLink: savedContent.bioLink || "",
-    highlights: savedContent.highlights || "",
-    references:
-      Array.isArray(savedContent.references) && savedContent.references.length
-        ? savedContent.references.map((reference) => ({
-            title: reference.title || "",
-            link: reference.link || "",
-          }))
-        : initialInstagramData.references,
-  });
+if (isInstagramModule) {
+  setInstagramData(normalizeInstagramData(savedContent));
 }
 
 if (isTiktokModule && isTikTokData(savedContent)) {
@@ -1739,31 +1695,6 @@ function isEditorialLinesData(value: unknown): value is EditorialLinesData {
   return "lines" in value || "generalGuidelines" in value || "references" in value;
 }
 
-function isInstagramData(value: unknown): value is InstagramData {
-  if (!value || typeof value !== "object") {
-    return false;
-  }
-
-  return (
-    "frequencyItems" in value ||
-    "objectives" in value ||
-    "stories" in value ||
-    "hashtags" in value ||
-    "reels" in value ||
-    "languageStructures" in value ||
-    "contents" in value ||
-    "visualStrategy" in value ||
-    "visualReferences" in value ||
-    "bioEnabled" in value ||
-    "bioPhoto" in value ||
-    "profileHandle" in value ||
-    "profileName" in value ||
-    "bioText" in value ||
-    "bioLink" in value ||
-    "highlights" in value ||
-    "references" in value
-  );
-}
 
 function isTikTokData(value: unknown): value is TikTokData {
   if (!value || typeof value !== "object") {
@@ -3772,6 +3703,7 @@ function isProjectObjectivesData(
     isSaving={isSaving}
     isDisabled={!isModuleSelected}
     onSave={() => saveModule()}
+    planningProjectId={project.id}
   />
 ) : isTiktokModule ? (
   <TikTokForm
