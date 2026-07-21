@@ -404,17 +404,82 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
       )}
 
       {hasStrategicDirectionSection && (
-        <SectionCard title="Direção estratégica">
-          <FieldBlock label="Papel do canal" value={d.strategicDirection.channelRole} />
-          <FieldBlock label="Estratégia geral" value={d.strategicDirection.generalStrategy} />
-          <div className="grid sm:grid-cols-2 gap-x-8">
-            <FieldBlock label="Públicos prioritários" value={d.strategicDirection.priorityAudiences} />
-            <FieldBlock label="Função no ecossistema" value={d.strategicDirection.ecosystemFunction} />
-            <FieldBlock label="Diferenciação do perfil" value={d.strategicDirection.profileDifferentiation} />
-            <FieldBlock label="Prioridades editoriais iniciais" value={d.strategicDirection.initialEditorialPriorities} />
-          </div>
-        </SectionCard>
+  <SectionCard title="Direção estratégica">
+    <div className="space-y-10">
+      {(hasText(d.strategicDirection.channelRole) ||
+        hasText(d.strategicDirection.generalStrategy)) && (
+        <div className="grid gap-6 lg:grid-cols-2">
+          {hasText(d.strategicDirection.channelRole) && (
+            <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
+              <FieldBlock
+                label="Papel do canal"
+                value={d.strategicDirection.channelRole}
+              />
+            </div>
+          )}
+
+          {hasText(d.strategicDirection.generalStrategy) && (
+            <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
+              <FieldBlock
+                label="Estratégia geral"
+                value={d.strategicDirection.generalStrategy}
+              />
+            </div>
+          )}
+        </div>
       )}
+
+      {(hasText(d.strategicDirection.priorityAudiences) ||
+        hasText(d.strategicDirection.ecosystemFunction) ||
+        hasText(d.strategicDirection.profileDifferentiation) ||
+        hasText(d.strategicDirection.initialEditorialPriorities)) && (
+        <div className="space-y-6">
+          <h3 className="text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+            Fundamentos estratégicos
+          </h3>
+
+          <div className="grid gap-6 lg:grid-cols-2">
+            {hasText(d.strategicDirection.priorityAudiences) && (
+              <div className="rounded-2xl bg-white p-6 ring-1 ring-slate-200">
+                <FieldBlock
+                  label="Públicos prioritários"
+                  value={d.strategicDirection.priorityAudiences}
+                />
+              </div>
+            )}
+
+            {hasText(d.strategicDirection.ecosystemFunction) && (
+              <div className="rounded-2xl bg-white p-6 ring-1 ring-slate-200">
+                <FieldBlock
+                  label="Função no ecossistema"
+                  value={d.strategicDirection.ecosystemFunction}
+                />
+              </div>
+            )}
+
+            {hasText(d.strategicDirection.profileDifferentiation) && (
+              <div className="rounded-2xl bg-white p-6 ring-1 ring-slate-200">
+                <FieldBlock
+                  label="Diferenciação do perfil"
+                  value={d.strategicDirection.profileDifferentiation}
+                />
+              </div>
+            )}
+
+            {hasText(d.strategicDirection.initialEditorialPriorities) && (
+              <div className="rounded-2xl bg-white p-6 ring-1 ring-slate-200">
+                <FieldBlock
+                  label="Prioridades editoriais iniciais"
+                  value={d.strategicDirection.initialEditorialPriorities}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  </SectionCard>
+)}
 
       {hasFrequencySection && (
         <SectionCard title="Frequência de publicação">
