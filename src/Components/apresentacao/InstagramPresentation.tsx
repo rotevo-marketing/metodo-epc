@@ -440,7 +440,7 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
 
           <div className="grid gap-6 lg:grid-cols-2">
             {hasText(d.strategicDirection.priorityAudiences) && (
-              <div className="rounded-2xl bg-white p-6 ring-1 ring-slate-200">
+              <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
                 <FieldBlock
                   label="Públicos prioritários"
                   value={d.strategicDirection.priorityAudiences}
@@ -449,7 +449,7 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
             )}
 
             {hasText(d.strategicDirection.ecosystemFunction) && (
-              <div className="rounded-2xl bg-white p-6 ring-1 ring-slate-200">
+              <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
                 <FieldBlock
                   label="Função no ecossistema"
                   value={d.strategicDirection.ecosystemFunction}
@@ -458,7 +458,7 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
             )}
 
             {hasText(d.strategicDirection.profileDifferentiation) && (
-              <div className="rounded-2xl bg-white p-6 ring-1 ring-slate-200">
+              <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
                 <FieldBlock
                   label="Diferenciação do perfil"
                   value={d.strategicDirection.profileDifferentiation}
@@ -467,7 +467,7 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
             )}
 
             {hasText(d.strategicDirection.initialEditorialPriorities) && (
-              <div className="rounded-2xl bg-white p-6 ring-1 ring-slate-200">
+              <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
                 <FieldBlock
                   label="Prioridades editoriais iniciais"
                   value={d.strategicDirection.initialEditorialPriorities}
