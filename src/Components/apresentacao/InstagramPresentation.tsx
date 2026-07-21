@@ -298,6 +298,111 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
         slug="instagram"
       />
 
+      {hasProfileSection && (
+        <SectionCard title="Apresentação visual do Instagram">
+          {(hasText(profilePhotoUrl) || hasText(profileName) || hasText(profileHandle)) && (
+            <div className="flex items-center gap-5">
+              {hasText(profilePhotoUrl) && (
+                // img used intentionally: photoUrl may be a base64 data URL (legacy) or HTTPS URL
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={profilePhotoUrl}
+                  alt={hasText(profileName) ? profileName : "Foto do perfil do Instagram"}
+                  className="h-24 w-24 shrink-0 rounded-full object-cover ring-1 ring-slate-200"
+                />
+              )}
+              {(hasText(profileName) || hasText(profileHandle)) && (
+                <div>
+                  {hasText(profileName) && (
+                    <p className="text-lg font-semibold text-slate-950">{profileName}</p>
+                  )}
+                  {hasText(profileHandle) && (
+                    <p className="mt-0.5 text-sm text-slate-500">{profileHandle}</p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          <FieldBlock label="Bio" value={bioText} />
+
+          {hasText(bioLink) && (
+            <div>
+              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                Link principal
+              </p>
+              <a
+                href={bioLink}
+                target="_blank"
+                rel="noreferrer"
+                className="break-all text-xs text-slate-500 hover:text-slate-950"
+              >
+                {bioLink}
+              </a>
+            </div>
+          )}
+
+          {profileLinkItems.length > 0 && (
+            <div>
+              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                Links adicionais
+              </p>
+              <ul className="space-y-3">
+                {profileLinkItems.map((item) => (
+                  <li key={item.id}>
+                    {hasText(item.title) && (
+                      <p className="text-sm font-medium text-slate-950">{item.title}</p>
+                    )}
+                    {hasText(item.url) && (
+                      <a
+                        href={item.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="break-all text-xs text-slate-500 hover:text-slate-950"
+                      >
+                        {item.url}
+                      </a>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {profileHighlights.length > 0 && (
+            <div>
+              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                Destaques
+              </p>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {profileHighlights.map((highlight) => (
+                  <div
+                    key={highlight.id}
+                    className="rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200"
+                  >
+                    {hasText(highlight.imageUrl) && (
+                      // img used intentionally: imageUrl may be a base64 data URL (legacy) or HTTPS URL
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={highlight.imageUrl}
+                        alt={hasText(highlight.title) ? highlight.title : "Imagem do destaque do Instagram"}
+                        className="mb-3 h-16 w-16 rounded-full object-cover ring-1 ring-slate-200"
+                      />
+                    )}
+                    {hasText(highlight.title) && (
+                      <p className="text-sm font-medium text-slate-950">{highlight.title}</p>
+                    )}
+                    {hasText(highlight.purpose) && (
+                      <p className="mt-1 text-xs leading-5 text-slate-500">{highlight.purpose}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </SectionCard>
+      )}
+
       {hasStrategicDirectionSection && (
         <SectionCard title="Direção estratégica">
           <FieldBlock label="Papel do canal" value={d.strategicDirection.channelRole} />
@@ -777,112 +882,7 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
           )}
         </SectionCard>
       )}
-
-      {hasProfileSection && (
-        <SectionCard title="Perfil">
-          {(hasText(profilePhotoUrl) || hasText(profileName) || hasText(profileHandle)) && (
-            <div className="flex items-center gap-5">
-              {hasText(profilePhotoUrl) && (
-                // img used intentionally: photoUrl may be a base64 data URL (legacy) or HTTPS URL
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={profilePhotoUrl}
-                  alt={hasText(profileName) ? profileName : "Foto do perfil do Instagram"}
-                  className="h-24 w-24 shrink-0 rounded-full object-cover ring-1 ring-slate-200"
-                />
-              )}
-              {(hasText(profileName) || hasText(profileHandle)) && (
-                <div>
-                  {hasText(profileName) && (
-                    <p className="text-lg font-semibold text-slate-950">{profileName}</p>
-                  )}
-                  {hasText(profileHandle) && (
-                    <p className="mt-0.5 text-sm text-slate-500">{profileHandle}</p>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
-
-          <FieldBlock label="Bio" value={bioText} />
-
-          {hasText(bioLink) && (
-            <div>
-              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
-                Link principal
-              </p>
-              <a
-                href={bioLink}
-                target="_blank"
-                rel="noreferrer"
-                className="break-all text-xs text-slate-500 hover:text-slate-950"
-              >
-                {bioLink}
-              </a>
-            </div>
-          )}
-
-          {profileLinkItems.length > 0 && (
-            <div>
-              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
-                Links adicionais
-              </p>
-              <ul className="space-y-3">
-                {profileLinkItems.map((item) => (
-                  <li key={item.id}>
-                    {hasText(item.title) && (
-                      <p className="text-sm font-medium text-slate-950">{item.title}</p>
-                    )}
-                    {hasText(item.url) && (
-                      <a
-                        href={item.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="break-all text-xs text-slate-500 hover:text-slate-950"
-                      >
-                        {item.url}
-                      </a>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {profileHighlights.length > 0 && (
-            <div>
-              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
-                Destaques
-              </p>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {profileHighlights.map((highlight) => (
-                  <div
-                    key={highlight.id}
-                    className="rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200"
-                  >
-                    {hasText(highlight.imageUrl) && (
-                      // img used intentionally: imageUrl may be a base64 data URL (legacy) or HTTPS URL
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={highlight.imageUrl}
-                        alt={hasText(highlight.title) ? highlight.title : "Imagem do destaque do Instagram"}
-                        className="mb-3 h-16 w-16 rounded-full object-cover ring-1 ring-slate-200"
-                      />
-                    )}
-                    {hasText(highlight.title) && (
-                      <p className="text-sm font-medium text-slate-950">{highlight.title}</p>
-                    )}
-                    {hasText(highlight.purpose) && (
-                      <p className="mt-1 text-xs leading-5 text-slate-500">{highlight.purpose}</p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </SectionCard>
-      )}
-
+      
       {hasExternalReferencesSection && (
         <SectionCard title="Referências externas">
           <div className="divide-y divide-slate-100">
