@@ -469,14 +469,44 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
             {visibleFreqItems.map((item) => (
               <div key={item.id} className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
                 {hasText(item.format) && (
-                  <h3 className="text-base font-semibold text-slate-950">{item.format}</h3>
+                  <h3 className="text-xl font-semibold text-slate-950">{item.format}</h3>
                 )}
-                <div className="mt-4 space-y-4">
-                  <PlainTextField label="Quantidade" value={item.quantity} />
-                  <PlainTextField label="Período" value={item.period} />
-                  <PlainTextField label="Papel na jornada" value={item.journeyRole} />
-                  <PlainTextField label="Observações" value={item.notes} />
-                </div>
+                {(hasText(item.quantity) || hasText(item.period)) && (
+                  <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                    {hasText(item.quantity) && (
+                      <div>
+                        <p className="text-sm font-medium text-slate-500">Quantidade</p>
+                        <p className="mt-1 whitespace-pre-wrap text-sm leading-7 text-slate-700">
+                          {item.quantity}
+                        </p>
+                      </div>
+                    )}
+                    {hasText(item.period) && (
+                      <div>
+                        <p className="text-sm font-medium text-slate-500">Período</p>
+                        <p className="mt-1 whitespace-pre-wrap text-sm leading-7 text-slate-700">
+                          {item.period}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+                {hasText(item.journeyRole) && (
+                  <div className="mt-5 border-t border-slate-200 pt-5">
+                    <p className="text-sm font-medium text-slate-500">Papel na jornada</p>
+                    <p className="mt-1 whitespace-pre-wrap text-sm leading-7 text-slate-700">
+                      {item.journeyRole}
+                    </p>
+                  </div>
+                )}
+                {hasText(item.notes) && (
+                  <div className="mt-5 border-t border-slate-200 pt-5">
+                    <p className="text-sm font-medium text-slate-500">Observações</p>
+                    <p className="mt-1 whitespace-pre-wrap text-sm leading-7 text-slate-700">
+                      {item.notes}
+                    </p>
+                  </div>
+                )}
               </div>
             ))}
             {hasText(d.publishing.minimumViableFrequency) && (
