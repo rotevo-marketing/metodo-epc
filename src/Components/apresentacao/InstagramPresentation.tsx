@@ -925,55 +925,122 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
 
       {hasMeasurementSection && (
         <SectionCard title="Indicadores e mensuração">
-          {(primaryIndicators.length > 0 ||
-            secondaryIndicators.length > 0 ||
-            vanityMetrics.length > 0) && (
-            <div>
-              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
-                Indicadores de desempenho
-              </p>
-              <TextList items={primaryIndicators} label="Indicadores principais" />
-              <TextList items={secondaryIndicators} label="Indicadores secundários" />
-              <TextList items={vanityMetrics} label="Métricas de vaidade" />
-            </div>
-          )}
-
-          {(hasText(d.measurement.weeklyReview) || hasText(d.measurement.monthlyReview)) && (
-            <div>
-              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
-                Rotina de análise
-              </p>
-              <div className="grid gap-x-8 sm:grid-cols-2">
-                <PlainTextField label="Revisão semanal" value={d.measurement.weeklyReview} />
-                <PlainTextField label="Revisão mensal" value={d.measurement.monthlyReview} />
+          <div className="space-y-10">
+            {(primaryIndicators.length > 0 ||
+              secondaryIndicators.length > 0 ||
+              vanityMetrics.length > 0) && (
+              <div className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <h3 className="shrink-0 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                    Indicadores de desempenho
+                  </h3>
+                  <div className="h-px flex-1 bg-slate-200" />
+                </div>
+                <div className="grid items-start gap-6 lg:grid-cols-2">
+                  {primaryIndicators.length > 0 && (
+                    <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
+                      <TextList items={primaryIndicators} label="Indicadores principais" />
+                    </div>
+                  )}
+                  {secondaryIndicators.length > 0 && (
+                    <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
+                      <TextList items={secondaryIndicators} label="Indicadores secundários" />
+                    </div>
+                  )}
+                  {vanityMetrics.length > 0 && (
+                    <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
+                      <TextList items={vanityMetrics} label="Métricas de vaidade" />
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {(hasText(d.measurement.keepCriterion) ||
-            hasText(d.measurement.adjustCriterion) ||
-            hasText(d.measurement.stopCriterion)) && (
-            <div>
-              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
-                Critérios de decisão
-              </p>
-              <div className="grid gap-x-8 sm:grid-cols-2 lg:grid-cols-3">
-                <PlainTextField label="Critério para manter" value={d.measurement.keepCriterion} />
-                <PlainTextField label="Critério para ajustar" value={d.measurement.adjustCriterion} />
-                <PlainTextField label="Critério para interromper" value={d.measurement.stopCriterion} />
+            {(hasText(d.measurement.weeklyReview) || hasText(d.measurement.monthlyReview)) && (
+              <div className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <h3 className="shrink-0 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                    Rotina de análise
+                  </h3>
+                  <div className="h-px flex-1 bg-slate-200" />
+                </div>
+                <div className="grid items-start gap-6 lg:grid-cols-2">
+                  {hasText(d.measurement.weeklyReview) && (
+                    <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
+                      <PlainTextField label="Revisão semanal" value={d.measurement.weeklyReview} />
+                    </div>
+                  )}
+                  {hasText(d.measurement.monthlyReview) && (
+                    <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
+                      <PlainTextField label="Revisão mensal" value={d.measurement.monthlyReview} />
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {(hasText(d.measurement.baseline) || measurementHypotheses.length > 0) && (
-            <div>
-              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
-                Linha de base e hipóteses
-              </p>
-              <PlainTextField label="Linha de base" value={d.measurement.baseline} />
-              <TextList items={measurementHypotheses} label="Hipóteses a testar" />
-            </div>
-          )}
+            {(hasText(d.measurement.keepCriterion) ||
+              hasText(d.measurement.adjustCriterion) ||
+              hasText(d.measurement.stopCriterion)) && (
+              <div className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <h3 className="shrink-0 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                    Critérios de decisão
+                  </h3>
+                  <div className="h-px flex-1 bg-slate-200" />
+                </div>
+                <div className="grid items-start gap-6 lg:grid-cols-3">
+                  {hasText(d.measurement.keepCriterion) && (
+                    <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
+                      <PlainTextField
+                        label="Critério para manter"
+                        value={d.measurement.keepCriterion}
+                      />
+                    </div>
+                  )}
+                  {hasText(d.measurement.adjustCriterion) && (
+                    <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
+                      <PlainTextField
+                        label="Critério para ajustar"
+                        value={d.measurement.adjustCriterion}
+                      />
+                    </div>
+                  )}
+                  {hasText(d.measurement.stopCriterion) && (
+                    <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
+                      <PlainTextField
+                        label="Critério para interromper"
+                        value={d.measurement.stopCriterion}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {(hasText(d.measurement.baseline) || measurementHypotheses.length > 0) && (
+              <div className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <h3 className="shrink-0 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                    Linha de base e hipóteses
+                  </h3>
+                  <div className="h-px flex-1 bg-slate-200" />
+                </div>
+                <div className="grid items-start gap-6 lg:grid-cols-2">
+                  {hasText(d.measurement.baseline) && (
+                    <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
+                      <PlainTextField label="Linha de base" value={d.measurement.baseline} />
+                    </div>
+                  )}
+                  {measurementHypotheses.length > 0 && (
+                    <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
+                      <TextList items={measurementHypotheses} label="Hipóteses a testar" />
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
         </SectionCard>
       )}
 
