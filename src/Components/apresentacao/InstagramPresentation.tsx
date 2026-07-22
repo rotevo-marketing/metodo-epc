@@ -562,131 +562,175 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
 
       {hasContentAndLanguageSection && (
         <SectionCard title="Conteúdo e linguagem">
-          {objectiveItems.length > 0 && (
-            <div>
-              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
-                Objetivos do canal
-              </p>
-              <div className="divide-y divide-slate-100">
-                {objectiveItems.map((item) => (
-                  <div key={item.id} className="py-6 first:pt-0">
-                    <PlainTextField label="Objetivo" value={item.objective} />
-                    <div className="grid gap-x-8 sm:grid-cols-2">
-                      <PlainTextField label="Indicador" value={item.indicator} />
-                      <PlainTextField label="Meta" value={item.target} />
+          <div className="space-y-10">
+            {objectiveItems.length > 0 && (
+              <div className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <h3 className="shrink-0 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                    Objetivos do canal
+                  </h3>
+                  <div className="h-px flex-1 bg-slate-200" />
+                </div>
+                <div className="grid items-start gap-6 lg:grid-cols-2">
+                  {objectiveItems.map((item) => (
+                    <div
+                      key={item.id}
+                      className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200"
+                    >
+                      <PlainTextField label="Objetivo" value={item.objective} />
+                      <div className="grid gap-x-8 sm:grid-cols-2">
+                        <PlainTextField label="Indicador" value={item.indicator} />
+                        <PlainTextField label="Meta" value={item.target} />
+                      </div>
+                      <div className="grid gap-x-8 sm:grid-cols-2">
+                        <PlainTextField label="Prazo" value={item.deadline} />
+                        <PlainTextField
+                          label="Status de validação"
+                          value={VALIDATION_STATUS_LABELS[item.validationStatus]}
+                        />
+                      </div>
                     </div>
-                    <div className="grid gap-x-8 sm:grid-cols-2">
-                      <PlainTextField label="Prazo" value={item.deadline} />
-                      <PlainTextField
-                        label="Status de validação"
-                        value={VALIDATION_STATUS_LABELS[item.validationStatus]}
-                      />
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {contentFormats.length > 0 && (
-            <div>
-              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
-                Formatos de conteúdo
-              </p>
-              <div className="divide-y divide-slate-100">
-                {contentFormats.map((item) => (
-                  <div key={item.id} className="py-6 first:pt-0">
-                    <PlainTextField label="Nome do formato" value={item.name} />
-                    <PlainTextField label="Estrutura" value={item.structure} />
-                    <div className="grid gap-x-8 sm:grid-cols-2">
-                      <PlainTextField label="Duração ou extensão" value={item.duration} />
-                      <PlainTextField label="Papel na jornada" value={item.journeyRole} />
+            {contentFormats.length > 0 && (
+              <div className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <h3 className="shrink-0 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                    Formatos de conteúdo
+                  </h3>
+                  <div className="h-px flex-1 bg-slate-200" />
+                </div>
+                <div className="grid items-start gap-6 lg:grid-cols-2">
+                  {contentFormats.map((item) => (
+                    <div
+                      key={item.id}
+                      className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200"
+                    >
+                      <PlainTextField label="Nome do formato" value={item.name} />
+                      <PlainTextField label="Estrutura" value={item.structure} />
+                      <div className="grid gap-x-8 sm:grid-cols-2">
+                        <PlainTextField label="Duração ou extensão" value={item.duration} />
+                        <PlainTextField label="Papel na jornada" value={item.journeyRole} />
+                      </div>
+                      <PlainTextField label="Finalidade estratégica" value={item.purpose} />
+                      <div className="grid gap-x-8 sm:grid-cols-2">
+                        <PlainTextField label="CTA recomendado" value={item.cta} />
+                        <PlainTextField label="Observações" value={item.notes} />
+                      </div>
                     </div>
-                    <PlainTextField label="Finalidade estratégica" value={item.purpose} />
-                    <div className="grid gap-x-8 sm:grid-cols-2">
-                      <PlainTextField label="CTA recomendado" value={item.cta} />
-                      <PlainTextField label="Observações" value={item.notes} />
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {strategicStories.length > 0 && (
-            <div>
-              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
-                Stories estratégicos
-              </p>
-              <div className="divide-y divide-slate-100">
-                {strategicStories.map((item) => (
-                  <div key={item.id} className="py-6 first:pt-0">
-                    <PlainTextField label="Nome do Story estratégico" value={item.name} />
-                    <div className="grid gap-x-8 sm:grid-cols-2">
-                      <PlainTextField label="Frequência" value={item.frequency} />
-                      <PlainTextField label="Etapa da jornada" value={item.journeyStage} />
+            {strategicStories.length > 0 && (
+              <div className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <h3 className="shrink-0 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                    Stories estratégicos
+                  </h3>
+                  <div className="h-px flex-1 bg-slate-200" />
+                </div>
+                <div className="grid items-start gap-6 lg:grid-cols-2">
+                  {strategicStories.map((item) => (
+                    <div
+                      key={item.id}
+                      className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200"
+                    >
+                      <PlainTextField label="Nome do Story estratégico" value={item.name} />
+                      <div className="grid gap-x-8 sm:grid-cols-2">
+                        <PlainTextField label="Frequência" value={item.frequency} />
+                        <PlainTextField label="Etapa da jornada" value={item.journeyStage} />
+                      </div>
+                      <PlainTextField label="Finalidade estratégica" value={item.purpose} />
+                      <div className="grid gap-x-8 sm:grid-cols-2">
+                        <PlainTextField label="CTA" value={item.cta} />
+                        <PlainTextField label="Descrição" value={item.description} />
+                      </div>
                     </div>
-                    <PlainTextField label="Finalidade estratégica" value={item.purpose} />
-                    <div className="grid gap-x-8 sm:grid-cols-2">
-                      <PlainTextField label="CTA" value={item.cta} />
-                      <PlainTextField label="Descrição" value={item.description} />
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          <TextList items={editorialGuidelines} label="Diretrizes editoriais" />
-
-          {languageStructureItems.length > 0 && (
-            <div>
-              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
-                Estruturas de linguagem
-              </p>
-              <div className="divide-y divide-slate-100">
-                {languageStructureItems.map((item) => (
-                  <div key={item.id} className="py-6 first:pt-0">
-                    <PlainTextField label="Nome da estrutura" value={item.name} />
-                    <PlainTextField label="Como aparece na comunicação" value={item.howItAppears} />
-                    <PlainTextField label="Relação com a jornada" value={item.journeyRelation} />
-                    <div className="grid gap-x-8 sm:grid-cols-2">
-                      <PlainTextField label="O que evitar" value={item.avoid} />
-                      <PlainTextField label="Exemplo aplicado" value={item.example} />
-                    </div>
-                  </div>
-                ))}
+            {editorialGuidelines.length > 0 && (
+              <div className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <h3 className="shrink-0 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                    Diretrizes editoriais
+                  </h3>
+                  <div className="h-px flex-1 bg-slate-200" />
+                </div>
+                <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
+                  <TextList items={editorialGuidelines} label="Diretrizes editoriais" />
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {hashtagCategories.length > 0 && (
-            <div>
-              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
-                Hashtags
-              </p>
-              <div className="divide-y divide-slate-100">
-                {hashtagCategories.map((cat) => {
-                  const filledHashtags: TextItem[] = filterFilledStrings(cat.hashtags).map(
-                    (h) => ({ value: h })
-                  );
-                  return (
-                    <div key={cat.id} className="py-6 first:pt-0">
-                      <PlainTextField label="Categoria" value={cat.name} />
-                      {filledHashtags.length > 0 && (
-                        <TextList items={filledHashtags} label="Hashtags da categoria" />
-                      )}
-                      <PlainTextField label="Observações" value={cat.notes} />
-                      <PlainTextField
-                        label="Status de validação"
-                        value={VALIDATION_STATUS_LABELS[cat.validationStatus]}
-                      />
+            {languageStructureItems.length > 0 && (
+              <div className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <h3 className="shrink-0 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                    Estruturas de linguagem
+                  </h3>
+                  <div className="h-px flex-1 bg-slate-200" />
+                </div>
+                <div className="grid items-start gap-6 lg:grid-cols-2">
+                  {languageStructureItems.map((item) => (
+                    <div
+                      key={item.id}
+                      className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200"
+                    >
+                      <PlainTextField label="Nome da estrutura" value={item.name} />
+                      <PlainTextField label="Como aparece na comunicação" value={item.howItAppears} />
+                      <PlainTextField label="Relação com a jornada" value={item.journeyRelation} />
+                      <div className="grid gap-x-8 sm:grid-cols-2">
+                        <PlainTextField label="O que evitar" value={item.avoid} />
+                        <PlainTextField label="Exemplo aplicado" value={item.example} />
+                      </div>
                     </div>
-                  );
-                })}
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
+
+            {hashtagCategories.length > 0 && (
+              <div className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <h3 className="shrink-0 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                    Hashtags
+                  </h3>
+                  <div className="h-px flex-1 bg-slate-200" />
+                </div>
+                <div className="grid items-start gap-6 lg:grid-cols-2">
+                  {hashtagCategories.map((cat) => {
+                    const filledHashtags: TextItem[] = filterFilledStrings(cat.hashtags).map(
+                      (h) => ({ value: h })
+                    );
+                    return (
+                      <div
+                        key={cat.id}
+                        className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200"
+                      >
+                        <PlainTextField label="Categoria" value={cat.name} />
+                        {filledHashtags.length > 0 && (
+                          <TextList items={filledHashtags} label="Hashtags da categoria" />
+                        )}
+                        <PlainTextField label="Observações" value={cat.notes} />
+                        <PlainTextField
+                          label="Status de validação"
+                          value={VALIDATION_STATUS_LABELS[cat.validationStatus]}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
         </SectionCard>
       )}
 
