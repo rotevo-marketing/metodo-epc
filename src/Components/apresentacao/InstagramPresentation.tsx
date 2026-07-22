@@ -509,38 +509,53 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
                 )}
               </div>
             ))}
-            {hasText(d.publishing.minimumViableFrequency) && (
-              <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
-                <PlainTextField
-                  label="Frequência mínima viável"
-                  value={d.publishing.minimumViableFrequency}
-                />
+            {(hasText(d.publishing.minimumViableFrequency) ||
+              hasText(d.publishing.recommendedFrequency) ||
+              hasText(d.publishing.maximumSustainableFrequency)) && (
+              <div className="space-y-4 pt-6">
+                <h3 className="text-xl font-semibold text-slate-950">Ritmo sustentável</h3>
+                {hasText(d.publishing.minimumViableFrequency) && (
+                  <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
+                    <PlainTextField
+                      label="Frequência mínima viável"
+                      value={d.publishing.minimumViableFrequency}
+                    />
+                  </div>
+                )}
+                {hasText(d.publishing.recommendedFrequency) && (
+                  <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
+                    <PlainTextField
+                      label="Frequência recomendada"
+                      value={d.publishing.recommendedFrequency}
+                    />
+                  </div>
+                )}
+                {hasText(d.publishing.maximumSustainableFrequency) && (
+                  <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
+                    <PlainTextField
+                      label="Frequência máxima sustentável"
+                      value={d.publishing.maximumSustainableFrequency}
+                    />
+                  </div>
+                )}
               </div>
             )}
-            {hasText(d.publishing.recommendedFrequency) && (
-              <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
-                <PlainTextField
-                  label="Frequência recomendada"
-                  value={d.publishing.recommendedFrequency}
-                />
-              </div>
-            )}
-            {hasText(d.publishing.maximumSustainableFrequency) && (
-              <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
-                <PlainTextField
-                  label="Frequência máxima sustentável"
-                  value={d.publishing.maximumSustainableFrequency}
-                />
-              </div>
-            )}
-            {hasText(d.publishing.productionRoutine) && (
-              <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
-                <PlainTextField label="Rotina de produção" value={d.publishing.productionRoutine} />
-              </div>
-            )}
-            {hasText(d.publishing.adjustmentRule) && (
-              <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
-                <PlainTextField label="Regra de ajuste" value={d.publishing.adjustmentRule} />
+            {(hasText(d.publishing.productionRoutine) || hasText(d.publishing.adjustmentRule)) && (
+              <div className="space-y-4 pt-6">
+                <h3 className="text-xl font-semibold text-slate-950">Operação e ajustes</h3>
+                {hasText(d.publishing.productionRoutine) && (
+                  <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
+                    <PlainTextField
+                      label="Rotina de produção"
+                      value={d.publishing.productionRoutine}
+                    />
+                  </div>
+                )}
+                {hasText(d.publishing.adjustmentRule) && (
+                  <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
+                    <PlainTextField label="Regra de ajuste" value={d.publishing.adjustmentRule} />
+                  </div>
+                )}
               </div>
             )}
           </div>
