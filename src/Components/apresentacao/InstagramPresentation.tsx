@@ -487,41 +487,40 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
       {hasFrequencySection && (
         <SectionCard title="Frequência de publicação">
           {visibleFreqItems.length > 0 && (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-slate-200">
-                    <th className="pb-3 pr-6 text-left text-xs font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
-                      Formato
-                    </th>
-                    <th className="pb-3 pr-6 text-left text-xs font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
-                      Quantidade
-                    </th>
-                    <th className="pb-3 pr-6 text-left text-xs font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
-                      Período
-                    </th>
-                    <th className="pb-3 pr-6 text-left text-xs font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
-                      Papel na jornada
-                    </th>
-                    <th className="pb-3 text-left text-xs font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
-                      Observações
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {visibleFreqItems.map((item) => (
-                    <tr key={item.id}>
-                      <td className="py-3 pr-6 align-top text-slate-700">{item.format}</td>
-                      <td className="py-3 pr-6 align-top text-slate-700">{item.quantity}</td>
-                      <td className="py-3 pr-6 align-top text-slate-700">{item.period}</td>
-                      <td className="py-3 pr-6 align-top text-slate-700">{item.journeyRole}</td>
-                      <td className="py-3 align-top text-slate-700">{item.notes}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+  <div className="space-y-6">
+    <div className="flex items-center gap-4">
+      <h3 className="shrink-0 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+        Formatos e ritmo de publicação
+      </h3>
+      <div className="h-px flex-1 bg-slate-200" />
+    </div>
+
+    <div className="grid items-start gap-6 lg:grid-cols-2">
+      {visibleFreqItems.map((item) => (
+        <div
+          key={item.id}
+          className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200"
+        >
+          {hasText(item.format) && (
+            <p className="text-lg font-semibold text-slate-950">
+              {item.format}
+            </p>
           )}
+
+          <div className="mt-5 grid gap-4 sm:grid-cols-2">
+            <PlainTextField label="Quantidade" value={item.quantity} />
+            <PlainTextField label="Período" value={item.period} />
+          </div>
+
+          <div className="mt-5 space-y-5">
+            <PlainTextField label="Papel na jornada" value={item.journeyRole} />
+            <PlainTextField label="Observações" value={item.notes} />
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
 
           {(hasText(d.publishing.minimumViableFrequency) ||
             hasText(d.publishing.recommendedFrequency) ||
