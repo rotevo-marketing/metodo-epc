@@ -408,7 +408,7 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
     <div className="space-y-10">
       {(hasText(d.strategicDirection.channelRole) ||
         hasText(d.strategicDirection.generalStrategy)) && (
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid items-start gap-6 lg:grid-cols-2">
           {hasText(d.strategicDirection.channelRole) && (
             <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
               <FieldBlock
@@ -434,11 +434,14 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
         hasText(d.strategicDirection.profileDifferentiation) ||
         hasText(d.strategicDirection.initialEditorialPriorities)) && (
         <div className="space-y-6">
-          <h3 className="text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
-            Fundamentos estratégicos
-          </h3>
+          <div className="flex items-center gap-4">
+  <h3 className="shrink-0 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+    Fundamentos estratégicos
+  </h3>
+  <div className="h-px flex-1 bg-slate-200" />
+</div>
 
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="grid items-start gap-6 lg:grid-cols-2">
             {hasText(d.strategicDirection.priorityAudiences) && (
               <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
                 <FieldBlock
