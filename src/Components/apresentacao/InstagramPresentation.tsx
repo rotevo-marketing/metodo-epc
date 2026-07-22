@@ -3,6 +3,7 @@ import {
   hasMeaningfulInstagramContent,
 } from "@/lib/normalizeInstagramData";
 import { PresentationHeader } from "./PresentationHeader";
+import { RichText } from "./RichText";
 import {
   TextList,
   FieldBlock,
@@ -38,10 +39,8 @@ function PlainTextField({ label, value }: { label: string; value: string }) {
   if (!hasText(value)) return null;
   return (
     <div>
-      <p className="mb-1 mt-6 text-xs font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
-        {label}
-      </p>
-      <p className="whitespace-pre-wrap text-sm leading-6 text-slate-700">{value}</p>
+      <p className="text-base font-semibold text-slate-950">{label}</p>
+      <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-slate-700">{value}</p>
     </div>
   );
 }
@@ -404,159 +403,117 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
       )}
 
       {hasStrategicDirectionSection && (
-  <SectionCard title="Direção estratégica">
-    <div className="space-y-10">
-      {(hasText(d.strategicDirection.channelRole) ||
-        hasText(d.strategicDirection.generalStrategy)) && (
-        <div className="grid items-start gap-6 lg:grid-cols-2">
+        <SectionCard title="Direção estratégica">
+          <div className="space-y-4">
           {hasText(d.strategicDirection.channelRole) && (
             <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
-              <FieldBlock
-                label="Papel do canal"
-                value={d.strategicDirection.channelRole}
+              <h3 className="text-base font-semibold text-slate-950">Papel do canal</h3>
+              <RichText
+                content={d.strategicDirection.channelRole}
+                className="mt-3 text-sm leading-7 text-slate-700"
               />
             </div>
           )}
-
           {hasText(d.strategicDirection.generalStrategy) && (
             <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
-              <FieldBlock
-                label="Estratégia geral"
-                value={d.strategicDirection.generalStrategy}
+              <h3 className="text-base font-semibold text-slate-950">Estratégia geral</h3>
+              <RichText
+                content={d.strategicDirection.generalStrategy}
+                className="mt-3 text-sm leading-7 text-slate-700"
               />
             </div>
           )}
-        </div>
-      )}
-
-      {(hasText(d.strategicDirection.priorityAudiences) ||
-        hasText(d.strategicDirection.ecosystemFunction) ||
-        hasText(d.strategicDirection.profileDifferentiation) ||
-        hasText(d.strategicDirection.initialEditorialPriorities)) && (
-        <div className="space-y-6">
-          <div className="flex items-center gap-4">
-  <h3 className="shrink-0 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
-    Fundamentos estratégicos
-  </h3>
-  <div className="h-px flex-1 bg-slate-200" />
-</div>
-
-          <div className="grid items-start gap-6 lg:grid-cols-2">
-            {hasText(d.strategicDirection.priorityAudiences) && (
+          {hasText(d.strategicDirection.priorityAudiences) && (
               <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
-                <FieldBlock
-                  label="Públicos prioritários"
-                  value={d.strategicDirection.priorityAudiences}
+                <h3 className="text-base font-semibold text-slate-950">Públicos prioritários</h3>
+                <RichText
+                  content={d.strategicDirection.priorityAudiences}
+                  className="mt-3 text-sm leading-7 text-slate-700"
                 />
               </div>
             )}
-
             {hasText(d.strategicDirection.ecosystemFunction) && (
               <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
-                <FieldBlock
-                  label="Função no ecossistema"
-                  value={d.strategicDirection.ecosystemFunction}
+                <h3 className="text-base font-semibold text-slate-950">Função no ecossistema</h3>
+                <RichText
+                  content={d.strategicDirection.ecosystemFunction}
+                  className="mt-3 text-sm leading-7 text-slate-700"
                 />
               </div>
             )}
-
             {hasText(d.strategicDirection.profileDifferentiation) && (
               <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
-                <FieldBlock
-                  label="Diferenciação do perfil"
-                  value={d.strategicDirection.profileDifferentiation}
+                <h3 className="text-base font-semibold text-slate-950">Diferenciação do perfil</h3>
+                <RichText
+                  content={d.strategicDirection.profileDifferentiation}
+                  className="mt-3 text-sm leading-7 text-slate-700"
                 />
               </div>
             )}
-
             {hasText(d.strategicDirection.initialEditorialPriorities) && (
               <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
-                <FieldBlock
-                  label="Prioridades editoriais iniciais"
-                  value={d.strategicDirection.initialEditorialPriorities}
+                <h3 className="text-base font-semibold text-slate-950">Prioridades editoriais iniciais</h3>
+                <RichText
+                  content={d.strategicDirection.initialEditorialPriorities}
+                  className="mt-3 text-sm leading-7 text-slate-700"
                 />
               </div>
             )}
           </div>
-        </div>
+        </SectionCard>
       )}
-    </div>
-  </SectionCard>
-)}
 
       {hasFrequencySection && (
         <SectionCard title="Frequência de publicação">
-          {visibleFreqItems.length > 0 && (
-  <div className="space-y-6">
-    <div className="flex items-center gap-4">
-      <h3 className="shrink-0 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
-        Formatos e ritmo de publicação
-      </h3>
-      <div className="h-px flex-1 bg-slate-200" />
-    </div>
-
-    <div className="grid items-start gap-6 lg:grid-cols-2">
-      {visibleFreqItems.map((item) => (
-        <div
-          key={item.id}
-          className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200"
-        >
-          {hasText(item.format) && (
-            <p className="text-lg font-semibold text-slate-950">
-              {item.format}
-            </p>
-          )}
-
-          <div className="mt-5 grid gap-4 sm:grid-cols-2">
-            <PlainTextField label="Quantidade" value={item.quantity} />
-            <PlainTextField label="Período" value={item.period} />
-          </div>
-
-          <div className="mt-5 space-y-5">
-            <PlainTextField label="Papel na jornada" value={item.journeyRole} />
-            <PlainTextField label="Observações" value={item.notes} />
-          </div>
-        </div>
-      ))}
-    </div>
-  </div>
-)}
-
-          {(hasText(d.publishing.minimumViableFrequency) ||
-            hasText(d.publishing.recommendedFrequency) ||
-            hasText(d.publishing.maximumSustainableFrequency)) && (
-            <div>
-              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
-                Frequência sustentável
-              </p>
-              <div className="grid gap-x-8 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="space-y-4">
+            {visibleFreqItems.map((item) => (
+              <div key={item.id} className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
+                {hasText(item.format) && (
+                  <h3 className="text-base font-semibold text-slate-950">{item.format}</h3>
+                )}
+                <div className="mt-4 space-y-4">
+                  <PlainTextField label="Quantidade" value={item.quantity} />
+                  <PlainTextField label="Período" value={item.period} />
+                  <PlainTextField label="Papel na jornada" value={item.journeyRole} />
+                  <PlainTextField label="Observações" value={item.notes} />
+                </div>
+              </div>
+            ))}
+            {hasText(d.publishing.minimumViableFrequency) && (
+              <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
                 <PlainTextField
                   label="Frequência mínima viável"
                   value={d.publishing.minimumViableFrequency}
                 />
+              </div>
+            )}
+            {hasText(d.publishing.recommendedFrequency) && (
+              <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
                 <PlainTextField
                   label="Frequência recomendada"
                   value={d.publishing.recommendedFrequency}
                 />
+              </div>
+            )}
+            {hasText(d.publishing.maximumSustainableFrequency) && (
+              <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
                 <PlainTextField
                   label="Frequência máxima sustentável"
                   value={d.publishing.maximumSustainableFrequency}
                 />
               </div>
-            </div>
-          )}
-
-          {(hasText(d.publishing.productionRoutine) || hasText(d.publishing.adjustmentRule)) && (
-            <div>
-              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
-                Rotina operacional
-              </p>
-              <div className="grid gap-x-8 sm:grid-cols-2">
+            )}
+            {hasText(d.publishing.productionRoutine) && (
+              <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
                 <PlainTextField label="Rotina de produção" value={d.publishing.productionRoutine} />
+              </div>
+            )}
+            {hasText(d.publishing.adjustmentRule) && (
+              <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
                 <PlainTextField label="Regra de ajuste" value={d.publishing.adjustmentRule} />
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </SectionCard>
       )}
 
@@ -565,24 +522,23 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
           <div className="space-y-10">
             {objectiveItems.length > 0 && (
               <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <h3 className="shrink-0 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                <div>
+                  <h3 className="text-xl font-semibold text-slate-950">
                     Objetivos do canal
                   </h3>
-                  <div className="h-px flex-1 bg-slate-200" />
                 </div>
-                <div className="grid items-start gap-6 lg:grid-cols-2">
+                <div className="space-y-4">
                   {objectiveItems.map((item) => (
                     <div
                       key={item.id}
                       className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200"
                     >
                       <PlainTextField label="Objetivo" value={item.objective} />
-                      <div className="grid gap-x-8 sm:grid-cols-2">
+                      <div className="space-y-4">
                         <PlainTextField label="Indicador" value={item.indicator} />
                         <PlainTextField label="Meta" value={item.target} />
                       </div>
-                      <div className="grid gap-x-8 sm:grid-cols-2">
+                      <div className="space-y-4">
                         <PlainTextField label="Prazo" value={item.deadline} />
                         <PlainTextField
                           label="Status de validação"
@@ -597,13 +553,12 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
 
             {contentFormats.length > 0 && (
               <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <h3 className="shrink-0 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                <div>
+                  <h3 className="text-xl font-semibold text-slate-950">
                     Formatos de conteúdo
                   </h3>
-                  <div className="h-px flex-1 bg-slate-200" />
                 </div>
-                <div className="grid items-start gap-6 lg:grid-cols-2">
+                <div className="space-y-4">
                   {contentFormats.map((item) => (
                     <div
                       key={item.id}
@@ -611,12 +566,12 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
                     >
                       <PlainTextField label="Nome do formato" value={item.name} />
                       <PlainTextField label="Estrutura" value={item.structure} />
-                      <div className="grid gap-x-8 sm:grid-cols-2">
+                      <div className="space-y-4">
                         <PlainTextField label="Duração ou extensão" value={item.duration} />
                         <PlainTextField label="Papel na jornada" value={item.journeyRole} />
                       </div>
                       <PlainTextField label="Finalidade estratégica" value={item.purpose} />
-                      <div className="grid gap-x-8 sm:grid-cols-2">
+                      <div className="space-y-4">
                         <PlainTextField label="CTA recomendado" value={item.cta} />
                         <PlainTextField label="Observações" value={item.notes} />
                       </div>
@@ -628,25 +583,24 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
 
             {strategicStories.length > 0 && (
               <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <h3 className="shrink-0 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                <div>
+                  <h3 className="text-xl font-semibold text-slate-950">
                     Stories estratégicos
                   </h3>
-                  <div className="h-px flex-1 bg-slate-200" />
                 </div>
-                <div className="grid items-start gap-6 lg:grid-cols-2">
+                <div className="space-y-4">
                   {strategicStories.map((item) => (
                     <div
                       key={item.id}
                       className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200"
                     >
                       <PlainTextField label="Nome do Story estratégico" value={item.name} />
-                      <div className="grid gap-x-8 sm:grid-cols-2">
+                      <div className="space-y-4">
                         <PlainTextField label="Frequência" value={item.frequency} />
                         <PlainTextField label="Etapa da jornada" value={item.journeyStage} />
                       </div>
                       <PlainTextField label="Finalidade estratégica" value={item.purpose} />
-                      <div className="grid gap-x-8 sm:grid-cols-2">
+                      <div className="space-y-4">
                         <PlainTextField label="CTA" value={item.cta} />
                         <PlainTextField label="Descrição" value={item.description} />
                       </div>
@@ -658,11 +612,10 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
 
             {editorialGuidelines.length > 0 && (
               <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <h3 className="shrink-0 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                <div>
+                  <h3 className="text-xl font-semibold text-slate-950">
                     Diretrizes editoriais
                   </h3>
-                  <div className="h-px flex-1 bg-slate-200" />
                 </div>
                 <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
                   <TextList items={editorialGuidelines} label="Diretrizes editoriais" />
@@ -672,13 +625,12 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
 
             {languageStructureItems.length > 0 && (
               <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <h3 className="shrink-0 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                <div>
+                  <h3 className="text-xl font-semibold text-slate-950">
                     Estruturas de linguagem
                   </h3>
-                  <div className="h-px flex-1 bg-slate-200" />
                 </div>
-                <div className="grid items-start gap-6 lg:grid-cols-2">
+                <div className="space-y-4">
                   {languageStructureItems.map((item) => (
                     <div
                       key={item.id}
@@ -687,7 +639,7 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
                       <PlainTextField label="Nome da estrutura" value={item.name} />
                       <PlainTextField label="Como aparece na comunicação" value={item.howItAppears} />
                       <PlainTextField label="Relação com a jornada" value={item.journeyRelation} />
-                      <div className="grid gap-x-8 sm:grid-cols-2">
+                      <div className="space-y-4">
                         <PlainTextField label="O que evitar" value={item.avoid} />
                         <PlainTextField label="Exemplo aplicado" value={item.example} />
                       </div>
@@ -699,13 +651,12 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
 
             {hashtagCategories.length > 0 && (
               <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <h3 className="shrink-0 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                <div>
+                  <h3 className="text-xl font-semibold text-slate-950">
                     Hashtags
                   </h3>
-                  <div className="h-px flex-1 bg-slate-200" />
                 </div>
-                <div className="grid items-start gap-6 lg:grid-cols-2">
+                <div className="space-y-4">
                   {hashtagCategories.map((cat) => {
                     const filledHashtags: TextItem[] = filterFilledStrings(cat.hashtags).map(
                       (h) => ({ value: h })
@@ -717,7 +668,21 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
                       >
                         <PlainTextField label="Categoria" value={cat.name} />
                         {filledHashtags.length > 0 && (
-                          <TextList items={filledHashtags} label="Hashtags da categoria" />
+                          <div>
+                            <h4 className="text-base font-semibold text-slate-950">
+                              Hashtags da categoria
+                            </h4>
+                            <div className="mt-4 flex flex-wrap gap-2">
+                              {filledHashtags.map((hashtag, index) => (
+                                <span
+                                  key={`${cat.id}-${index}`}
+                                  className="rounded-full bg-white px-3 py-1 text-sm text-slate-700 ring-1 ring-slate-200"
+                                >
+                                  {hashtag.value}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
                         )}
                         <PlainTextField label="Observações" value={cat.notes} />
                         <PlainTextField
@@ -736,65 +701,31 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
 
       {hasVisualDirectionSection && (
         <SectionCard title="Direção visual">
-          <FieldBlock label="Estratégia visual do canal" value={visualStrategy} />
-
-          {(hasText(d.visualDirection.humanPresence) ||
-            hasText(d.visualDirection.specialistRole) ||
-            hasText(d.visualDirection.backstage) ||
-            hasText(d.visualDirection.socialProof) ||
-            hasText(d.visualDirection.dataUsage)) && (
-            <div>
-              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
-                Presença e construção de autoridade
-              </p>
-              <div className="grid gap-x-8 sm:grid-cols-2">
-                <PlainTextField label="Presença humana" value={d.visualDirection.humanPresence} />
-                <PlainTextField label="Papel visual do especialista" value={d.visualDirection.specialistRole} />
+          <div className="space-y-4">
+            {hasText(visualStrategy) && (
+              <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
+                <h3 className="text-base font-semibold text-slate-950">Estratégia visual do canal</h3>
+                <RichText content={visualStrategy} className="mt-3 text-sm leading-7 text-slate-700" />
               </div>
-              <div className="grid gap-x-8 sm:grid-cols-2">
-                <PlainTextField label="Bastidores" value={d.visualDirection.backstage} />
-                <PlainTextField label="Provas e depoimentos" value={d.visualDirection.socialProof} />
-              </div>
-              <PlainTextField label="Uso de dados" value={d.visualDirection.dataUsage} />
-            </div>
-          )}
-
-          {(hasText(d.visualDirection.informationHierarchy) ||
-            hasText(d.visualDirection.visualDensity) ||
-            hasText(d.visualDirection.desiredFeeling)) && (
-            <div>
-              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
-                Organização visual dos conteúdos
-              </p>
-              <div className="grid gap-x-8 sm:grid-cols-2">
-                <PlainTextField label="Hierarquia da informação" value={d.visualDirection.informationHierarchy} />
-                <PlainTextField label="Densidade visual" value={d.visualDirection.visualDensity} />
-              </div>
-              <PlainTextField label="Sensação desejada" value={d.visualDirection.desiredFeeling} />
-            </div>
-          )}
-
-          {(hasText(d.visualDirection.formatConsistency) ||
-            hasText(d.visualDirection.journeyAdaptation) ||
-            hasText(d.visualDirection.avoid)) && (
-            <div>
-              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
-                Consistência e adaptação
-              </p>
-              <div className="grid gap-x-8 sm:grid-cols-2">
-                <PlainTextField label="Consistência entre formatos" value={d.visualDirection.formatConsistency} />
-                <PlainTextField label="Adaptação visual à jornada" value={d.visualDirection.journeyAdaptation} />
-              </div>
-              <PlainTextField label="O que evitar" value={d.visualDirection.avoid} />
-            </div>
-          )}
+            )}
+            {hasText(d.visualDirection.humanPresence) && <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200"><PlainTextField label="Presença humana" value={d.visualDirection.humanPresence} /></div>}
+            {hasText(d.visualDirection.specialistRole) && <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200"><PlainTextField label="Papel visual do especialista" value={d.visualDirection.specialistRole} /></div>}
+            {hasText(d.visualDirection.backstage) && <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200"><PlainTextField label="Bastidores" value={d.visualDirection.backstage} /></div>}
+            {hasText(d.visualDirection.socialProof) && <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200"><PlainTextField label="Provas e depoimentos" value={d.visualDirection.socialProof} /></div>}
+            {hasText(d.visualDirection.dataUsage) && <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200"><PlainTextField label="Uso de dados" value={d.visualDirection.dataUsage} /></div>}
+            {hasText(d.visualDirection.informationHierarchy) && <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200"><PlainTextField label="Hierarquia da informação" value={d.visualDirection.informationHierarchy} /></div>}
+            {hasText(d.visualDirection.visualDensity) && <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200"><PlainTextField label="Densidade visual" value={d.visualDirection.visualDensity} /></div>}
+            {hasText(d.visualDirection.desiredFeeling) && <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200"><PlainTextField label="Sensação desejada" value={d.visualDirection.desiredFeeling} /></div>}
+            {hasText(d.visualDirection.formatConsistency) && <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200"><PlainTextField label="Consistência entre formatos" value={d.visualDirection.formatConsistency} /></div>}
+            {hasText(d.visualDirection.journeyAdaptation) && <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200"><PlainTextField label="Adaptação visual à jornada" value={d.visualDirection.journeyAdaptation} /></div>}
+            {hasText(d.visualDirection.avoid) && <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200"><PlainTextField label="O que evitar" value={d.visualDirection.avoid} /></div>}
 
           {visualReferenceItems.length > 0 && (
-            <div>
-              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold text-slate-950">
                 Referências visuais
-              </p>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              </h3>
+              <div className="space-y-4">
                 {visualReferenceItems.map((ref) => (
                   <div
                     key={ref.id}
@@ -826,6 +757,7 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
               </div>
             </div>
           )}
+          </div>
         </SectionCard>
       )}
 
@@ -834,13 +766,12 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
           <div className="space-y-10">
             {(hasDiscoveryConversion || hasConsiderationConversion || hasDecisionConversion) && (
               <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <h3 className="shrink-0 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                <div>
+                  <h3 className="text-xl font-semibold text-slate-950">
                     Etapas de conversão
                   </h3>
-                  <div className="h-px flex-1 bg-slate-200" />
                 </div>
-                <div className="grid items-start gap-6 lg:grid-cols-3">
+                <div className="space-y-4">
                   {hasDiscoveryConversion && (
                     <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
                       <p className="text-sm font-semibold text-slate-950">Descoberta</p>
@@ -880,13 +811,12 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
               hasText(d.conversion.commercialChannel) ||
               hasText(d.conversion.crmIntegration)) && (
               <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <h3 className="shrink-0 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                <div>
+                  <h3 className="text-xl font-semibold text-slate-950">
                     Caminho comercial
                   </h3>
-                  <div className="h-px flex-1 bg-slate-200" />
                 </div>
-                <div className="grid items-start gap-6 lg:grid-cols-2">
+                <div className="space-y-4">
                   {hasText(d.conversion.conversionPath) && (
                     <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
                       <PlainTextField
@@ -930,13 +860,12 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
               secondaryIndicators.length > 0 ||
               vanityMetrics.length > 0) && (
               <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <h3 className="shrink-0 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                <div>
+                  <h3 className="text-xl font-semibold text-slate-950">
                     Indicadores de desempenho
                   </h3>
-                  <div className="h-px flex-1 bg-slate-200" />
                 </div>
-                <div className="grid items-start gap-6 lg:grid-cols-2">
+                <div className="space-y-4">
                   {primaryIndicators.length > 0 && (
                     <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
                       <TextList items={primaryIndicators} label="Indicadores principais" />
@@ -958,13 +887,12 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
 
             {(hasText(d.measurement.weeklyReview) || hasText(d.measurement.monthlyReview)) && (
               <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <h3 className="shrink-0 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                <div>
+                  <h3 className="text-xl font-semibold text-slate-950">
                     Rotina de análise
                   </h3>
-                  <div className="h-px flex-1 bg-slate-200" />
                 </div>
-                <div className="grid items-start gap-6 lg:grid-cols-2">
+                <div className="space-y-4">
                   {hasText(d.measurement.weeklyReview) && (
                     <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
                       <PlainTextField label="Revisão semanal" value={d.measurement.weeklyReview} />
@@ -983,13 +911,12 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
               hasText(d.measurement.adjustCriterion) ||
               hasText(d.measurement.stopCriterion)) && (
               <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <h3 className="shrink-0 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                <div>
+                  <h3 className="text-xl font-semibold text-slate-950">
                     Critérios de decisão
                   </h3>
-                  <div className="h-px flex-1 bg-slate-200" />
                 </div>
-                <div className="grid items-start gap-6 lg:grid-cols-3">
+                <div className="space-y-4">
                   {hasText(d.measurement.keepCriterion) && (
                     <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
                       <PlainTextField
@@ -1020,13 +947,12 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
 
             {(hasText(d.measurement.baseline) || measurementHypotheses.length > 0) && (
               <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <h3 className="shrink-0 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
+                <div>
+                  <h3 className="text-xl font-semibold text-slate-950">
                     Linha de base e hipóteses
                   </h3>
-                  <div className="h-px flex-1 bg-slate-200" />
                 </div>
-                <div className="grid items-start gap-6 lg:grid-cols-2">
+                <div className="space-y-4">
                   {hasText(d.measurement.baseline) && (
                     <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
                       <PlainTextField label="Linha de base" value={d.measurement.baseline} />
@@ -1046,68 +972,64 @@ export default function InstagramPresentation({ data }: InstagramPresentationPro
 
       {hasIntegrationSection && (
         <SectionCard title="Integração com outros canais">
-          {hasText(d.integration.ecosystemRole) && (
-            <div>
-              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
-                Papel no ecossistema
-              </p>
-              <PlainTextField
-                label="Papel do Instagram no ecossistema"
-                value={d.integration.ecosystemRole}
-              />
-            </div>
-          )}
-
-          {(receivesAudienceFrom.length > 0 || directsAudienceTo.length > 0) && (
-            <div>
-              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
-                Fluxo de audiência
-              </p>
-              <div className="grid gap-x-8 sm:grid-cols-2">
+          <div className="space-y-4">
+            {hasText(d.integration.ecosystemRole) && (
+              <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
+                <PlainTextField
+                  label="Papel do Instagram no ecossistema"
+                  value={d.integration.ecosystemRole}
+                />
+              </div>
+            )}
+            {receivesAudienceFrom.length > 0 && (
+              <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
                 <TextList items={receivesAudienceFrom} label="Recebe audiência de" />
+              </div>
+            )}
+            {directsAudienceTo.length > 0 && (
+              <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
                 <TextList items={directsAudienceTo} label="Direciona audiência para" />
               </div>
-            </div>
-          )}
-
-          {(hasText(d.integration.contentRepurposing) || connectionCtas.length > 0) && (
-            <div>
-              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
-                Reaproveitamento e conexão
-              </p>
-              <PlainTextField
-                label="Estratégia de reaproveitamento"
-                value={d.integration.contentRepurposing}
-              />
-              <TextList items={connectionCtas} label="CTAs de conexão entre canais" />
-            </div>
-          )}
-
-          {operationalDependencies.length > 0 && (
-            <div>
-              <p className="mb-3 mt-8 text-base font-semibold uppercase tracking-[0.22em] text-[#5f6f8a]">
-                Dependências operacionais
-              </p>
-              <TextList items={operationalDependencies} label="Recursos e processos necessários" />
-            </div>
-          )}
+            )}
+            {hasText(d.integration.contentRepurposing) && (
+              <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
+                <PlainTextField
+                  label="Estratégia de reaproveitamento"
+                  value={d.integration.contentRepurposing}
+                />
+              </div>
+            )}
+            {connectionCtas.length > 0 && (
+              <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
+                <TextList items={connectionCtas} label="CTAs de conexão entre canais" />
+              </div>
+            )}
+            {operationalDependencies.length > 0 && (
+              <div className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
+                <TextList items={operationalDependencies} label="Recursos e processos necessários" />
+              </div>
+            )}
+          </div>
         </SectionCard>
       )}
       
       {hasExternalReferencesSection && (
         <SectionCard title="Referências externas">
-          <div className="divide-y divide-slate-100">
+          <div className="space-y-4">
             {externalReferenceItems.map((ref) => (
-              <div key={ref.id} className="py-5">
+              <div
+                key={ref.id}
+                className="rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200"
+              >
                 {hasText(ref.title) && (
-                  <p className="text-sm font-medium text-slate-950">{ref.title}</p>
+                  <h3 className="text-base font-semibold text-slate-950">{ref.title}</h3>
                 )}
                 {hasText(ref.url) && (
                   <a
                     href={ref.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="mt-1 block break-all text-xs text-slate-500 hover:text-slate-950"
+                    className="mt-3 block break-all text-sm text-slate-500 hover:text-slate-950"
                   >
                     {ref.url}
                   </a>
